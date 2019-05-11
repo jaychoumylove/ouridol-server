@@ -9,7 +9,7 @@ class WxAPI
 {
     public function __construct($type = 'miniapp')
     {
-        $this->appinfo = Appinfo::get(['type' => $type]);
+        $this->appinfo = Appinfo::get(['type' => $type]); 
     }
 
     /**登录 */
