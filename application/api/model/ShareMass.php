@@ -19,7 +19,7 @@ class ShareMass extends Base
     {
         $item = self::get(['user_id' => $uid]);
         if (!$item) {
-            self::create(['user_id' => $uid, 'mass_uid_list' => '[]']);
+            self::create(['user_id' => $uid]);
             $item = self::get(['user_id' => $uid]);
         }
         if ($item['mass_times'] != 0 && date('Ymd', $item['mass_start_time']) != date('Ymd', time())) {

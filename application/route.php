@@ -4,6 +4,8 @@ use think\Route;
 
 // Test
 Route::rule('test', 'api/Test/index');
+// Clearner
+Route::rule('clean', 'api/v1.Cleaner/index');
 
 // AutoRun 
 Route::rule('api/:version/auto', 'api/AutoRun/index');// 每周执行

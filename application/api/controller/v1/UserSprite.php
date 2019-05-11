@@ -17,6 +17,7 @@ class UserSprite extends Base
     public function settle()
     {
         $user_id = input('user_id');
+        // if(!$user_id) Common::res(['code' => 100]);
         $this->getUser();
 
         $earn = UserSpriteModel::settle($user_id);
