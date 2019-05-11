@@ -18,10 +18,27 @@ class UserRelation extends Base
         if ($ral_user_id == $rer_user_id) return;
         $item = self::get(['ral_user_id' => $ral_user_id]);
         if (!$item) {
+            // 非新人
+            if (UserStar::get(['user_id' => $ral_user_id])) return;
+
             self::create([
                 'rer_user_id' => $rer_user_id,
                 'ral_user_id' => $ral_user_id,
             ]);
+        }
+    }
+
+    /**新用户加入圈子后 修改关系状态 */
+    public static function join($ral_user_id)
+    {
+        $relation = self::get(['ral_user_id' => $ral_user_id]);
+        if ($relation['status'] == 0) {
+            self::where(['ral_user_id' => $ral_user_id])->update(['status' => 1]);
+        }
+
+        // 如果加入了同一个圈子 为师徒关系
+        if (UserStar::where(['user_id' => $relation['rer_user_id']])->value('star_id') == UserStar::where(['user_id' => $ral_user_id])->value('star_id')) {
+            UserFather::join($relation['rer_user_id'], $ral_user_id);
         }
     }
 
@@ -38,13 +55,12 @@ class UserRelation extends Base
                 array_multisort($sort, SORT_DESC, $res);
             } else {
                 $sprite = UserSprite::getInfo($uid);
-                if($sprite['skillone_times'] == 0){
+                if ($sprite['skillone_times'] == 0) {
                     // 给一个虚拟好友
                     $vrUser['user'] = User::where(['id' => 1])->field('id,nickname,avatarurl')->find();
                     $vrUser['sprite']['earn'] = 100;
                     $res[] = $vrUser;
                 }
-                
             }
         } else if ($type = 2) {
             // 师徒页 统计用户今日贡献

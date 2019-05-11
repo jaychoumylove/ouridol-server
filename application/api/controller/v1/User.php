@@ -100,7 +100,7 @@ class User extends Base
         $type = input('type', 0);
 
         $this->getUser();
-        $res = UserRelation::with('User')->where(['rer_user_id' => $this->uid])->select();
+        $res = UserRelation::with('User')->where(['rer_user_id' => $this->uid, 'status' => ['neq', 0]])->select();
         $res = UserRelation::fixByType($type, $res, $this->uid);
         Common::res(['data' => [
             'list' => $res,

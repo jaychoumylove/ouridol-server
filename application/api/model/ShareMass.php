@@ -68,12 +68,12 @@ class ShareMass extends Base
     public static function join($rer, $uid)
     {
         $mass = self::getMass($rer);
+       
         if ($mass['status'] == 1) {
             // 正在集结
             // 检查今日是否已加入集结
-            if (!RecMass::where(['be_mass_uid' => $uid])->whereTime('create_time', 'd')->count()) {
-
-                RecMass::create(['be_mass_uid' => $uid,  'mass_uid' => $rer]);
+            if (!RecMass::where(['be_mass_uid' => $uid])->whereTime('create_time', 'd')->value('id')) {
+                RecMass::create(['be_mass_uid' => $uid, 'mass_uid' => $rer]);
             }
         }
     }

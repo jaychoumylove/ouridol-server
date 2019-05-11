@@ -6,6 +6,8 @@ use app\api\model\ShareMass;
 use app\base\service\Common;
 use app\api\model\UserFather;
 use app\api\model\Cfg;
+use think\Db;
+use app\api\model\UserRelation;
 
 class Share extends Base
 {
@@ -23,14 +25,21 @@ class Share extends Base
         Common::res([]);
     }
 
+    /**
+     * 从分享入口进入每次都会调用该接口
+     */
     public function massJoin()
     {
         $rer_user_id = input('referrer');
         if (!$rer_user_id) Common::res(['code' => 100]);
         $this->getUser();
 
+        // 加入集结
         ShareMass::join($rer_user_id, $this->uid);
+        // 师徒关系
         UserFather::join($rer_user_id, $this->uid);
+        // 拉新关系
+        UserRelation::saveNew($this->uid, $rer_user_id);
         Common::res([]);
     }
 
@@ -42,22 +51,30 @@ class Share extends Base
         Common::res(['data' => $earn]);
     }
 
+    /**师徒关系列表 */
     public function father()
     {
         $this->getUser();
 
-        $res = UserFather::with('User')->where(['father' => $this->uid])->select();
-        if ($res) {
-            foreach ($res as $key => &$value) {
-                $value['user_star'] = $value['user']['user_star'];
-                $value['user_earn'] = ceil(Cfg::getCfg('father_earn_per') * $value['user_star']['thisday_count']);
-                // 排序
-                $sort[$key] = $value['user_star']['thisday_count'];
-            }
-            array_multisort($sort, SORT_DESC, $res);
-        }
-
+        $res = UserFather::getFatherList($this->uid);
 
         Common::res(['data' => $res]);
+    }
+
+    /**获取徒弟的收益 */
+    public function sonEarn()
+    {
+        $sonUid = input('user_id', 0);
+        $this->getUser();
+        $earn = UserFather::sonEarn($this->uid, $sonUid);
+        Common::res(['data' => $earn]);
+    }
+
+    public function checkEarn()
+    {
+        $this->getUser();
+        $cur_contribute = UserFather::where(['father' => $this->uid])->max('cur_contribute');
+        $earn = floor($cur_contribute * Cfg::getCfg('father_earn_per'));
+        Common::res(['data' => $earn]);
     }
 }

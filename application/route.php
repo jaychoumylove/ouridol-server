@@ -43,6 +43,8 @@ Route::rule('api/:version/user/steal/time', 'api/v1.User/stealTime');// 用户�
 Route::rule('api/:version/user/rank', 'api/v1.UserRank/getRank');// 用户贡献排行
 
 Route::rule('api/:version/user/father', 'api/v1.Share/father');// 师徒关系
+Route::rule('api/:version/user/sonearn', 'api/v1.Share/sonEarn');// 获取徒弟收益
+Route::rule('api/:version/user/checkearn', 'api/v1.Share/checkEarn');// 检查是否有土地收益
 
 Route::rule('api/:version/user/sayworld', 'api/v1.User/sayworld');// 世界喊话
 Route::rule('api/:version/user/bind', 'api/v1.User/bindClientId');// 绑定client_id

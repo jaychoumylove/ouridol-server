@@ -86,7 +86,7 @@ class User
                 'rer_user_id' => $uid,
                 'ral_user_id' => $ral_user_id,
             ])->update([
-                'status' => 1,
+                'status' => 2,
             ]);
             if (!$res) Common::res(['code' => 1]);
 
