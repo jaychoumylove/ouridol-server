@@ -105,12 +105,12 @@ class Star extends Base
     public function follow()
     {
         $starid = input('starid');
-        $rer_user_id = input('rer_user_id', null); // 推荐人
+        $rer_user_id = input('rer_user_id', 0); // 推荐人
         if (!$starid) Common::res(['code' => 100]);
         $this->getUser();
 
         UserStar::joinNew($starid, $this->uid);
-        UserRelation::saveNew($this->uid, $rer_user_id);
+        if ($rer_user_id) UserRelation::saveNew($this->uid, $rer_user_id);
         Common::res([]);
     }
 
@@ -132,7 +132,7 @@ class Star extends Base
     {
         $starid = input('starid');
         if (!$starid) Common::res(['code' => 100]);
-        $res = Rec::with(['User'=>['UserStar'=>['Star']]])->where('target_star_id', $starid)->limit(10)->order('id desc')->select();
+        $res = Rec::with(['User ' = > ['UserStar ' = > ['Star']]])->where('target_star_id', $starid)->limit(10)->order('id desc')->select();
 
         Common::res(['data' => $res]);
     }

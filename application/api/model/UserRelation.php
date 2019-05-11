@@ -17,7 +17,7 @@ class UserRelation extends Base
     {
         if ($ral_user_id == $rer_user_id) return;
         $item = self::get(['ral_user_id' => $ral_user_id]);
-        if (!$item && $rer_user_id) {
+        if (!$item) {
             self::create([
                 'rer_user_id' => $rer_user_id,
                 'ral_user_id' => $ral_user_id,
