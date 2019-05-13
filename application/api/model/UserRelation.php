@@ -33,13 +33,12 @@ class UserRelation extends Base
     {
         $relation = self::get(['ral_user_id' => $ral_user_id]);
         if ($relation['status'] == 0) {
+            // 
             self::where(['ral_user_id' => $ral_user_id])->update(['status' => 1]);
         }
 
-        // 如果加入了同一个圈子 为师徒关系
-        if (UserStar::where(['user_id' => $relation['rer_user_id']])->value('star_id') == UserStar::where(['user_id' => $ral_user_id])->value('star_id')) {
-            UserFather::join($relation['rer_user_id'], $ral_user_id);
-        }
+        // 师徒关系
+        UserFather::join($relation['rer_user_id'], $ral_user_id);
     }
 
     public static function fixByType($type, $res, $uid)

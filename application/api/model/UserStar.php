@@ -63,9 +63,21 @@ class UserStar extends Base
     {
         $ext = UserExt::get(['user_id' => $uid]);
         if (time() - $ext['exit_group_time'] > 3600 * 24 * 365 / 2) {
-            // 半年才能推一次
-            self::destroy(['user_id' => $uid]);
-            UserExt::where(['user_id' => $uid])->update(['exit_group_time' => time()]);
+            // 半年才能退一次
+            Db::startTrans();
+            try {
+                // 退圈
+                self::destroy(['user_id' => $uid], true);
+                // 记录退圈时间
+                UserExt::where(['user_id' => $uid])->update(['exit_group_time' => time()]);
+                // 清除师徒关系
+                UserFather::where(['father' => $uid])->whereOr(['son' => $uid])->delete(true);
+
+                Db::commit();
+            } catch (\Exception $e) {
+                Db::rollBack();
+                Common::res(['code' => 400]);
+            }
         } else {
             Common::res(['code' => 1, 'msg' => '退出偶像圈失败，上次退出偶像圈时间为' . date('Y-m-d', $ext['exit_group_time'])]);
         }

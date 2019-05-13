@@ -17,23 +17,15 @@ class UserFather extends Base
 
     public static function getFatherList($uid)
     {
+        self::initFather($uid);
         $res = self::with('User')->where(['father' => $uid])->order('cur_contribute desc,create_time desc')->select();
 
         if ($res) {
-            foreach ($res as $key => &$value) {
+            foreach ($res as &$value) {
                 $value['user_earn'] = floor($value['cur_contribute'] * Cfg::getCfg('father_earn_per'));
             }
         }
 
-        // if (date('Ymd', time()) != $opTime) {
-        //     // 重置
-        //     self::where(['father' => $uid])->update([
-        //         'can_earn_count' => 0,
-        //         'has_earn_count' => 0
-        //     ]);
-
-        //     return self::getFatherList($uid);
-        // }
         return $res;
     }
 
@@ -43,8 +35,8 @@ class UserFather extends Base
         if ($rer_user_id == $uid) return;
         // 师傅必须已加入圈子
         $userStar = UserStar::where(['user_id' => $rer_user_id])->value('star_id');
-        if(!$userStar) return;
-        
+        if (!$userStar) return;
+
         // 师傅与徒弟需在同一个圈子
         if (UserStar::where(['user_id' => $rer_user_id])->value('star_id') != UserStar::where(['user_id' => $uid])->value('star_id')) {
             // Common::res(['msg' => '不是同一圈子']); 
@@ -92,6 +84,20 @@ class UserFather extends Base
             return $earn;
         } else {
             Common::res(['code' => 1]);
+        }
+    }
+
+    public static function initFather($uid)
+    {
+        $opTime = self::where(['father' => $uid])->order('update_time desc')->value('update_time');
+        $opTime = date('Ymd', strtotime($opTime));
+
+        if (date('Ymd', time()) != $opTime) {
+            // 重置
+            self::where(['father' => $uid])->update([
+                'cur_contribute' => 0,
+                'has_earn_count' => 0
+            ]);
         }
     }
 }
