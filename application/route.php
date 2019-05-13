@@ -5,10 +5,11 @@ use think\Route;
 // Test
 Route::rule('test', 'api/Test/index');
 // Clearner
-Route::rule('clean', 'api/v1.Cleaner/index');
+Route::rule('api/:version/clean', 'api/v1.Cleaner/index');
 
 // AutoRun 
-Route::rule('api/:version/auto', 'api/AutoRun/index');// 每周执行
+Route::rule('api/:version/auto/d', 'api/v1.AutoRun/dayHandle');// 每日定期执行
+Route::rule('api/:version/auto/w', 'api/v1.AutoRun/weekHandle');// 每周定期执行
 
 // Star
 Route::rule('api/:version/star/info', 'api/v1.Star/getInfo');// 获取单个明星信息
@@ -43,8 +44,8 @@ Route::rule('api/:version/user/steal/time', 'api/v1.User/stealTime');// 用户�
 Route::rule('api/:version/user/rank', 'api/v1.UserRank/getRank');// 用户贡献排行
 
 Route::rule('api/:version/user/father', 'api/v1.Share/father');// 师徒关系
-Route::rule('api/:version/user/sonearn', 'api/v1.Share/sonEarn');// 获取徒弟收益
-Route::rule('api/:version/user/checkearn', 'api/v1.Share/checkEarn');// 检查是否有土地收益
+Route::rule('api/:version/user/sonearn', 'api/v1.Share/sonEarn');// 领取徒弟收益
+Route::rule('api/:version/user/checkearn', 'api/v1.Share/checkEarn');// 检查是否有徒弟收益
 
 Route::rule('api/:version/user/sayworld', 'api/v1.User/sayworld');// 世界喊话
 Route::rule('api/:version/user/bind', 'api/v1.User/bindClientId');// 绑定client_id

@@ -15,6 +15,7 @@ use app\api\model\UserExt;
 use app\api\model\UserSprite;
 use app\api\model\CfgShare;
 use app\api\model\Cfg;
+use app\base\service\WxAPI;
 
 class User extends Base
 {
@@ -29,6 +30,7 @@ class User extends Base
 
         $res['platform'] = input('platform', null); // 平台
         $res['model'] = input('model', null); // 手机型号
+
         $uid = UserModel::saveUser($res);
         $token = Common::setSession($uid);
 
@@ -40,15 +42,27 @@ class User extends Base
     {
         $this->getUser();
 
-        $data['nickname'] = input('nickName');
-        $data['gender'] = input('gender');
-        $data['language'] = input('language');
-        $data['city'] = input('city');
-        $data['province'] = input('province');
-        $data['country'] = input('country');
-        $data['avatarurl'] = input('avatarUrl');
+        $appid = (new WxAPI())->appinfo['appid'];
+        $sessionKey = UserModel::where(['id' => $this->uid])->value('session_key');
 
-        UserModel::where(['id' => $this->uid])->update($data);
+        $encryptedData = input('encryptedData');
+        $iv = input('iv');
+
+        require_once APP_PATH . 'wx/aes/wxBizDataCrypt.php';
+        $pc = new \WXBizDataCrypt($appid, $sessionKey);
+        $pc->decryptData($encryptedData, $iv, $data);
+
+        $data = json_decode($data, true);
+        $data_t['nickname'] = $data['nickName'];
+        $data_t['gender'] = $data['gender'];
+        $data_t['language'] = $data['language'];
+        $data_t['city'] = $data['city'];
+        $data_t['province'] = $data['province'];
+        $data_t['country'] = $data['country'];
+        $data_t['avatarurl'] = $data['avatarUrl'];
+        $data_t['unionid'] = $data['unionId'];
+
+        UserModel::where(['id' => $this->uid])->update($data_t);
         Common::res([]);
     }
 

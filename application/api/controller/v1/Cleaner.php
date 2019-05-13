@@ -8,6 +8,7 @@ use app\base\service\Common;
 class Cleaner extends Base
 {
 
+    /**转存记录表数据 */
     public function index()
     {
         $clearTime = date('Y-m-d H:i:s', time() - 3600 * 24 * input('day', 30));

@@ -67,8 +67,9 @@ class ShareMass extends Base
     /**加入集结 */
     public static function join($rer, $uid)
     {
+        if ($rer == $uid) return;
         $mass = self::getMass($rer);
-       
+
         if ($mass['status'] == 1) {
             // 正在集结
             // 检查今日是否已加入集结

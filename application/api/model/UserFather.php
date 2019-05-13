@@ -39,7 +39,7 @@ class UserFather extends Base
 
         // 师傅与徒弟需在同一个圈子
         if (UserStar::where(['user_id' => $rer_user_id])->value('star_id') != UserStar::where(['user_id' => $uid])->value('star_id')) {
-            // Common::res(['msg' => '不是同一圈子']); 
+            // Common::res(['msg' => '不是同一圈子']);
             return;
         }
         // 不能是别人徒弟
