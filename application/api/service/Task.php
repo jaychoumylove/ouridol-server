@@ -19,7 +19,7 @@ class Task
     /**检查任务是否完成 */
     public function checkTask($uid, $taskList)
     {
-        // 已领取
+        // 已领取记录
         $recTask = RecTask::where(['user_id' => $uid])->whereTime('create_time', 'd')->column('task_id');
 
         foreach ($taskList as &$task) {
@@ -66,7 +66,7 @@ class Task
                     if (in_array($task['id'], $recTask)) {
                         $task['status'] = 2;
                     } else {
-                        $isDone = RecPayOrder::where(['user_id' => $uid, 'pay_time' => 'not null'])->whereTime('create_time', 'd')->value('id');
+                        $isDone = RecPayOrder::where(['user_id' => $uid])->where('pay_time', 'not null')->whereTime('create_time', 'd')->find();
                         if ($isDone) {
                             $task['status'] = 1;
                         }
