@@ -42,6 +42,7 @@ class User extends Base
     {
         $this->getUser();
 
+        // 解密encryptedData
         $appid = (new WxAPI())->appinfo['appid'];
         $sessionKey = UserModel::where(['id' => $this->uid])->value('session_key');
 
@@ -53,16 +54,16 @@ class User extends Base
         $pc->decryptData($encryptedData, $iv, $data);
 
         $data = json_decode($data, true);
-        $data_t['nickname'] = $data['nickName'];
-        $data_t['gender'] = $data['gender'];
-        $data_t['language'] = $data['language'];
-        $data_t['city'] = $data['city'];
-        $data_t['province'] = $data['province'];
-        $data_t['country'] = $data['country'];
-        $data_t['avatarurl'] = $data['avatarUrl'];
-        $data_t['unionid'] = $data['unionId'];
+        $saveData['nickname'] = $data['nickName'];
+        $saveData['gender'] = $data['gender'];
+        $saveData['language'] = $data['language'];
+        $saveData['city'] = $data['city'];
+        $saveData['province'] = $data['province'];
+        $saveData['country'] = $data['country'];
+        $saveData['avatarurl'] = $data['avatarUrl'];
+        $saveData['unionid'] = $data['unionId'];
 
-        UserModel::where(['id' => $this->uid])->update($data_t);
+        UserModel::where(['id' => $this->uid])->update($saveData);
         Common::res([]);
     }
 
@@ -114,8 +115,7 @@ class User extends Base
         $type = input('type', 0);
 
         $this->getUser();
-        $res = UserRelation::with('User')->where(['rer_user_id' => $this->uid, 'status' => ['neq', 0]])->select();
-        $res = UserRelation::fixByType($type, $res, $this->uid);
+        $res = UserRelation::fixByType($type, $this->uid);
         Common::res(['data' => [
             'list' => $res,
             'award' => Cfg::getCfg('invitAward'),

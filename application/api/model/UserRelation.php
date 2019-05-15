@@ -13,10 +13,17 @@ class UserRelation extends Base
         return $this->belongsTo('User', 'ral_user_id', 'id')->field('id,nickname,avatarurl');
     }
 
+    public function RerUser()
+    {
+        return $this->belongsTo('User', 'rer_user_id', 'id')->field('id,nickname,avatarurl');
+    }
+
     public static function saveNew($ral_user_id, $rer_user_id)
     {
         if ($ral_user_id == $rer_user_id) return;
-        $item = self::get(['ral_user_id' => $ral_user_id]);
+        $item = self::get([
+            'ral_user_id' => $ral_user_id,
+        ]);
         if (!$item) {
             // 非新人
             if (UserStar::get(['user_id' => $ral_user_id])) return;
@@ -29,39 +36,91 @@ class UserRelation extends Base
     }
 
     /**新用户加入圈子后 修改关系状态 */
-    public static function join($ral_user_id)
+    public static function join($starid, $uid)
     {
-        $relation = self::get(['ral_user_id' => $ral_user_id]);
-        if ($relation['status'] == 0) {
-            // 
-            self::where(['ral_user_id' => $ral_user_id])->update(['status' => 1]);
+        $relation = self::where(['ral_user_id' => $uid, 'status' => ['in',  [0, 1, 2]]])->find();
+
+        if ($relation) {
+            self::where(['ral_user_id' => $uid])->update(['status' => 1]);
+            // 判断是否结成师徒关系
+            UserFather::join($relation['rer_user_id'], $uid);
         }
 
-        // 师徒关系
-        UserFather::join($relation['rer_user_id'], $ral_user_id);
+        self::giveFriend($starid, $uid);
     }
 
-    public static function fixByType($type, $res, $uid)
+    /**给新加入圈子的用户5个本圈子内的用户作为初始好友 */
+    public static function giveFriend($starid, $uid)
+    {
+        $num = 5;
+        $exitUser = self::where('rer_user_id', $uid)->column('ral_user_id');
+        $exitUser = array_merge($exitUser, self::where('ral_user_id', $uid)->column('rer_user_id'));
+
+        $userList = UserStar::where(['star_id' => $starid])->where('user_id', 'neq', $uid)->where('user_id', 'not in', $exitUser)
+            ->orderRaw('rand()')->limit($num)->column('user_id');
+
+        foreach ($userList as $value) {
+            UserRelation::create([
+                'rer_user_id' => $uid,
+                'ral_user_id' => $value,
+                'status' => 3,
+            ]);
+        }
+    }
+
+    public static function fixByType($type, $uid)
     {
         if ($type == 1) { // 宠物页面邀请列表，统计收益
+            // 我邀请的人
+            $res = UserRelation::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2, 3]]])->select();
+
+            // 邀请我的人
+            $ralUser = self::with('RerUser')->where(['ral_user_id' => $uid, 'status' => ['in', [1, 2, 3]]])->find();
+            if ($ralUser) {
+                $ralUser['user'] = $ralUser['rer_user'];
+                $ralUser = [$ralUser];
+            } else {
+                $ralUser =  [];
+            }
+
+            // 加上本圈子所有用户
+            // $page = input('page', 1);
+            // $size = input('size', 5);
+            // $myStarid = UserStar::where(['user_id' => $uid])->value('star_id');
+            // // 圈子所有用户ID
+            // $starUserList = UserStar::where(['star_id' => $myStarid])->column('user_id');
+            // $userSpriteList = UserSprite::with('User')->where(['user_id' => ['in', $starUserList]])->order('settle_time asc')->page($page, $size)->select();
+            // $userSpriteList = [];
+
+            $res = array_merge($res, $ralUser);
+
             if ($res) {
                 foreach ($res as $key => &$value) {
-                    $value['sprite'] =  UserSprite::getInfo($value['user']['id']);
+
+                    $value['sprite'] = ['earn' => 0];
+                    if (isset($value['user']['id'])) {
+                        // 精灵收益
+                        $value['sprite'] = UserSprite::getInfo($value['user']['id']);
+                    }
+
                     // 排序
                     $sort[$key] = $value['sprite']['earn'];
                 }
 
                 array_multisort($sort, SORT_DESC, $res);
-            } else {
-                $sprite = UserSprite::getInfo($uid);
-                if ($sprite['skillone_times'] == 0) {
-                    // 给一个虚拟好友
-                    $vrUser['user'] = User::where(['id' => 1])->field('id,nickname,avatarurl')->find();
-                    $vrUser['sprite']['earn'] = 100;
-                    $res[] = $vrUser;
-                }
             }
+            // else {
+            //     $sprite = UserSprite::getInfo($uid);
+            //     if ($sprite['skillone_times'] == 0) {
+            //         // 给一个虚拟好友
+            //         $vrUser['user'] = User::where(['id' => 1])->field('id,nickname,avatarurl')->find();
+            //         $vrUser['sprite']['earn'] = 100;
+            //         $res[] = $vrUser;
+            //     }
+            // }
         } else if ($type = 2) {
+            $res = self::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2]]])->select();
+
             // 师徒页 统计用户今日贡献
             if ($res) {
                 foreach ($res as $key => &$value) {
@@ -72,6 +131,8 @@ class UserRelation extends Base
                 }
                 array_multisort($sort, SORT_DESC, $res);
             }
+        } else {
+            $res = self::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2]]])->select();
         }
 
         return $res;

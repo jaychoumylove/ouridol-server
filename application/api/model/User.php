@@ -2,6 +2,8 @@
 namespace app\api\model;
 
 use app\base\model\Base;
+use app\base\service\Common;
+use think\Db;
 
 class User extends Base
 {
@@ -9,7 +11,12 @@ class User extends Base
     {
         return $this->hasOne('UserStar', 'user_id', 'id');
     }
-    
+
+    public function Sprite()
+    {
+        return $this->hasOne('UserSprite', 'user_id', 'id');
+    }
+
     public static function saveUser($data)
     {
         $user = self::get(['openid' => $data['openid']]);
@@ -27,23 +34,31 @@ class User extends Base
             if (isset($data['unionid']) && $data['unionid']) {
                 $insert['unionid'] = $data['unionid'];
             }
-            $user = self::create($insert);
-            // UserCurrency
-            UserCurrency::create([
-                'uid' => $user['id'],
-            ]);
+            
+            Db::startTrans();
+            try {
+                $user = self::create($insert);
+                // UserCurrency
+                UserCurrency::create([
+                    'uid' => $user['id'],
+                ]);
 
-            // UserExt
-            UserExt::create([
-                'user_id' => $user['id'],
-                'left_time' => json_encode([0, 0, 0, 0, 0]),
-            ]);
+                // UserExt
+                UserExt::create([
+                    'user_id' => $user['id'],
+                    'left_time' => json_encode([0, 0, 0, 0, 0]),
+                ]);
 
-            // UserSprite
-            UserSprite::create([
-                'user_id' => $user['id'],
-                'settle_time' => time(),
-            ]);
+                // UserSprite
+                UserSprite::create([
+                    'user_id' => $user['id'],
+                    'settle_time' => time(),
+                ]);
+                Db::commit();
+            } catch (\Exception $e) {
+                Db::rollBack();
+                Common::res(['code' => 400]);
+            }
         } else {
             self::where(['openid' => $data['openid']])->update(['session_key' => $data['session_key']]);
         }

@@ -14,6 +14,11 @@ class UserSprite extends Base
         return $this->belongsTo('CfgSprite', 'sprite_level', 'level');
     }
 
+    public function User()
+    {
+        return $this->belongsTo('User', 'user_id', 'id')->field('id,nickname,avatarurl');
+    }
+
     /**获取该用户宠物信息 */
     public static function getInfo($uid)
     {
@@ -39,10 +44,10 @@ class UserSprite extends Base
         // 下一级所需灵丹
         $item['need_stone'] = CfgSprite::where(['level' => $item['sprite_level'] + 1])->value('need_stone');
 
-        if($uid == 1){
-            // GM 收益始终显示为100
-            $item['earn'] = 100;
-        }
+        // if($uid == 1){
+        //     // GM 收益始终显示为100
+        //     $item['earn'] = 100;
+        // }
 
         return $item;
     }
@@ -51,21 +56,19 @@ class UserSprite extends Base
     public static function settle($uid)
     {
         $userSprite = self::getInfo($uid);
-        if ($uid != 1) {
-            Db::startTrans();
-            try {
-                self::where(['user_id' => $uid])->update([
-                    'settle_time' => time() - 5,
-                ]);
+        Db::startTrans();
+        try {
+            self::where(['user_id' => $uid])->update([
+                'settle_time' => time() - 5,
+            ]);
 
-                (new User())->change($uid, [
-                    'coin' => $userSprite['earn'],
-                ]);
-                Db::commit();
-            } catch (\Exception $e) {
-                Db::rollBack();
-                Common::res(['code' => 400]);
-            }
+            (new User())->change($uid, [
+                'coin' => $userSprite['earn'],
+            ]);
+            Db::commit();
+        } catch (\Exception $e) {
+            Db::rollBack();
+            Common::res(['code' => 400]);
         }
         return $userSprite['earn'];
     }
@@ -116,14 +119,17 @@ class UserSprite extends Base
     {
         $userSprite = self::getInfo($uid);
         // 技能一等级百分比
-        $myEarn = CfgSpriteSkillone::where(['times' => ['elt', $userSprite['skillone_times']]])->order('times desc')->value('earn');
+        // $myEarn = CfgSpriteSkillone::where(['times' => ['elt', $userSprite['skillone_times']]])->order('times desc')->value('earn');
+
+        // 按被收人的50%
+        $myEarn =  floor($earn * Cfg::getCfg('sprite_percent'));
 
         (new User)->change($uid, [
             'coin' => $myEarn,
         ]);
 
         // 帮被人收集次数+1
-        self::where(['user_id'=>$uid])->update(['skillone_times' => Db::raw('skillone_times+1')]);
+        self::where(['user_id' => $uid])->update(['skillone_times' => Db::raw('skillone_times+1')]);
         return $myEarn;
     }
 

@@ -14,20 +14,26 @@ class Test extends Controller
 
     public function index()
     {
-        echo json_encode([
-            [
-                'title' => '',
-                "imageUrl"  => '',
-            ],
-            [
-                'title' => '',
-                "imageUrl"  => '',
-            ],
-            [
-                'title' => '',
-                "imageUrl"  => '',
-            ],
-        ], true);
+        // echo json_encode([
+        //     [
+        //         'title' => '',
+        //         "imageUrl"  => '',
+        //     ],
+        //     [
+        //         'title' => '',
+        //         "imageUrl"  => '',
+        //     ],
+        //     [
+        //         'title' => '',
+        //         "imageUrl"  => '',
+        //     ],
+        // ], true);
+        // phpinfo();
+
+        ini_set('memory_limit', '128M');
+        $string = str_pad('1', 128 * 1024 * 1024);
+        // dump(memory_get_usage());
+        // Common::res(['data'=>1]);
     }
     // {
     //     // dump(Common::request('https://weibointl.api.weibo.cn/share/68524895.html?weibo_id=4366752424995193', false));

@@ -97,6 +97,8 @@ class Task
                     break;
                 case 7:
                     // 观看广告
+                    
+
                     break;
                 case 8:
                     // 微博发帖
@@ -114,7 +116,7 @@ class Task
                     if (in_array($task['id'], $recTask)) {
                         $task['status'] = 2;
                     } else {
-                        $isDone = UserRelation::where(['rer_user_id' => $uid])->whereTime('create_time', 'd')->find();
+                        $isDone = UserRelation::where(['rer_user_id' => $uid])->where('status', 'neq', 3)->whereTime('create_time', 'd')->find();
                         if ($isDone) {
                             $task['status'] = 1;
                         }

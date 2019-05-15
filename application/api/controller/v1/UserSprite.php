@@ -10,6 +10,7 @@ class UserSprite extends Base
     public function info()
     {
         $user_id = input('user_id');
+        if (!$user_id) Common::res(['code' => 100]);
         $res = UserSpriteModel::getInfo($user_id);
         Common::res(['data' => $res]);
     }
@@ -17,7 +18,7 @@ class UserSprite extends Base
     public function settle()
     {
         $user_id = input('user_id');
-        // if(!$user_id) Common::res(['code' => 100]);
+        if(!$user_id) Common::res(['code' => 100]);
         $this->getUser();
 
         $earn = UserSpriteModel::settle($user_id);
