@@ -25,11 +25,8 @@ class Common
         } else {
             $return['data'] = [];
         }
-      
-        $return['memory_get_usage'] = memory_get_usage();
-        header('Access-Control-Allow-Origin:*');
-        error_reporting("E_ALL");
-        exit(json_encode($return, JSON_UNESCAPED_UNICODE));
+
+        die(json_encode($return, JSON_UNESCAPED_UNICODE));
     }
 
     /**服务端基础curl */
@@ -86,7 +83,7 @@ class Common
             return $uid;
         }
     }
-    
+
     /**将array转换为xml */
     public static function toXml($data)
     {
@@ -120,5 +117,5 @@ class Common
         }
         return $str;
     }
-
+    
 }

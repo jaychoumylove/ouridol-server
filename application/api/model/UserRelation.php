@@ -75,7 +75,7 @@ class UserRelation extends Base
             $res = UserRelation::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2, 3]]])->select();
 
             // 邀请我的人
-            $ralUser = self::with('RerUser')->where(['ral_user_id' => $uid, 'status' => ['in', [1, 2, 3]]])->find();
+            $ralUser = self::with('RerUser')->where(['ral_user_id' => $uid, 'status' => ['in', [1, 2]]])->find();
             if ($ralUser) {
                 $ralUser['user'] = $ralUser['rer_user'];
                 $ralUser = [$ralUser];

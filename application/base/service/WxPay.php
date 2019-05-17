@@ -3,13 +3,18 @@ namespace app\base\service;
 
 class WxPay
 {
+    public function __construct($type = 'miniapp')
+    {
+        $this->appinfo = Appinfo::get(['type' => $type]);
+    }
+    
     public function returnFont($res)
     {
         if ($res['result_code'] == 'SUCCESS') {
             if ($res['trade_type'] == 'JSAPI') {
                 // JSAPI支付
                 $returnData = [
-                    'appId' => (new WxAPI())->appinfo['appid'],
+                    'appId' => $this->appinfo['appid'],
                     'timeStamp' => (string)time(),
                     'nonceStr' => $res['nonce_str'],
                     'package' => 'prepay_id=' . $res['prepay_id'],
@@ -36,7 +41,7 @@ class WxPay
             }
         }
         $stringA = implode("&", $newArr);         //使用 & 符号连接参数
-        $payapikey = (new WxAPI())->appinfo['payapikey'];
+        $payapikey = $this->appinfo['payapikey'];
         $stringSignTemp = $stringA . "&key=" . $payapikey;        //拼接key
         // key是在商户平台API安全里自己设置的
         $stringSignTemp = MD5($stringSignTemp);       //将字符串进行MD5加密

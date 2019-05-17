@@ -8,7 +8,7 @@ use app\base\service\Common;
 class UserSprite extends Base
 {
     public function info()
-    {
+    {   
         $user_id = input('user_id');
         if (!$user_id) Common::res(['code' => 100]);
         $res = UserSpriteModel::getInfo($user_id);

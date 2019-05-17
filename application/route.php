@@ -11,6 +11,9 @@ Route::rule('api/:version/clean', 'api/v1.Cleaner/index');
 Route::rule('api/:version/auto/d', 'api/v1.AutoRun/dayHandle');// 每日定期执行
 Route::rule('api/:version/auto/w', 'api/v1.AutoRun/weekHandle');// 每周定期执行
 
+// Notify
+Route::get('api/:version/notify/receive', 'api/v1.Notify/receive');// 客服消息推送
+
 // Star
 Route::rule('api/:version/star/info', 'api/v1.Star/getInfo');// 获取单个明星信息
 Route::rule('api/:version/star/chart', 'api/v1.Star/getChart');// 获取明星圈子聊天内容

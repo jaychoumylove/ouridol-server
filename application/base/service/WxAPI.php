@@ -12,7 +12,9 @@ class WxAPI
         $this->appinfo = Appinfo::get(['type' => $type]); 
     }
 
-    /**登录 */
+    /**
+     * 登录
+     */
     public function code2session($js_code)
     {
         $url = 'https://api.weixin.qq.com/sns/jscode2session?appid=APPID&secret=SECRET&js_code=JSCODE&grant_type=authorization_code';

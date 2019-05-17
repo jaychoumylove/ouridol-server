@@ -7,6 +7,7 @@ use app\base\service\Common;
 use app\api\model\StarRank;
 use app\api\model\Star;
 use think\Db;
+use GatewayClient\Gateway;
 
 class Test extends Controller
 {
@@ -30,8 +31,14 @@ class Test extends Controller
         // ], true);
         // phpinfo();
 
-        ini_set('memory_limit', '128M');
-        $string = str_pad('1', 128 * 1024 * 1024);
+        // ini_set('memory_limit', '128M');
+        // $string = str_pad('1', 128 * 1024 * 1024);
+
+
+        Gateway::sendToGroup('star_' . 1, json_encode([
+            'type' => 'chartMsg',
+            'data' => 'hello'
+        ], JSON_UNESCAPED_UNICODE));
         // dump(memory_get_usage());
         // Common::res(['data'=>1]);
     }

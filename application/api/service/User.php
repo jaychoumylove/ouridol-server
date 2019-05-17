@@ -29,7 +29,7 @@ class User
      * 货币变动
      * @params int $uid
      * @params array $currency 货币增减额
-     * @params array $rec 日志存入
+     * @params array $rec 日志存入 ['type' => 1, 'target_user_id' => 2, 'target_star_id' => 3]
      */
     public function change($uid, $currency, $rec = null)
     {

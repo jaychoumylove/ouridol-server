@@ -27,9 +27,8 @@ class ShareMass extends Base
             self::where(['user_id' => $uid])->update(['mass_times' => 0]);
             $item['mass_times'] = 0;
         }
-        // 集结用户信息
-        $item['mass_user'] = RecMass::with('User')->where(['mass_uid' => $uid])->whereTime('create_time', '>', $item['mass_start_time'])->select();
 
+        $item['mass_user'] = [];
         // 集结状态
         $massConfig = Cfg::getCfg('share_mass');
         if (time() - $item['mass_settle_time'] < $massConfig['cooling']) {
@@ -40,6 +39,10 @@ class ShareMass extends Base
             // 正在集结
             $item['status'] = 1;
             $item['lefttime'] = $massConfig['duration'] - time() + $item['mass_start_time'];
+
+            // 集结用户信息
+            $item['mass_user'] = RecMass::with('User')->where(['mass_uid' => $uid])
+                ->whereTime('create_time', '>', $item['mass_start_time'])->select();
         } else {
             // 可开始新的集结
             $item['status'] = 0;
@@ -79,6 +82,7 @@ class ShareMass extends Base
         }
     }
 
+    /**集结结算 */
     public static function settle($uid)
     {
         $mass = self::getMass($uid);
@@ -92,6 +96,8 @@ class ShareMass extends Base
 
             (new UserService())->change($uid, [
                 'coin' => $earn
+            ], [
+                'type' => 6
             ]);
 
             Db::commit();

@@ -8,6 +8,7 @@ use think\Db;
 use app\api\model\StarRankHistory;
 use app\api\model\UserStar;
 use app\api\model\UserCurrency;
+use app\api\model\OtherLock;
 
 class AutoRun extends Base
 {
@@ -36,6 +37,17 @@ class AutoRun extends Base
     /**每周执行 */
     public function weekHandle()
     {
+        if (date("w") != 1) {
+            die('today is not monday!');
+        }
+
+        $opTime = OtherLock::where('1=1')->max('update_time');
+        if (date('oW', time()) == date('oW', strtotime($opTime))) {
+            die('this week has executed the method!');
+        }
+        // lock
+        OtherLock::where('1=1')->update(['islock' => 1]);
+
         Db::startTrans();
         try {
             // 用户能量每周清零
@@ -63,8 +75,12 @@ class AutoRun extends Base
             Db::commit();
         } catch (\Exception $e) {
             Db::rollBack();
+
             die('rollBack');
         }
+
+        OtherLock::where('1=1')->update(['islock' => 0]);
+
 
         die('done');
     }

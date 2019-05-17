@@ -26,7 +26,7 @@ class Star extends Base
 
         $starService = new StarService();
         $star['star_rank']['week_hot_rank'] = $starService->getRank($star['star_rank']['week_hot'], 'week_hot');
-        $star['star_rank']['month_hot_rank'] = $starService->getRank($star['star_rank']['month_hot'], 'month_hot');
+        // $star['star_rank']['month_hot_rank'] = $starService->getRank($star['star_rank']['month_hot'], 'month_hot');
 
         Common::res(['data' => $star]);
     }

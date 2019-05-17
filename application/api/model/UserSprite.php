@@ -117,7 +117,7 @@ class UserSprite extends Base
     /**帮别人收 获得利益 */
     public static function getTip($earn, $uid)
     {
-        $userSprite = self::getInfo($uid);
+        // $userSprite = self::getInfo($uid);
         // 技能一等级百分比
         // $myEarn = CfgSpriteSkillone::where(['times' => ['elt', $userSprite['skillone_times']]])->order('times desc')->value('earn');
 
@@ -126,6 +126,8 @@ class UserSprite extends Base
 
         (new User)->change($uid, [
             'coin' => $myEarn,
+        ],[
+            'type' => 4,
         ]);
 
         // 帮被人收集次数+1

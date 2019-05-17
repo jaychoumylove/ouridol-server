@@ -3,7 +3,6 @@ namespace app\base\controller;
 
 use think\Controller;
 use app\base\service\Common;
-use app\api\model\Cfg;
 
 class Base extends Controller
 {
@@ -22,5 +21,4 @@ class Base extends Controller
         $this->uid = Common::getSession($token);
         if (!$this->uid) Common::res(['code' => 201]);
     }
-    
 }

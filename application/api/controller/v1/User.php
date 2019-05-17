@@ -75,7 +75,7 @@ class User extends Base
             $uid = $this->uid;
         }
 
-        $res = UserModel::where(['id' => $uid])->field('id,nickname,avatarurl')->find();
+        $res = UserModel::where(['id' => $uid])->field('id,nickname,avatarurl,type')->find();
         Common::res(['data' => $res]);
     }
 

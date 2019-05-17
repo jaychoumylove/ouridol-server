@@ -32,29 +32,31 @@ class UserStar extends Base
     /**贡献度改变 */
     public static function change($uid, $starid, $hot)
     {
-        $item = self::get(['user_id' => $uid, 'star_id' => $starid]);
-        if ($item) {
-            self::where(['user_id' => $uid, 'star_id' => $starid])->update([
-                'total_count' => Db::raw('total_count+' . $hot),
-                'thisweek_count' => Db::raw('thisweek_count+' . $hot),
-                'thismonth_count' => Db::raw('thismonth_count+' . $hot),
-                'thisday_count' => Db::raw('thisday_count+' . $hot),
-            ]);
-        } else {
-            Common::res(['code' => 301]);
-        }
+        self::where(['user_id' => $uid, 'star_id' => $starid])->update([
+            'total_count' => Db::raw('total_count+' . $hot),
+            'thisweek_count' => Db::raw('thisweek_count+' . $hot),
+            'thismonth_count' => Db::raw('thismonth_count+' . $hot),
+            'thisday_count' => Db::raw('thisday_count+' . $hot),
+        ]);
     }
 
     /**加入爱豆圈子 */
     public static function joinNew($starid, $uid)
     {
-        $item = self::get(['user_id' => $uid, 'star_id' => $starid]);
-        if ($item) {
-            Common::res(['code' => 302]);
-        } else {
-            self::create([
-                'user_id' => $uid, 'star_id' => $starid
-            ]);
+        Db::startTrans();
+        try {
+            if (self::get(['user_id' => $uid, 'star_id' => $starid])) {
+                Common::res(['code' => 302]);
+            } else {
+                self::create([
+                    'user_id' => $uid, 'star_id' => $starid
+                ]);
+            }
+
+            Db::commit();
+        } catch (\Exception $e) {
+            Db::rollBack();
+            Common::res(['code' => 400]);
         }
     }
 
