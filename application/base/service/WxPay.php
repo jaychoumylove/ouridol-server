@@ -1,6 +1,8 @@
 <?php
 namespace app\base\service;
 
+use app\base\model\Appinfo;
+
 class WxPay
 {
     public function __construct($type = 'miniapp')
