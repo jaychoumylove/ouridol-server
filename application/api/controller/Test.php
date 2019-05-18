@@ -8,6 +8,9 @@ use app\api\model\StarRank;
 use app\api\model\Star;
 use think\Db;
 use GatewayClient\Gateway;
+use think\Log;
+use think\Cache;
+use app\base\service\WxAPI;
 
 class Test extends Controller
 {
@@ -15,52 +18,43 @@ class Test extends Controller
 
     public function index()
     {
+        $res = (new WxAPI('wx7dc912994c80d9ac'))->uploadMedia(ROOT_PATH . 'public' . DS . 'test.png');
+        dump($res);
+
+        //    cache(' test ',1);
+        //    cache(' test ',2);
+
+        //    dump(cache(' test '));
+
+        // Cache::set(' lockSend ', [
+        //     ' isLock ' => 1,
+        //     ' time ' => time()
+        // ]);
+        // die(Log::record(' hello ', ' error '));
         // echo json_encode([
         //     [
-        //         'title' => '',
-        //         "imageUrl"  => '',
+        //         ' title ' => ' ',
+        //         "imageUrl"  => ' ',
         //     ],
         //     [
-        //         'title' => '',
-        //         "imageUrl"  => '',
+        //         ' title ' => ' ',
+        //         "imageUrl"  => ' ',
         //     ],
         //     [
-        //         'title' => '',
-        //         "imageUrl"  => '',
+        //         ' title ' => ' ',
+        //         "imageUrl"  => ' ',
         //     ],
         // ], true);
         // phpinfo();
 
-        // ini_set('memory_limit', '128M');
-        // $string = str_pad('1', 128 * 1024 * 1024);
+        // ini_set(' memory_limit ', ' 128 M ');
+        // $string = str_pad(' 1 ', 128 * 1024 * 1024);
 
 
-        Gateway::sendToGroup('star_' . 1, json_encode([
-            'type' => 'chartMsg',
-            'data' => 'hello'
-        ], JSON_UNESCAPED_UNICODE));
+        // include_once APP_PATH . ' wx / crypto / wxBizMsgCrypt . php ';
+        // require_once APP_PATH . ' wx / aes / wxBizDataCrypt . php ';
+
         // dump(memory_get_usage());
-        // Common::res(['data'=>1]);
+        // Common::res([' data'=>1]);
     }
-    // {
-    //     // dump(Common::request('https://weibointl.api.weibo.cn/share/68524895.html?weibo_id=4366752424995193', false));
-    //     $starid = Star::where('1=1')->column('id');
-
-    //     foreach ($starid as $key => $value) {
-
-    //         $in[] = [
-    //             'id' => $value,
-    //             'star_id' => $value,
-    //             'week_hot' => 10000,
-    //         ];
-    //     }
-
-    //     StarRank::insertAll($in);$in = [];
-
-
-
-    //     // StarRank::where('1=1')->delete(true);
-
-
-
 }

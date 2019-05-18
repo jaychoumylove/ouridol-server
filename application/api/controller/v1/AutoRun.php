@@ -9,6 +9,7 @@ use app\api\model\StarRankHistory;
 use app\api\model\UserStar;
 use app\api\model\UserCurrency;
 use app\api\model\OtherLock;
+use think\Cache;
 
 class AutoRun extends Base
 {
@@ -37,16 +38,20 @@ class AutoRun extends Base
     /**每周执行 */
     public function weekHandle()
     {
-        if (date("w") != 1) {
-            die('today is not monday!');
+        // if (date("w") != 1) {
+        //     die('今日不是星期一');
+        // }
+
+        $opTime = Cache::get('lockSend')['time'];
+        if (date('oW', time()) == date('oW', $opTime)) {
+            die('本周已执行过');
         }
 
-        $opTime = OtherLock::where('1=1')->max('update_time');
-        if (date('oW', time()) == date('oW', strtotime($opTime))) {
-            die('this week has executed the method!');
-        }
         // lock
-        OtherLock::where('1=1')->update(['islock' => 1]);
+        Cache::set('lockSend', [
+            'isLock' => 1,
+            'time' => time()
+        ]);
 
         Db::startTrans();
         try {
@@ -79,8 +84,10 @@ class AutoRun extends Base
             die('rollBack');
         }
 
-        OtherLock::where('1=1')->update(['islock' => 0]);
-
+        Cache::set('lockSend', [
+            'isLock' => 0,
+            'time' => time()
+        ]);
 
         die('done');
     }

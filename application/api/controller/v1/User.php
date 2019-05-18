@@ -43,7 +43,7 @@ class User extends Base
         $this->getUser();
 
         // 解密encryptedData
-        $appid = (new WxAPI())->appinfo['appid'];
+        $appid = (new WxAPI('miniapp'))->appinfo['appid'];
         $sessionKey = UserModel::where(['id' => $this->uid])->value('session_key');
 
         $encryptedData = input('encryptedData');

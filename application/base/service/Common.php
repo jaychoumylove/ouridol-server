@@ -3,6 +3,7 @@
 namespace app\base\service;
 
 use app\api\model\Cfg;
+use app\base\model\Appinfo;
 
 class Common
 {
@@ -26,6 +27,7 @@ class Common
             $return['data'] = [];
         }
 
+        header('Access-Control-Allow-Origin:*');
         die(json_encode($return, JSON_UNESCAPED_UNICODE));
     }
 
@@ -117,5 +119,21 @@ class Common
         }
         return $str;
     }
-    
+
+    /**
+     * 获取微信APP信息
+     * @param string $w appid或type 默认miniapp
+     */
+    public static function getAppinfo($w)
+    {
+        if ($w) {
+            $appinfo = Appinfo::get(['appid' => $w]);
+            if (!$appinfo) $appinfo = Appinfo::get(['type' => $w]);
+            if (!$appinfo) $appinfo = Appinfo::get(['type' => 'miniapp']);
+        } else {
+            $appinfo = Appinfo::get(['type' => 'miniapp']);
+        }
+
+        return $appinfo;
+    }
 }

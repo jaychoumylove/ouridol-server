@@ -9,7 +9,7 @@ class User extends Base
 {
     public function UserStar()
     {
-        return $this->hasOne('UserStar', 'user_id', 'id');
+        return $this->hasOne('UserStar', 'user_id', 'id', [], 'LEFT');
     }
 
     public function Sprite()
@@ -17,31 +17,41 @@ class User extends Base
         return $this->hasOne('UserSprite', 'user_id', 'id');
     }
 
+    /**
+     * 创建一个新用户
+     */
     public static function saveUser($data)
     {
-        $user = self::get(['openid' => $data['openid']]);
-        if (!$user) {
-            // 新用户
-            // User
-            $shortCode = strtoupper(substr(md5(md5($data['openid'])), 0, 6));
-            $insert = [
-                'openid' => $data['openid'],
-                'session_key' => $data['session_key'],
-                'ident_code' => $shortCode,
-                'platform' => $data['platform'],
-                'model' => $data['model'],
-            ];
-            if (isset($data['unionid']) && $data['unionid']) {
-                $insert['unionid'] = $data['unionid'];
-            }
-            
-            Db::startTrans();
-            try {
+        Db::startTrans();
+        try {
+            $user = self::get(['openid' => $data['openid']]);
+            if (!$user) {
+                // 新用户
+                // User
+                $shortCode = strtoupper(substr(md5(md5($data['openid'])), 0, 6));
+                $insert = [
+                    'openid' => $data['openid'],
+                    'unionid' => isset($data['unionid']) ? $data['unionid'] : null,
+                    'session_key' => isset($data['session_key']) ? $data['session_key'] : null,
+                    'ident_code' => $shortCode,
+                    'platform' => isset($data['platform']) ? $data['platform'] : null,
+                    'model' => isset($data['model']) ? $data['model'] : null,
+                    'type' => isset($data['type']) ? $data['type'] : 0,
+                    'nickname' => isset($data['nickname']) ? $data['nickname'] : null,
+                    'avatarurl' => isset($data['avatarurl']) ? $data['avatarurl'] : null,
+                ];
+
                 $user = self::create($insert);
                 // UserCurrency
-                UserCurrency::create([
+                $currency = [
                     'uid' => $user['id'],
-                ]);
+                ];
+                if (isset($data['type']) && $data['type'] == 1) {
+                    $currency['coin'] =  100000;
+                    $currency['stone'] =  300;
+                    $currency['trumpet'] =  100;
+                }
+                UserCurrency::create($currency);
 
                 // UserExt
                 UserExt::create([
@@ -54,15 +64,31 @@ class User extends Base
                     'user_id' => $user['id'],
                     'settle_time' => time(),
                 ]);
-                Db::commit();
-            } catch (\Exception $e) {
-                Db::rollBack();
-                Common::res(['code' => 400]);
+            } else {
+                self::where(['openid' => $data['openid']])->update(['session_key' => $data['session_key']]);
             }
-        } else {
-            self::where(['openid' => $data['openid']])->update(['session_key' => $data['session_key']]);
+
+            Db::commit();
+        } catch (\Exception $e) {
+            Db::rollBack();
+            Common::res(['code' => 400]);
         }
 
         return $user['id'];
+    }
+
+    /**创建虚拟用户 */
+    public static function createVirtualUser($data)
+    {
+        $vrNickname = OtherFakeUser::where('1=1')->orderRaw('rand()')->value('nickname');
+        $vrAvatar = OtherFakeUser::where('1=1')->orderRaw('rand()')->value('avatar');
+
+        return self::saveUser([
+            'openid' => $data['openid'],
+            'unionid' => $data['unionid'],
+            'nickname' => $vrNickname,
+            'avatarurl' => $vrAvatar,
+            'type' => 1 // 虚拟用户type
+        ]);
     }
 }

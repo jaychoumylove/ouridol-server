@@ -48,7 +48,6 @@ class PKCS7Encoder
 		}
 		return substr($text, 0, (strlen($text) - $pad));
 	}
-
 }
 
 /**
@@ -60,7 +59,7 @@ class Prpcrypt
 {
 	public $key;
 
-	function Prpcrypt($k)
+	function __construct($k)
 	{
 		$this->key = base64_decode($k . "=");
 	}
@@ -74,21 +73,28 @@ class Prpcrypt
 	{
 
 		try {
-			//获得16位随机字符串，填充到明文之前
+			// //获得16位随机字符串，填充到明文之前
+			// $random = $this->getRandomStr();
+			// $text = $random . pack("N", strlen($text)) . $text . $appid;
+			// // 网络字节序
+			// $size = mcrypt_get_block_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
+			// $module = mcrypt_module_open(MCRYPT_RIJNDAEL_128, '', MCRYPT_MODE_CBC, '');
+			// $iv = substr($this->key, 0, 16);
+			// //使用自定义的填充方式对明文进行补位填充
+			// $pkc_encoder = new PKCS7Encoder;
+			// $text = $pkc_encoder->encode($text);
+			// mcrypt_generic_init($module, $this->key, $iv);
+			// //加密
+			// $encrypted = mcrypt_generic($module, $text);
+			// mcrypt_generic_deinit($module);
+			// mcrypt_module_close($module);
+
 			$random = $this->getRandomStr();
 			$text = $random . pack("N", strlen($text)) . $text . $appid;
-			// 网络字节序
-			$size = mcrypt_get_block_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
-			$module = mcrypt_module_open(MCRYPT_RIJNDAEL_128, '', MCRYPT_MODE_CBC, '');
 			$iv = substr($this->key, 0, 16);
-			//使用自定义的填充方式对明文进行补位填充
 			$pkc_encoder = new PKCS7Encoder;
 			$text = $pkc_encoder->encode($text);
-			mcrypt_generic_init($module, $this->key, $iv);
-			//加密
-			$encrypted = mcrypt_generic($module, $text);
-			mcrypt_generic_deinit($module);
-			mcrypt_module_close($module);
+			$encrypted = openssl_encrypt($text, 'AES-256-CBC', $this->key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $iv);
 
 			//print(base64_encode($encrypted));
 			//使用BASE64对加密后的字符串进行编码
@@ -109,15 +115,19 @@ class Prpcrypt
 
 		try {
 			//使用BASE64对需要解密的字符串进行解码
-			$ciphertext_dec = base64_decode($encrypted);
-			$module = mcrypt_module_open(MCRYPT_RIJNDAEL_128, '', MCRYPT_MODE_CBC, '');
-			$iv = substr($this->key, 0, 16);
-			mcrypt_generic_init($module, $this->key, $iv);
+			// $ciphertext_dec = base64_decode($encrypted);
+			// $module = mcrypt_module_open(MCRYPT_RIJNDAEL_128, '', MCRYPT_MODE_CBC, '');
+			// $iv = substr($this->key, 0, 16);
+			// mcrypt_generic_init($module, $this->key, $iv);
 
-			//解密
-			$decrypted = mdecrypt_generic($module, $ciphertext_dec);
-			mcrypt_generic_deinit($module);
-			mcrypt_module_close($module);
+			// //解密
+			// $decrypted = mdecrypt_generic($module, $ciphertext_dec);
+			// mcrypt_generic_deinit($module);
+			// mcrypt_module_close($module);
+
+			$ciphertext_dec = base64_decode($encrypted);
+			$iv = substr($this->key, 0, 16);
+			$decrypted = openssl_decrypt($ciphertext_dec, 'AES-256-CBC', $this->key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $iv);
 		} catch (Exception $e) {
 			return array(ErrorCode::$DecryptAESError, null);
 		}
@@ -142,7 +152,6 @@ class Prpcrypt
 		if ($from_appid != $appid)
 			return array(ErrorCode::$ValidateAppidError, null);
 		return array(0, $xml_content);
-
 	}
 
 
@@ -161,7 +170,4 @@ class Prpcrypt
 		}
 		return $str;
 	}
-
 }
-
-?>

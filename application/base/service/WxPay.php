@@ -1,13 +1,11 @@
 <?php
 namespace app\base\service;
 
-use app\base\model\Appinfo;
-
 class WxPay
 {
-    public function __construct($type = 'miniapp')
+    public function __construct($w = null)
     {
-        $this->appinfo = Appinfo::get(['type' => $type]);
+        $this->appinfo = Common::getAppinfo($w);
     }
     
     public function returnFont($res)
@@ -23,7 +21,6 @@ class WxPay
                     'signType' => 'MD5',
                 ];
                 $returnData['paySign'] = $this->makeSign($returnData);
-                unset($returnData['appId']);
             }
 
             Common::res(['data' => $returnData]);

@@ -3,25 +3,28 @@ namespace app\base\service;
 
 class WxMsg
 {
-    public function __construct($type = 'miniapp')
+    public function __construct($w = null)
     {
-        $this->appinfo = Appinfo::get(['type' => $type]);
+        $this->appinfo = Common::getAppinfo($w);
     }
 
+    /**
+     * 解密并返回用户发送的消息体
+     * @return array 消息体
+     */
     public function getMsg()
     {
-        $wxapi = new WxAPI('gzh');
-        $wxapi->getAccessToken();
+        require_once APP_PATH . 'wx/crypto/wxBizMsgCrypt.php';
+        $pc = new \WXBizMsgCrypt($this->appinfo['signature_token'], $this->appinfo['encoding_aes_key'], $this->appinfo['appid']);
+        $xmlData = file_get_contents('php://input');
+        $msg = '';
+        $pc->decryptMsg(input('msg_signature'), input('timestamp'), input('nonce'), $xmlData, $msg);
 
-        require_once APP_PATH . 'wx/crypto/WXBizMsgCrypt.php';
-        $pc = new \WXBizMsgCrypt($wxapi->appinfo['access_token'], $wxapi->appinfo['encoding_aes_key'], $wxapi->appinfo['appid']);
-        $encryptMsg = '';
-        $errCode = $pc->encryptMsg($text, $timeStamp, $nonce, $encryptMsg);
+        return Common::fromXml($msg);
     }
 
     /**
      * 验证消息signature
-     * @param string $token signature_token
      */
     public function checkSignature()
     {
@@ -31,6 +34,7 @@ class WxMsg
         $echostr = input('echostr');
 
         $token = $this->appinfo['signature_token'];
+
         $tmpArr = array($token, $timestamp, $nonce);
         sort($tmpArr, SORT_STRING);
         $tmpStr = implode($tmpArr);
@@ -42,5 +46,22 @@ class WxMsg
         } else {
             die();
         }
+    }
+
+    /**
+     * 自动回复
+     * @param array $msgFrom 消息来源
+     */
+    public function autoSend($msgFrom, $msgType, $msgBody)
+    {
+        $content = [
+            'ToUserName' => $msgFrom['FromUserName'],
+            'FromUserName' => $msgFrom['ToUserName'],
+            'CreateTime' => time(),
+            'MsgType' => $msgType,
+        ];
+
+        $content = array_merge($content, $msgBody);
+        die(Common::toXml($content));
     }
 }

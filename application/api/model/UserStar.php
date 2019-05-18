@@ -45,19 +45,48 @@ class UserStar extends Base
     {
         Db::startTrans();
         try {
-            if (self::get(['user_id' => $uid, 'star_id' => $starid])) {
-                Common::res(['code' => 302]);
-            } else {
+            $userType = User::where('id', $uid)->value('type');
+            if ($userType == 1) {
+                $uid = self::getVirtualUser($starid, $uid);
+            }
+
+            if (!self::get(['user_id' => $uid, 'star_id' => $starid])) {
+                // Common::res(['code' => 302]);
                 self::create([
                     'user_id' => $uid, 'star_id' => $starid
                 ]);
             }
-
             Db::commit();
         } catch (\Exception $e) {
             Db::rollBack();
             Common::res(['code' => 400]);
         }
+    }
+
+    /**
+     * 获取该管理员在该圈子的虚拟用户
+     * @param mixed $uid 管理员uid
+     * @return mixed 虚拟用户uid
+     */
+    public static function getVirtualUser($starid, $uid)
+    {
+        $user = User::where('id', $uid)->find();
+        $oldStarid = UserStar::where('user_id', $uid)->value('star_id');
+        if (!$oldStarid) $oldStarid = 0;
+        // 旧 带上starid后缀
+        User::where('id', $uid)->update(['openid' => $user['openid'] . '@' . $oldStarid]);
+
+        $virtualUid = User::where(['openid' => $user['openid'] . '@' . $starid])->value('id');
+        if (!$virtualUid) {
+            $virtualUid = User::createVirtualUser([
+                'openid' => $user['openid'],
+                'unionid' => $user['unionid'],
+            ]);
+        } else {
+            User::where(['openid' => $user['openid'] . '@' . $starid])->update(['openid' => $user['openid']]);
+        }
+
+        return $virtualUid;
     }
 
     /**退出偶像圈 */

@@ -9,6 +9,8 @@ use app\api\model\Rec;
 use app\api\model\Cfg;
 use app\api\model\UserRelation;
 use app\api\model\UserFather;
+use app\api\model\OtherLock;
+use think\Cache;
 
 class Star
 {
@@ -20,6 +22,10 @@ class Star
 
     public function sendHot($starid, $hot, $uid)
     {
+        if (Cache::get('lockSend')['isLock'] == 1) {
+            Common::res(['code' => 1, 'msg' => '榜单结算中，请稍后再试！']);
+        }
+
         Db::startTrans();
         try {
             // 用户贡献度增加
