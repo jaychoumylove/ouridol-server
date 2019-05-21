@@ -11,9 +11,11 @@ class Article extends Base
     public function getArticle()
     {
         $id = input('id');
-
+        $id_str = input('id_str');
         if ($id) {
             $w = ['id' => $id];
+        } else if ($id_str) {
+            $w = ['id_str' => $id_str];
         } else {
             $w = '1=1';
         }

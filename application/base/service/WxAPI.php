@@ -45,7 +45,7 @@ class WxAPI
             $params['openid'] = $config['openid'];
         }
         // 签名
-        $params['sign'] = (new WxPay())->makeSign($params);
+        $params['sign'] = (new WxPay($this->appinfo['appid']))->makeSign($params);
         // 发送请求
         $xml = Common::toXml($params);
         $res = Common::request($url, $xml);
@@ -128,6 +128,37 @@ class WxAPI
         if (!$accessToken) return false;
         $url = str_replace('ACCESS_TOKEN', $accessToken, $url);
         $url = str_replace('MEDIA_ID', $mediaId, $url);
+
+        return Common::request($url, false);
+    }
+
+    
+    /**
+     * 新增其他类型永久素材
+     */
+    public function addMaterial($filePath)
+    {
+        $url = 'https://api.weixin.qq.com/cgi-bin/material/add_material?access_token=ACCESS_TOKEN&type=TYPE';
+
+        $accessToken = $this->getAccessToken();
+        if (!$accessToken) return false;
+        $url = str_replace('ACCESS_TOKEN', $accessToken, $url);
+        $url = str_replace('TYPE', 'image', $url);
+
+        $data = ['media' => new \CURLFile($filePath, false, false)];
+        return Common::request($url, $data);
+    }
+
+    /**
+     * 公众号授权
+     */
+    public function getAuth($code)
+    {
+        $url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=APPID&secret=SECRET&code=CODE&grant_type=authorization_code';
+
+        $url = str_replace('APPID', $this->appinfo['appid'], $url);
+        $url = str_replace('SECRET', $this->appinfo['appsecret'], $url);
+        $url = str_replace('CODE', $code, $url);
 
         return Common::request($url, false);
     }

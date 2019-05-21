@@ -9,7 +9,7 @@ class WxMsg
     }
 
     /**
-     * 解密并返回用户发送的消息体
+     * 解密并返回收到的消息体
      * @return array 消息体
      */
     public function getMsg()

@@ -37,7 +37,7 @@ class Treasure extends Base
             Db::commit();
         } catch (\Exception $e) {
             Db::rollBack();
-            Common::res(['code' => 400]);
+            Common::res(['code' => 400, 'data' => $e->getMessage()]);
         }
 
         Common::res(['data' => Cfg::getCfg('treasure_earn')]);

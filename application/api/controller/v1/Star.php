@@ -108,8 +108,8 @@ class Star extends Base
         if (!$starid) Common::res(['code' => 100]);
         $this->getUser();
 
-        UserStar::joinNew($starid, $this->uid);
-        UserRelation::join($starid, $this->uid);
+        $uid = UserStar::joinNew($starid, $this->uid);
+        UserRelation::join($starid, $uid);
 
         Common::res([]);
     }

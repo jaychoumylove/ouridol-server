@@ -29,7 +29,7 @@ class AutoRun extends Base
             Db::commit();
         } catch (\Exception $e) {
             Db::rollBack();
-            die('rollBack');
+            die('rollBack:' . $e->getMessage());
         }
 
         die('done');
@@ -81,7 +81,7 @@ class AutoRun extends Base
         } catch (\Exception $e) {
             Db::rollBack();
 
-            die('rollBack');
+            die('rollBack:' . $e->getMessage());
         }
 
         Cache::set('lockSend', [

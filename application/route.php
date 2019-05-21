@@ -13,6 +13,9 @@ Route::rule('api/:version/auto/w', 'api/v1.AutoRun/weekHandle');// 每周定期�
 
 // Notify
 Route::rule('api/:version/notify/receive', 'api/v1.Notify/receive');// 客服消息推送
+Route::rule('api/:version/notify/auth', 'api/v1.Notify/getAuth');// 
+
+
 
 // Star
 Route::rule('api/:version/star/info', 'api/v1.Star/getInfo');// 获取单个明星信息
@@ -83,6 +86,15 @@ Route::rule('api/:version/sharetext', 'api/v1.Task/sharetext');// 分享文字
 
 // Ext
 Route::rule('api/:version/config', 'api/v1.Ext/config');// 配置信息
+
+Route::rule('api/:version/active/info', 'api/v1.Ext/getActiveInfo');// 活动信息
+Route::rule('api/:version/active/card', 'api/v1.Ext/setCard');// 打卡
+Route::rule('api/:version/active/userrank', 'api/v1.Ext/userRank');// 用户打卡排名
+
+// 
+Route::rule('api/:version/upload', 'api/v1.Ext/upload');// 文件上传
+
+Route::rule('api/:version/funclub/join', 'api/v1.Ext/funclubJoin');// 后援会
 
 // Treasure
 Route::rule('api/:version/treasure/settle', 'api/v1.Treasure/settle');// 寻宝结算

@@ -11,15 +11,36 @@ use GatewayClient\Gateway;
 use think\Log;
 use think\Cache;
 use app\base\service\WxAPI;
+use think\Exception;
 
 class Test extends Controller
 {
 
+    private function test()
+    {
+        return 1;
+    }
 
     public function index()
     {
-        $res = (new WxAPI('wx7dc912994c80d9ac'))->uploadMedia(ROOT_PATH . 'public' . DS . 'test.png');
-        dump($res);
+
+        // echo (int)null;
+
+        try {
+            //code...
+
+           throw new Exception('cuowu');
+
+        } catch (\Throwable $th) {
+            //throw $th;
+            echo $th->getMessage();
+        }
+        // $res = $this->test();
+
+        // die((string)213213);
+        // echo date('y-m-d');
+        // $res = (new WxAPI('wx7dc912994c80d9ac'))->uploadMedia(ROOT_PATH . 'public' . DS . 'test.png');
+        // dump($res);
 
         //    cache(' test ',1);
         //    cache(' test ',2);

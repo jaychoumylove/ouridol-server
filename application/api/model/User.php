@@ -71,7 +71,7 @@ class User extends Base
             Db::commit();
         } catch (\Exception $e) {
             Db::rollBack();
-            Common::res(['code' => 400]);
+            Common::res(['code' => 400, 'data' => $e->getMessage()]);
         }
 
         return $user['id'];

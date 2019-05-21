@@ -8,6 +8,10 @@ class WxPay
         $this->appinfo = Common::getAppinfo($w);
     }
     
+    /**
+     * 返回给客服端预支付信息
+     * @param array $res 
+     */
     public function returnFont($res)
     {
         if ($res['result_code'] == 'SUCCESS') {

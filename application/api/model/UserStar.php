@@ -59,8 +59,9 @@ class UserStar extends Base
             Db::commit();
         } catch (\Exception $e) {
             Db::rollBack();
-            Common::res(['code' => 400]);
+            Common::res(['code' => 400, 'data' => $e->getMessage()]);
         }
+        return $uid;
     }
 
     /**
@@ -107,7 +108,7 @@ class UserStar extends Base
                 Db::commit();
             } catch (\Exception $e) {
                 Db::rollBack();
-                Common::res(['code' => 400]);
+                Common::res(['code' => 400, 'data' => $e->getMessage()]);
             }
         } else {
             Common::res(['code' => 1, 'msg' => '退出偶像圈失败，上次退出偶像圈时间为' . date('Y-m-d', $ext['exit_group_time'])]);
