@@ -90,7 +90,7 @@ class WxAPI
      */
     public function getAccessToken()
     {
-        if (strtotime($this->appinfo['access_token_expire']) - 300 < time()) {
+        if (strtotime($this->appinfo['access_token_expire']) < time()) {
             // 更新accessToken
             $url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET';
             $url = str_replace('APPID', $this->appinfo['appid'], $url);

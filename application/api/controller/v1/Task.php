@@ -14,7 +14,7 @@ class Task extends Base
     public function index()
     {
         $this->getUser();
-        $taskList = TaskModel::with('TaskType')->select();
+        $taskList = TaskModel::with('TaskType')->order('sort asc')->select();
         $taskList = (new TaskService())->checkTask($this->uid, $taskList);
 
         Common::res(['data' => $taskList]);

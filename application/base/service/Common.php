@@ -60,7 +60,7 @@ class Common
     public static function setSession($uid)
     {
         $salt = Cfg::getCfg('salt');
-        $token =  base64_encode($salt . base64_encode((time() * 26) . '&' . $uid));
+        $token =  base64_encode($salt . base64_encode(time() . '&' . $_SERVER['REMOTE_ADDR'] . '&' . $uid));
         return $token;
     }
 
@@ -68,22 +68,25 @@ class Common
     public static function getSession($token)
     {
         $salt = Cfg::getCfg('salt');
-        $saltAndCode = base64_decode($token);
-        $timeAndUid = base64_decode(str_replace($salt, '', $saltAndCode));
-        $timeAndUidArr = explode('&', $timeAndUid);
+        $code = base64_decode(str_replace($salt, '', base64_decode($token)));
+        $arr = explode('&', $code);
 
-        if (count($timeAndUidArr) != 2) {
+        try {
+            $time = $arr[0];
+            $ip = $arr[1];
+            $uid = $arr[2];
+
+            if ($time < time() - 3600 * 2) {
+                // token超过2小时表示已过期，请重新登录
+                return false;
+            } else if ($ip != $_SERVER['REMOTE_ADDR']) {
+                // ip不一致
+                return false;
+            } else {
+                return $uid;
+            }
+        } catch (\Throwable $th) {
             return false;
-        }
-
-        $time = $timeAndUidArr[0] / 26;
-        $uid = $timeAndUidArr[1];
-
-        if ($time < time() - 3600 * 2) {
-            // token超过2小时表示已过期，请重新登录
-            return false;
-        } else {
-            return $uid;
         }
     }
 

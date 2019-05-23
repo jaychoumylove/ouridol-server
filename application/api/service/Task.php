@@ -12,6 +12,7 @@ use app\api\model\Rec;
 use app\api\model\RecPayOrder;
 use app\api\model\RecWeibo;
 use app\api\model\UserRelation;
+use app\api\model\UserExt;
 
 class Task
 {
@@ -169,6 +170,15 @@ class Task
                         if ($task['doneTimes'] >= $task['times']) {
                             $task['status'] = 1;
                         }
+                    }
+                    break;
+                case 13:
+                    // 公众号签到
+                    $signin_time = UserExt::where(['user_id' => $uid])->value('signin_time');
+                    $isDone = date('Ymd', time()) == date('Ymd', $signin_time);
+
+                    if ($isDone) {
+                        $task['status'] = 2;
                     }
                     break;
                 default:

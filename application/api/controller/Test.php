@@ -24,7 +24,9 @@ class Test extends Base
 
     public function index()
     {
-        echo urlencode('https://rank.xiaolishu.com/#/pages/signin/signin');
+
+        // dump((new WxAPI('gzh'))->addMaterial($realPath));
+        // echo urlencode('https://rank.xiaolishu.com/#/pages/signin/signin');
 
         // $wxApi = new WxAPI('wx7dc912994c80d9ac');
         // dump($wxApi->createMenu());
