@@ -102,14 +102,13 @@ class Ext extends Base
         // if (!file_exists($dir)) {
         //     mkdir($dir, 0777, true);
         // } 
-            
+
         if ($file) {
             $info = $file->move(ROOT_PATH . 'public' . DS . 'uploads');
             if ($info) {
 
                 $realPath = ROOT_PATH . 'public' . DS . 'uploads' . DS . $info->getSaveName();
-                // $res = (new WxAPI('gzh'))->addMaterial($realPath);
-                $res = (new WxAPI())->uploadMedia($realPath);
+                $res = (new WxAPI('gzh'))->addMaterial($realPath);
                 unlink($realPath);
                 Common::res(['data' => $res]);
             } else {
