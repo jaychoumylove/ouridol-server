@@ -12,8 +12,9 @@ use think\Log;
 use think\Cache;
 use app\base\service\WxAPI;
 use think\Exception;
+use app\base\controller\Base;
 
-class Test extends Controller
+class Test extends Base
 {
 
     private function test()
@@ -24,17 +25,19 @@ class Test extends Controller
     public function index()
     {
 
+        echo strtotime('-1 day');
+
         // echo (int)null;
 
-        try {
-            //code...
+        // try {
+        //     //code...
 
-           throw new Exception('cuowu');
+        //    throw new Exception('cuowu');
 
-        } catch (\Throwable $th) {
-            //throw $th;
-            echo $th->getMessage();
-        }
+        // } catch (\Throwable $th) {
+        //     //throw $th;
+        //     echo $th->getMessage();
+        // }
         // $res = $this->test();
 
         // die((string)213213);

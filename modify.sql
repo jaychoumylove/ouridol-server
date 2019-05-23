@@ -11,3 +11,6 @@ PRIMARY KEY (`id`)
 )
 COMMENT='其他-结榜锁';
 
+ALTER TABLE `f_rec_task`
+ADD COLUMN `count`  int NULL DEFAULT 1 COMMENT '完成数量' AFTER `user_id`;
+

@@ -9,14 +9,28 @@ use think\Db;
 use app\api\model\UserRelation;
 use app\api\model\Rec;
 use app\api\model\Cfg;
+use app\api\model\CfgSignin;
+use app\api\model\UserExt;
 
 class User
 {
 
-    public function wxGetAuth($js_code)
+    /**
+     * 获取用户openid等信息
+     */
+    public function wxGetAuth($js_code, $code)
     {
-        $WxAPI = new WxAPI();
-        $res = $WxAPI->code2session($js_code);
+        if ($js_code) {
+            // 微信小程序登录
+            $wxApi = new WxAPI();
+            $res = $wxApi->code2session($js_code);
+        } else if ($code) {
+            // 微信授权网页登录
+            $wxApi = new WxAPI('wx00cf0e6d01bb8b01');
+            $res = $wxApi->getAuth($code);
+            // code has been used
+            if (isset($res['errcode']) && $res['errcode'] == 40163) Common::res(['msg' => '已登录']);
+        }
 
         if (!isset($res['openid'])) {
             Common::res(['code' => 202, 'data' => $res]);
@@ -97,5 +111,44 @@ class User
             Db::rollBack();
             Common::res(['code' => 400, 'data' => $e->getMessage()]);
         }
+    }
+
+    /**
+     * 连续签到
+     */
+    public function signin($uid)
+    {
+        // 判定签到
+        $ext = UserExt::get(['user_id' => $uid]);
+
+        if (date('Ymd', time()) == date('Ymd', $ext['signin_time'])) {
+            // 今日已签到
+            return ['signin_day' => $ext['signin_day']];
+        }
+
+        if (date('Ymd', $ext['signin_time']) == date("Ymd", strtotime("-1 day"))) {
+            // 连续签到
+            $ext['signin_day'] += 1;
+        } else {
+            // 第一天签到或中途断签
+            $ext['signin_day'] = 1;
+        }
+
+        // 奖励数额
+        $coin = CfgSignin::where('days', '<=', $ext['signin_day'])->order('days desc')->value('coin');
+
+        UserExt::where(['user_id' => $uid])->update([
+            'signin_day' => $ext['signin_day'],
+            'signin_time' => time(),
+        ]);
+
+        (new User())->change($uid, [
+            'coin' => $coin,
+        ]);
+
+        return [
+            'coin' => $coin,
+            'signin_day' => $ext['signin_day']
+        ];
     }
 }

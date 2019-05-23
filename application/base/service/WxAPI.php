@@ -13,7 +13,7 @@ class WxAPI
     }
 
     /**
-     * 登录
+     * 小程序登录
      */
     public function code2session($js_code)
     {
@@ -21,6 +21,38 @@ class WxAPI
         $url = str_replace('APPID', $this->appinfo['appid'], $url);
         $url = str_replace('SECRET', $this->appinfo['appsecret'], $url);
         $url = str_replace('JSCODE', $js_code, $url);
+
+        return Common::request($url, false);
+    }
+
+    /**
+     * 公众号授权
+     * 通过code换取网页授权access_token
+     * 该接口可能返回unionid
+     */
+    public function getAuth($code)
+    {
+        $url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=APPID&secret=SECRET&code=CODE&grant_type=authorization_code';
+
+        $url = str_replace('APPID', $this->appinfo['appid'], $url);
+        $url = str_replace('SECRET', $this->appinfo['appsecret'], $url);
+        $url = str_replace('CODE', $code, $url);
+
+        return Common::request($url, false);
+    }
+
+    /**
+     * 公众号授权
+     * 拉取用户信息
+     * @param string $accessToken 网页授权接口调用凭证,注意：此access_token与基础支持的access_token不同
+     * @param string $openid 用户的唯一标识
+     */
+    public function getUserInfo($accessToken, $openid)
+    {
+        $url = 'https://api.weixin.qq.com/sns/userinfo?access_token=ACCESS_TOKEN&openid=OPENID&lang=zh_CN';
+
+        $url = str_replace('ACCESS_TOKEN', $accessToken, $url);
+        $url = str_replace('OPENID', $openid, $url);
 
         return Common::request($url, false);
     }
@@ -132,7 +164,7 @@ class WxAPI
         return Common::request($url, false);
     }
 
-    
+
     /**
      * 新增其他类型永久素材
      */
@@ -147,19 +179,5 @@ class WxAPI
 
         $data = ['media' => new \CURLFile($filePath, false, false)];
         return Common::request($url, $data);
-    }
-
-    /**
-     * 公众号授权
-     */
-    public function getAuth($code)
-    {
-        $url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=APPID&secret=SECRET&code=CODE&grant_type=authorization_code';
-
-        $url = str_replace('APPID', $this->appinfo['appid'], $url);
-        $url = str_replace('SECRET', $this->appinfo['appsecret'], $url);
-        $url = str_replace('CODE', $code, $url);
-
-        return Common::request($url, false);
     }
 }

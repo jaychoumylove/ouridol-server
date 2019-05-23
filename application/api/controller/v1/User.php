@@ -16,22 +16,24 @@ use app\api\model\UserSprite;
 use app\api\model\CfgShare;
 use app\api\model\Cfg;
 use app\base\service\WxAPI;
+use app\api\model\CfgSignin;
 
 class User extends Base
 {
     /**用户登录 */
     public function login()
     {
-        $js_code = input('js_code'); // 微信登录
+        $js_code = input('js_code'); // 微信小程序登录
+        $code = input('code'); // 微信授权登录
         // $unionid = input('unionid'); // APP登录
-        if (!$js_code) Common::res(['code' => 100]);
+        if (!$js_code && !$code) Common::res(['code' => 100]);
 
-        $res = (new UserService())->wxGetAuth($js_code);
+        $res = (new UserService())->wxGetAuth($js_code, $code);
 
         $res['platform'] = input('platform', null); // 平台
         $res['model'] = input('model', null); // 手机型号
 
-        $uid = UserModel::saveUser($res);
+        $uid = UserModel::searchUser($res);
         $token = Common::setSession($uid);
 
         Common::res(['msg' => '登录成功', 'data' => ['token' => $token]]);
@@ -192,5 +194,17 @@ class User extends Base
         $this->getUser();
         UserStar::exit($this->uid);
         Common::res([]);
+    }
+
+    public function signin()
+    {
+        $this->getUser();
+
+        $cfg = CfgSignin::all();
+
+        $res = (new UserService())->signin($this->uid);
+        $res['cfg'] = $cfg;
+
+        Common::res(['data' => $res]);
     }
 }

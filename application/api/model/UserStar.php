@@ -74,9 +74,13 @@ class UserStar extends Base
         $user = User::where('id', $uid)->find();
         $oldStarid = UserStar::where('user_id', $uid)->value('star_id');
         if (!$oldStarid) $oldStarid = 0;
-        // 旧 带上starid后缀
-        User::where('id', $uid)->update(['openid' => $user['openid'] . '@' . $oldStarid]);
+        // 旧 带上oldStarid后缀
+        User::where('id', $uid)->update([
+            'openid' => $user['openid'] . '@' . $oldStarid,
+            'unionid' => $user['unionid'] . '@' . $oldStarid
+        ]);
 
+        // 新的角色
         $virtualUid = User::where(['openid' => $user['openid'] . '@' . $starid])->value('id');
         if (!$virtualUid) {
             $virtualUid = User::createVirtualUser([
@@ -84,7 +88,10 @@ class UserStar extends Base
                 'unionid' => $user['unionid'],
             ]);
         } else {
-            User::where(['openid' => $user['openid'] . '@' . $starid])->update(['openid' => $user['openid']]);
+            User::where(['openid' => $user['openid'] . '@' . $starid])->update([
+                'openid' => $user['openid'],
+                'unionid' => $user['unionid']
+            ]);
         }
 
         return $virtualUid;

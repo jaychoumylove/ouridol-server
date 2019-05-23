@@ -18,22 +18,26 @@ class User extends Base
     }
 
     /**
-     * 创建一个新用户
+     * 检索用户
+     * @return mixed uid 用户id
      */
-    public static function saveUser($data)
+    public static function searchUser($data)
     {
         Db::startTrans();
         try {
-            $user = self::get(['openid' => $data['openid']]);
+            if (isset($data['unionid'])) {
+                $user = self::get(['unionid' => $data['unionid']]);
+            } else {
+                $user = self::get(['openid' => $data['openid']]);
+            }
             if (!$user) {
-                // 新用户
+                // 创建新用户
                 // User
-                $shortCode = strtoupper(substr(md5(md5($data['openid'])), 0, 6));
                 $insert = [
                     'openid' => $data['openid'],
                     'unionid' => isset($data['unionid']) ? $data['unionid'] : null,
                     'session_key' => isset($data['session_key']) ? $data['session_key'] : null,
-                    'ident_code' => $shortCode,
+                    'ident_code' => strtoupper(substr(md5(md5($data['openid'])), 0, 6)),
                     'platform' => isset($data['platform']) ? $data['platform'] : null,
                     'model' => isset($data['model']) ? $data['model'] : null,
                     'type' => isset($data['type']) ? $data['type'] : 0,
@@ -65,7 +69,9 @@ class User extends Base
                     'settle_time' => time(),
                 ]);
             } else {
-                self::where(['openid' => $data['openid']])->update(['session_key' => $data['session_key']]);
+                if (isset($data['session_key'])) {
+                    self::where(['openid' => $data['openid']])->update(['session_key' => $data['session_key']]);
+                }
             }
 
             Db::commit();
@@ -83,7 +89,7 @@ class User extends Base
         $vrNickname = OtherFakeUser::where('1=1')->orderRaw('rand()')->value('nickname');
         $vrAvatar = OtherFakeUser::where('1=1')->orderRaw('rand()')->value('avatar');
 
-        return self::saveUser([
+        return self::searchUser([
             'openid' => $data['openid'],
             'unionid' => $data['unionid'],
             'nickname' => $vrNickname,

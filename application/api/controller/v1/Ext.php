@@ -108,8 +108,8 @@ class Ext extends Base
             if ($info) {
 
                 $realPath = ROOT_PATH . 'public' . DS . 'uploads' . DS . $info->getSaveName();
-
                 $res = (new WxAPI('gzh'))->addMaterial($realPath);
+                unlink($realPath);
                 Common::res(['data' => $res]);
             } else {
                 // 上传失败获取错误信息

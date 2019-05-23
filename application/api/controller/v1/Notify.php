@@ -4,8 +4,6 @@ namespace app\api\controller\v1;
 use app\base\service\WxMsg;
 use app\base\controller\Base;
 use think\Log;
-use app\base\service\WxAPI;
-use app\base\service\Common;
 
 class Notify extends Base
 {
@@ -23,7 +21,7 @@ class Notify extends Base
         Log::record(json_encode($msg));
         // $content = "<a href='https://rank.xiaolishu.com/#/?token=" . $msg['SessionFrom'] . "'>你好！</a>";
 
-        $redirectUrl = urlencode('https://rank.xiaolishu.com/api/v1/notify/auth');
+
 
         // $ret = (new WxAPI(input('appid')))->sendCustomerMsg(
         //     $msg['FromUserName'],
@@ -33,27 +31,28 @@ class Notify extends Base
         //     ]
         // );
 
-        // if (isset($ret['errcode'])) {
-            // 被动回复
-        $wxMsg->autoSend($msg, 'text', [
-            'Content' =>
-            "<a href='https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx00cf0e6d01bb8b01&redirect_uri=$redirectUrl&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'>链接</a>",
-        ]);
-        // }
+        if ($msg['Content'] == '签到') {
+            $redirectUrl = urlencode('https://rank.xiaolishu.com/#/pages/signin/signin');
+            $wxMsg->autoSend($msg, 'text', [
+                'Content' =>
+                "<a href='https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx00cf0e6d01bb8b01&redirect_uri=$redirectUrl&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'>链接</a>",
+            ]);
+        } else if ($msg['Content'] == '充值') {
+            $redirectUrl = urlencode('https://rank.xiaolishu.com/#/pages/recharge/recharge');
+
+            $wxMsg->autoSend($msg, 'text', [
+                'Content' =>
+                "<a href='https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx00cf0e6d01bb8b01&redirect_uri=$redirectUrl&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'>链接</a>",
+            ]);
+        } else {
+            $wxMsg->autoSend($msg, 'text', [
+                'Content' =>
+                "回复：签到或充值",
+            ]);
+        }
+
+
+
         die('success');
     }
-
-    public function getAuth()
-    {
-        $code = input('code');
-        $state = input('state');
-
-        $ret = (new WxAPI('wx00cf0e6d01bb8b01'))->getAuth($code);
-
-        // Common::res(['data' => $ret]);
-
-        Log::record(json_encode($ret));
-    }
-
-    
 }
