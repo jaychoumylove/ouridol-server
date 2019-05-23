@@ -24,8 +24,12 @@ class Test extends Base
 
     public function index()
     {
+        echo urlencode('https://rank.xiaolishu.com/#/pages/signin/signin');
 
-        echo strtotime('-1 day');
+        // $wxApi = new WxAPI('wx7dc912994c80d9ac');
+        // dump($wxApi->createMenu());
+
+        // echo strtotime('-1 day');
 
         // echo (int)null;
 

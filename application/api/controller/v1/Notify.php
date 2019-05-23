@@ -35,7 +35,7 @@ class Notify extends Base
             $redirectUrl = urlencode('https://rank.xiaolishu.com/#/pages/signin/signin');
             $wxMsg->autoSend($msg, 'text', [
                 'Content' =>
-                "<a href='https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx00cf0e6d01bb8b01&redirect_uri=$redirectUrl&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'>链接</a>",
+                "<a href='https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx00cf0e6d01bb8b01&redirect_uri=https%3A%2F%2Frank.xiaolishu.com%2F%23%2Fpages%2Fsignin%2Fsignin&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'>链接</a>",
             ]);
         } else if ($msg['Content'] == '充值') {
             $redirectUrl = urlencode('https://rank.xiaolishu.com/#/pages/recharge/recharge');
@@ -47,7 +47,7 @@ class Notify extends Base
         } else {
             $wxMsg->autoSend($msg, 'text', [
                 'Content' =>
-                "回复：签到或充值",
+                "11",
             ]);
         }
 

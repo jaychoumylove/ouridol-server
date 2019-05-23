@@ -25,11 +25,7 @@ class User extends Base
     {
         Db::startTrans();
         try {
-            if (isset($data['unionid'])) {
-                $user = self::get(['unionid' => $data['unionid']]);
-            } else {
-                $user = self::get(['openid' => $data['openid']]);
-            }
+            $user = self::get(['openid' => $data['openid']]);
             if (!$user) {
                 // 创建新用户
                 // User

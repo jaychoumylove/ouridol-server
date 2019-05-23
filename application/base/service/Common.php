@@ -79,8 +79,8 @@ class Common
         $time = $timeAndUidArr[0] / 26;
         $uid = $timeAndUidArr[1];
 
-        if ($time < time() - 3600 * 24) {
-            // token超过24小时表示已过期，请重新登录
+        if ($time < time() - 3600 * 2) {
+            // token超过2小时表示已过期，请重新登录
             return false;
         } else {
             return $uid;

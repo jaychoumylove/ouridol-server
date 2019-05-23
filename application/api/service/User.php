@@ -30,6 +30,12 @@ class User
             $res = $wxApi->getAuth($code);
             // code has been used
             if (isset($res['errcode']) && $res['errcode'] == 40163) Common::res(['msg' => '已登录']);
+            if (isset($res['unionid'])) {
+                $res['openid'] = UserModel::where(['unionid' => $res['unionid']])->value('openid');
+                if(!$res['openid']) Common::res(['code' => 202, 'msg' => '未找到该用户']);
+            } else {
+                Common::res(['code' => 202, 'msg' => '未获取到用户信息，缺少unionid']);
+            }
         }
 
         if (!isset($res['openid'])) {
