@@ -18,7 +18,9 @@ class RecStarChart extends Base
 
     public static function getLeastChart($starid)
     {
-        $list = self::with('User')->where(['star_id' => $starid])->order('id desc')->limit(10)->select();
+        $list = self::with(['User' => ['UserStar']])->where(['star_id' => $starid])->order('id desc')->limit(10)->select();
+
+
         return array_reverse($list);
     }
 }

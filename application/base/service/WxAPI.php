@@ -145,6 +145,7 @@ class WxAPI
         $url = str_replace('TYPE', 'image', $url);
 
         $data = ['media' => new \CURLFile($filePath, false, false)];
+
         return Common::request($url, $data);
     }
 

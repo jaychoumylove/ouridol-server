@@ -14,7 +14,7 @@ class User extends Base
 
     public function Sprite()
     {
-        return $this->hasOne('UserSprite', 'user_id', 'id');
+        return $this->hasOne('UserSprite', 'user_id', 'id', [], 'LEFT');
     }
 
     /**

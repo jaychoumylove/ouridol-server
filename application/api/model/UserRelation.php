@@ -73,14 +73,14 @@ class UserRelation extends Base
         if ($type == 1) { // 宠物页面邀请列表，统计收益
             // 我邀请的人
             $res = UserRelation::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2, 3]]])->page($page, $size)->select();
-            if ($page == 1 || count($res) > 0) {
+            if ($page == 1) {
                 // 邀请我的人
                 $ralUser = self::with('RerUser')->where(['ral_user_id' => $uid, 'status' => ['in', [1, 2]]])->find();
                 if ($ralUser) {
                     $ralUser['user'] = $ralUser['rer_user'];
                     $ralUser = [$ralUser];
                 } else {
-                    $ralUser =  [];
+                    $ralUser = [];
                 }
 
                 $res = array_merge($res, $ralUser);

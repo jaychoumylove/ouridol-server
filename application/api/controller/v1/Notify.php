@@ -21,17 +21,17 @@ class Notify extends Base
         // "MsgType":"text","Content":"99","MsgId":"22306477788296821"}
         Log::record(json_encode($msg));
 
+        $media_id = 'lK7m2JjQpaoYn20rXe8D2-DbT3Ne9a7QKKp1jWkSopqIQMNZ1MzxE2CJAueJNaqW';
 
-        if ($msg['Content'] == '1') {
-            // 充值
-            $media_id = 'Rhb7Ve9i_o4CTDHFEEDLxLrezUmYLgtHJX4ygFnU6ByqyfNKc7AqO4fV4xbOW_0b';
-        } else if ($msg['Content'] == '2') {
-            // 打卡
-            $media_id = 'OcmHYC1bg8SEP0RQBEJixn4ob6a-fTNba6KIwBXgHf5P0FsDWigvNnwfe0dbu0UF';
-        } else {
-            $media_id = 'lK7m2JjQpaoYn20rXe8D2-DbT3Ne9a7QKKp1jWkSopqIQMNZ1MzxE2CJAueJNaqW';
+        if (isset($msg['Content'])) {
+            if ($msg['Content'] == '1') {
+                // 充值
+                $media_id = 'Rhb7Ve9i_o4CTDHFEEDLxLrezUmYLgtHJX4ygFnU6ByqyfNKc7AqO4fV4xbOW_0b';
+            } else if ($msg['Content'] == '2') {
+                // 打卡
+                $media_id = 'OcmHYC1bg8SEP0RQBEJixn4ob6a-fTNba6KIwBXgHf5P0FsDWigvNnwfe0dbu0UF';
+            }
         }
-
 
         $ret = (new WxAPI(input('appid')))->sendCustomerMsg(
             $msg['FromUserName'],
@@ -49,7 +49,6 @@ class Notify extends Base
         //     'Content' =>
         //     "欢迎！回复：\n1 签到\n2 补充能量\n3 人工服务",
         // ]);
-
 
         die('success');
     }

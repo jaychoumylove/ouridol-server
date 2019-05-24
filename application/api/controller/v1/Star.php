@@ -76,6 +76,7 @@ class Star extends Base
             'create_time' => time(),
         ]);
         $res['user'] = UserModel::where(['id' => $this->uid])->field('nickname,avatarurl')->find();
+        $res['user']['user_star'] = UserStar::get(['user_id' => $this->uid, 'star_id' => $starid]);
 
         // 推送socket消息
         Gateway::sendToGroup('star_' . $starid, json_encode([
