@@ -116,7 +116,7 @@ class User extends Base
     {
         $type = input('type', 0);
         $page = input('page', 1);
-        $size = input('size', 5);
+        $size = input('size', 10);
 
         $this->getUser();
         $res = UserRelation::fixByType($type, $this->uid, $page, $size);
