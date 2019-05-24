@@ -73,26 +73,18 @@ class UserRelation extends Base
         if ($type == 1) { // 宠物页面邀请列表，统计收益
             // 我邀请的人
             $res = UserRelation::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2, 3]]])->page($page, $size)->select();
+            if ($page == 1 || count($res) > 0) {
+                // 邀请我的人
+                $ralUser = self::with('RerUser')->where(['ral_user_id' => $uid, 'status' => ['in', [1, 2]]])->find();
+                if ($ralUser) {
+                    $ralUser['user'] = $ralUser['rer_user'];
+                    $ralUser = [$ralUser];
+                } else {
+                    $ralUser =  [];
+                }
 
-            // 邀请我的人
-            $ralUser = self::with('RerUser')->where(['ral_user_id' => $uid, 'status' => ['in', [1, 2]]])->find();
-            if ($ralUser) {
-                $ralUser['user'] = $ralUser['rer_user'];
-                $ralUser = [$ralUser];
-            } else {
-                $ralUser =  [];
+                $res = array_merge($res, $ralUser);
             }
-
-            // 加上本圈子所有用户
-            // $page = input('page', 1);
-            // $size = input('size', 5);
-            // $myStarid = UserStar::where(['user_id' => $uid])->value('star_id');
-            // // 圈子所有用户ID
-            // $starUserList = UserStar::where(['star_id' => $myStarid])->column('user_id');
-            // $userSpriteList = UserSprite::with('User')->where(['user_id' => ['in', $starUserList]])->order('settle_time asc')->page($page, $size)->select();
-            // $userSpriteList = [];
-
-            $res = array_merge($res, $ralUser);
 
             if ($res) {
                 foreach ($res as $key => &$value) {
@@ -109,16 +101,8 @@ class UserRelation extends Base
 
                 array_multisort($sort, SORT_DESC, $res);
             }
-            // else {
-            //     $sprite = UserSprite::getInfo($uid);
-            //     if ($sprite['skillone_times'] == 0) {
-            //         // 给一个虚拟好友
-            //         $vrUser['user'] = User::where(['id' => 1])->field('id,nickname,avatarurl')->find();
-            //         $vrUser['sprite']['earn'] = 100;
-            //         $res[] = $vrUser;
-            //     }
-            // }
-        } else if ($type = 2) {
+       
+        } else if ($type == 2) {
             $res = self::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2]]])->page($page, $size)->select();
 
             // 师徒页 统计用户今日贡献
@@ -133,6 +117,16 @@ class UserRelation extends Base
             }
         } else {
             $res = self::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2]]])->page($page, $size)->select();
+            if (count($res) < $size && $page <= 10) {
+                for ($i = 0; $i < ($size - count($res)); $i++) {
+                    $res[] = [
+                        'status' => 0,
+                        'user' => [
+                            'avatarurl' => 'https://wx.qlogo.cn/mmhead/gBSelbQM7M19TeazvLwo3f8znKS8KR1CuibicFHc1GTWI/132',
+                        ]
+                    ];
+                }
+            }
         }
 
         return $res;
