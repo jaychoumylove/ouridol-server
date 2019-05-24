@@ -115,12 +115,16 @@ class User extends Base
     public function invitList()
     {
         $type = input('type', 0);
+        $page = input('page', 1);
+        $size = input('size', 5);
 
         $this->getUser();
-        $res = UserRelation::fixByType($type, $this->uid);
+        $res = UserRelation::fixByType($type, $this->uid, $page, $size);
+
         Common::res(['data' => [
             'list' => $res,
             'award' => Cfg::getCfg('invitAward'),
+            'hasInvitcount' => UserRelation::with('User')->where(['rer_user_id' => $this->uid, 'status' => ['in', [1, 2]]])->count()
         ]]);
     }
 

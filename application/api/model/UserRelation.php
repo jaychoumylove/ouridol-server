@@ -68,11 +68,11 @@ class UserRelation extends Base
         }
     }
 
-    public static function fixByType($type, $uid)
+    public static function fixByType($type, $uid, $page, $size)
     {
         if ($type == 1) { // 宠物页面邀请列表，统计收益
             // 我邀请的人
-            $res = UserRelation::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2, 3]]])->select();
+            $res = UserRelation::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2, 3]]])->page($page, $size)->select();
 
             // 邀请我的人
             $ralUser = self::with('RerUser')->where(['ral_user_id' => $uid, 'status' => ['in', [1, 2]]])->find();
@@ -119,7 +119,7 @@ class UserRelation extends Base
             //     }
             // }
         } else if ($type = 2) {
-            $res = self::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2]]])->select();
+            $res = self::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2]]])->page($page, $size)->select();
 
             // 师徒页 统计用户今日贡献
             if ($res) {
@@ -132,7 +132,7 @@ class UserRelation extends Base
                 array_multisort($sort, SORT_DESC, $res);
             }
         } else {
-            $res = self::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2]]])->select();
+            $res = self::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2]]])->page($page, $size)->select();
         }
 
         return $res;
