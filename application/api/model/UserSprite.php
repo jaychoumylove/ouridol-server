@@ -53,7 +53,7 @@ class UserSprite extends Base
     }
 
     /**结算该用户宠物收益 */
-    public static function settle($uid)
+    public static function settle($uid, $self)
     {
         $userSprite = self::getInfo($uid);
         Db::startTrans();
@@ -62,9 +62,21 @@ class UserSprite extends Base
                 'settle_time' => time() - 5,
             ]);
 
+            if ($uid != $self) {
+                // 他人帮收
+                $log = [
+                    'type' => 7,
+                    'target_user_id' => $self
+                ];
+            } else {
+                $log = [
+                    'type' => 9
+                ];
+            }
+
             (new User())->change($uid, [
                 'coin' => $userSprite['earn'],
-            ]);
+            ], $log);
             Db::commit();
         } catch (\Exception $e) {
             Db::rollBack();
@@ -106,6 +118,8 @@ class UserSprite extends Base
 
             (new User())->change($uid, [
                 'stone' => $need_stone / -1,
+            ],[
+                'type' => 11
             ]);
             Db::commit();
         } catch (\Exception $e) {
@@ -126,7 +140,7 @@ class UserSprite extends Base
 
         (new User)->change($uid, [
             'coin' => $myEarn,
-        ],[
+        ], [
             'type' => 4,
         ]);
 

@@ -11,6 +11,7 @@ use app\api\model\UserStar;
 use think\Db;
 use app\base\service\WxAPI;
 use app\api\model\Funclub;
+use app\api\model\Rec;
 
 class Ext extends Base
 {
@@ -30,6 +31,9 @@ class Ext extends Base
 
     public function config()
     {
+        $key = input('key');
+        if ($key) Common::res(['data' => Cfg::getCfg($key)]);
+        
         // 顺便获取分享信息
         $res['share_text'] = CfgShare::getOne();
 
@@ -138,5 +142,16 @@ class Ext extends Base
 
         Funclub::create($res);
         Common::res([]);
+    }
+
+    public function log()
+    {
+        $this->getUser();
+        $page = input('page', 1);
+        $size = input('size', 10);
+
+        $logList = Rec::with('Type,TargetUser,TargetStar')->where(['user_id' => $this->uid])->order('id desc')->page($page, $size)->select();
+
+        Common::res(['data' => $logList]);
     }
 }

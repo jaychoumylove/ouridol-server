@@ -88,7 +88,6 @@ class UserRelation extends Base
 
             if ($res) {
                 foreach ($res as $key => &$value) {
-
                     $value['sprite'] = ['earn' => 0];
                     if (isset($value['user']['id'])) {
                         // 精灵收益

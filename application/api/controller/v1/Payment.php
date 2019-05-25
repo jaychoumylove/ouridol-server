@@ -67,6 +67,8 @@ class Payment extends Base
                 (new UserService())->change($order['user_id'], [
                     'coin' => $order['coin'],
                     'stone' => $order['stone'],
+                ],[
+                    'type' => 8
                 ]);
 
                 Db::commit();

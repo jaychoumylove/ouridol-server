@@ -219,7 +219,13 @@ class Task
                 'stone' => $task['stone'],
                 'trumpet' => $task['trumpet'],
             ];
-            (new User())->change($uid, $update);
+            (new User())->change(
+                $uid,
+                $update,
+                [
+                    'type' => 12
+                ]
+            );
 
             Db::commit();
         } catch (\Exception $e) {

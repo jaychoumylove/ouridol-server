@@ -1,1 +1,60 @@
-[{"title":"活动时间：","content":["5月20日-6月20日"]},{"title":"精灵怎么升级","content":["精灵可以通过“灵丹”来升级，每个等级获得对应数量的灵丹即可升级，目前开放等级为30级。"]},{"title":"精灵等级说明","content":["等级&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;产量","LV1&nbsp;&nbsp;&nbsp;&nbsp;1能量/100秒","LV2&nbsp;&nbsp;&nbsp;&nbsp;2能量/100秒","LV3&nbsp;&nbsp;&nbsp;&nbsp;3能量/100秒","LV4&nbsp;&nbsp;&nbsp;&nbsp;4能量/100秒","LV5&nbsp;&nbsp;&nbsp;&nbsp;5能量/100秒","LV6&nbsp;&nbsp;&nbsp;&nbsp;6能量/100秒","LV7&nbsp;&nbsp;&nbsp;&nbsp;7能量/100秒","LV8&nbsp;&nbsp;&nbsp;&nbsp;8能量/100秒","LV9&nbsp;&nbsp;&nbsp;&nbsp;9能量/100秒","LV10&nbsp;&nbsp;&nbsp;10能量/100秒"]}]
+[2019-05-25 14:55:03.755] [061843] [47.106.85.153_3306] [MYSQL]
+SHOW VARIABLES LIKE 'lower_case_%'
+
+[2019-05-25 14:55:03.775] [061843] [47.106.85.153_3306] [MYSQL]
+SHOW VARIABLES LIKE 'profiling'
+
+[2019-05-25 14:55:03.794] [061843] [47.106.85.153_3306] [MYSQL]
+SHOW DATABASES
+
+[2019-05-25 14:55:17.294] [061844] [47.106.85.153_3306] [MYSQL]
+SELECT @@character_set_database, @@collation_database
+
+[2019-05-25 14:55:17.313] [061844] [47.106.85.153_3306] [MYSQL]
+SHOW FULL TABLES WHERE Table_type != 'VIEW'
+
+[2019-05-25 14:55:17.333] [061844] [47.106.85.153_3306] [MYSQL]
+SHOW TABLE STATUS
+
+[2019-05-25 14:55:30.541] [061845] [47.106.85.153_3306] [MYSQL]
+SHOW TABLE STATUS LIKE 'f_cfg'
+
+[2019-05-25 14:55:30.559] [061845] [47.106.85.153_3306] [MYSQL]
+SHOW ENGINES
+
+[2019-05-25 14:55:30.578] [061844] [47.106.85.153_3306] [MYSQL]
+SHOW CREATE TABLE `f_cfg`
+
+[2019-05-25 14:55:30.873] [061845] [47.106.85.153_3306] [MYSQL]
+SELECT * FROM `f_cfg` LIMIT 0, 1000
+
+[2019-05-25 14:55:30.892] [061845] [47.106.85.153_3306] [MYSQL]
+SHOW COLUMNS FROM `db_0420`.`f_cfg`
+
+[2019-05-25 15:54:04.450] [061941] [47.106.85.153_3306] [MYSQL]
+SHOW TABLE STATUS LIKE 'f_cfg_rec_type'
+
+[2019-05-25 15:54:04.468] [061941] [47.106.85.153_3306] [MYSQL]
+SHOW ENGINES
+
+[2019-05-25 15:54:04.487] [061844] [47.106.85.153_3306] [MYSQL]
+SHOW CREATE TABLE `f_cfg_rec_type`
+
+[2019-05-25 15:54:04.577] [061941] [47.106.85.153_3306] [MYSQL]
+SELECT * FROM `f_cfg_rec_type` LIMIT 0, 1000
+
+[2019-05-25 15:54:04.596] [061941] [47.106.85.153_3306] [MYSQL]
+SHOW COLUMNS FROM `db_0420`.`f_cfg_rec_type`
+
+[2019-05-25 15:55:03.602] [061941] [47.106.85.153_3306] [MYSQL]
+INSERT INTO `f_cfg_rec_type` (`content`) VALUES ('升级精灵')
+
+[2019-05-25 15:55:03.620] [061941] [47.106.85.153_3306] [MYSQL]
+SELECT * FROM `f_cfg_rec_type` WHERE (`id`='11') LIMIT 1
+
+[2019-05-25 15:58:38.978] [061941] [47.106.85.153_3306] [MYSQL]
+INSERT INTO `f_cfg_rec_type` (`content`) VALUES ('完成任务')
+
+[2019-05-25 15:58:38.996] [061941] [47.106.85.153_3306] [MYSQL]
+SELECT * FROM `f_cfg_rec_type` WHERE (`id`='12') LIMIT 1
+

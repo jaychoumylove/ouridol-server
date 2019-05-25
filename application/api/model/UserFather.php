@@ -75,7 +75,8 @@ class UserFather extends Base
                 (new UserService())->change($father, [
                     'coin' => $earn
                 ], [
-                    'type' => 5
+                    'type' => 5,
+                    'target_user_id' => $son
                 ]);
                 Db::commit();
             } catch (\Exception $e) {

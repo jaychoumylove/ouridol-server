@@ -92,6 +92,8 @@ Route::rule('api/:version/active/info', 'api/v1.Ext/getActiveInfo');// 活动信
 Route::rule('api/:version/active/card', 'api/v1.Ext/setCard');// 打卡
 Route::rule('api/:version/active/userrank', 'api/v1.Ext/userRank');// 用户打卡排名
 
+Route::rule('api/:version/ext/log', 'api/v1.Ext/log');// 用户日志
+
 // 
 Route::rule('api/:version/upload', 'api/v1.Ext/upload');// 文件上传
 

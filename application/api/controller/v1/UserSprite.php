@@ -8,7 +8,7 @@ use app\base\service\Common;
 class UserSprite extends Base
 {
     public function info()
-    {   
+    {
         $user_id = input('user_id');
         if (!$user_id) Common::res(['code' => 100]);
         $res = UserSpriteModel::getInfo($user_id);
@@ -18,10 +18,10 @@ class UserSprite extends Base
     public function settle()
     {
         $user_id = input('user_id');
-        if(!$user_id) Common::res(['code' => 100]);
+        if (!$user_id) Common::res(['code' => 100]);
         $this->getUser();
 
-        $earn = UserSpriteModel::settle($user_id);
+        $earn = UserSpriteModel::settle($user_id, $this->uid);
 
         if ($user_id != $this->uid) {
             // 为别人收能量

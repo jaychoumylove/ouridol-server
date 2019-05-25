@@ -150,6 +150,8 @@ class User
 
         (new User())->change($uid, [
             'coin' => $coin,
+        ],[
+            'type' => 10
         ]);
 
         return [
