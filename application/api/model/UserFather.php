@@ -30,31 +30,35 @@ class UserFather extends Base
     }
 
     /**结成师徒关系 */
-    public static function join($rer_user_id, $uid)
+    public static function join($father, $son)
     {
-        if ($rer_user_id == $uid) return;
+        if ($father == $son) return;
         // 师傅必须已加入圈子
-        $userStar = UserStar::where(['user_id' => $rer_user_id])->value('star_id');
+        $userStar = UserStar::where(['user_id' => $father])->value('star_id');
         if (!$userStar) return;
 
         // 师傅与徒弟需在同一个圈子
-        if (UserStar::where(['user_id' => $rer_user_id])->value('star_id') != UserStar::where(['user_id' => $uid])->value('star_id')) {
+        if (UserStar::where(['user_id' => $father])->value('star_id') != UserStar::where(['user_id' => $son])->value('star_id')) {
             // Common::res(['msg' => '不是同一圈子']);
             return;
         }
         // 不能是别人徒弟
-        if (self::get(['son' => $uid])) {
+        if (self::get(['son' => $son])) {
             // Common::res(['msg' => '已经是别人的徒弟了']);
             return;
         }
         // 师徒关系不能逆转
-        if (self::get(['father' => $uid, 'son' => $rer_user_id])) {
+        if (self::get(['father' => $son, 'son' => $father])) {
             // Common::res(['msg' => '你是邀请人的师傅，不能成为他的徒弟']);
             return;
         }
+        // 徒弟必须是师傅拉进来的
+        if (!UserRelation::get(['rer_user_id' => $father, 'ral_user_id' => $son])) { 
+            return;
+        }
         self::create([
-            'father' => $rer_user_id,
-            'son' => $uid,
+            'father' => $father,
+            'son' => $son,
         ]);
     }
 
