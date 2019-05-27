@@ -52,7 +52,7 @@ class StarRank extends Base
         // $page = input('page', 1);
         // $size = input('size', 10);
 
-        $res = StarRankHistory::all();
+        $res = StarRankHistory::where('1=1')->order('date desc')->select();
         Common::res(['data' => $res]);
     }
 }
