@@ -15,6 +15,9 @@ Route::rule('api/:version/auto/w', 'api/v1.AutoRun/weekHandle');// 每周定期�
 Route::rule('api/:version/notify/receive', 'api/v1.Notify/receive');// 客服消息推送
 Route::rule('api/:version/notify/auth', 'api/v1.Notify/getAuth');// 
 
+// Page 
+Route::rule('api/:version/page/app', 'api/v1.Page/app');
+Route::rule('api/:version/page/group', 'api/v1.Page/group');
 
 
 // Star

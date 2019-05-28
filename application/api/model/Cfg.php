@@ -15,4 +15,17 @@ class Cfg extends Base
         if ($res) return $res;
         else return $value;
     }
+
+    public static function getList()
+    {
+        $list = self::all(['show' => 1]);
+        foreach ($list as $value) {
+            $val = json_decode($value['value'], true);
+            if (!$val) $val = $value['value'];
+
+            $res[$value['key']] = $val;
+        }
+
+        return $res;
+    }
 }

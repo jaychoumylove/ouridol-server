@@ -24,7 +24,7 @@ class Test extends Base
 
     public function index()
     {
-
+        echo strtotime('06:00:00');
         // dump((new WxAPI('gzh'))->addMaterial($realPath));
         // echo urlencode('https://rank.xiaolishu.com/#/pages/signin/signin');
 

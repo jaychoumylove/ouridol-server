@@ -34,16 +34,10 @@ class Ext extends Base
         $key = input('key');
         if ($key) Common::res(['data' => Cfg::getCfg($key)]);
         
+        $res = Cfg::getList();
         // 顺便获取分享信息
         $res['share_text'] = CfgShare::getOne();
 
-        $list = Cfg::all(['show' => 1]);
-        foreach ($list as $value) {
-            $val = json_decode($value['value'], true);
-            if (!$val) $val = $value['value'];
-
-            $res[$value['key']] = $val;
-        }
         Common::res(['data' => $res]);
     }
 

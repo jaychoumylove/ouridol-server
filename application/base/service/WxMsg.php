@@ -53,13 +53,13 @@ class WxMsg
     /**上传临时图片，保存mediaId */
     public function getMediaId($realPath)
     {
-        $img = WxImg::where(['img_local_url' => $realPath])->find();
+        $img = WxImg::where(['appid' => $this->appinfo['appid'], 'img_local_url' => $realPath])->find();
 
         if ($img) {
-            if ($img['expire_in'] < time()) {// 已过期
+            if ($img['expire_in'] < time()) { // 已过期
                 $res = (new WxAPI($this->appinfo['appid']))->uploadMedia($realPath);
                 if (isset($res['media_id'])) {
-                    WxImg::where(['img_local_url' => $realPath])->update([
+                    WxImg::where(['appid' => $this->appinfo['appid'], 'img_local_url' => $realPath])->update([
                         'media_id' => $res['media_id'],
                         'expire_in' => time() + 3600 * 24 * 3
                     ]);
@@ -72,6 +72,7 @@ class WxMsg
             $res = (new WxAPI($this->appinfo['appid']))->uploadMedia($realPath);
             if (isset($res['media_id'])) {
                 WxImg::create([
+                    'appid' => $this->appinfo['appid'],
                     'img_local_url' => $realPath,
                     'media_id' => $res['media_id'],
                     'expire_in' => time() + 3600 * 24 * 3
