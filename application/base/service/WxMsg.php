@@ -83,7 +83,7 @@ class WxMsg
     }
 
     /**
-     * 自动回复
+     * 自动(被动)回复
      * @param array $msgFrom 消息来源
      */
     public function autoSend($msgFrom, $msgType, $msgBody)
@@ -97,5 +97,14 @@ class WxMsg
 
         $content = array_merge($content, $msgBody);
         die(Common::toXml($content));
+    }
+
+    /**下载图片 */
+    public function download($url)
+    {
+        $content = file_get_contents($url);
+        $filePath = ROOT_PATH . 'public/uploads/' . time() . mt_rand(10000, 99999);
+        file_put_contents($filePath, $content);
+        return $filePath;
     }
 }

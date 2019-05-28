@@ -49,7 +49,8 @@ class Task extends Base
         $user = User::with(['UserStar' => ['Star' => ['StarRank']]])->where(['id' => $this->uid])->find();
         $rank = (new Star())->getRank($user['user_star']['star']['star_rank']['week_hot'], 'week_hot');
         $type = input('type', 0);
-        $text = "我正在为#APPNAME#STARNAME打榜，STARNAME已经获得了STARSCORE票，实时排名第STARRANK，wx搜索小程序“APPNAME”，加入STARNAME的偶像圈，一起用爱解锁最强福利！";
+        // $text = "我正在为#APPNAME#STARNAME打榜，STARNAME已经获得了STARSCORE票，实时排名第STARRANK，wx搜索小程序“APPNAME”，加入STARNAME的偶像圈，一起用爱解锁最强福利！";
+        $text = "#STARNAME[超话]#我爱你不是说说而已，每天坚持做数据，wx小程序搜索#APPNAME# 为STARNAME应援贡献一份自己的力量。打卡解锁千元应援金，更有新浪微博送花可提高排名，主流媒体宣传福利。大家都行动起来多多参与活动吧！@APPNAMEIDOL";
         // $text = "#STARNAME[超话]#今天我已为爱豆打榜，STARNAME加油，我爱你，我会每天支持你，
         //     不离不弃。爱STARNAME的伙伴们，一起来支持STARNAME吧？微信小程序搜索：APPNAME，夺取冠军福利，就等
         //     你了。现在STARNAME排名第STARRANK，获得了STARSCORE票。@APPNAME";

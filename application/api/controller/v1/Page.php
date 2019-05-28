@@ -38,8 +38,12 @@ class Page extends Base
 
         $res['userInfo'] = User::where(['id' => $this->uid])->field('id,nickname,avatarurl,type')->find();
         $res['userCurrency'] = UserCurrency::getCurrency($this->uid);
+
         $res['userStar'] = UserStar::with('Star')->where(['user_id' => $this->uid])->order('id desc')->find()['star'];
         unset($res['userStar']['create_time']);
+        if (!$res['userStar']) {
+            $res['userStar'] = [];
+        }
 
         // 顺便获取分享信息
         $res['config'] = Cfg::getList();

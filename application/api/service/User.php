@@ -11,6 +11,7 @@ use app\api\model\Rec;
 use app\api\model\Cfg;
 use app\api\model\CfgSignin;
 use app\api\model\UserExt;
+use think\Log;
 
 class User
 {
@@ -32,8 +33,9 @@ class User
             if (isset($res['errcode']) && $res['errcode'] == 40163) Common::res(['msg' => '已登录']);
             if (isset($res['unionid'])) {
                 $res['openid'] = UserModel::where(['unionid' => $res['unionid']])->value('openid');
-                if(!$res['openid']) Common::res(['code' => 202, 'msg' => '请先到同名小程序进行授权']);
+                if (!$res['openid']) Common::res(['code' => 202, 'msg' => '请先到同名小程序进行用户授权']);
             } else {
+                Log::record('未获取到用户信息，缺少unionid', 'error');
                 Common::res(['code' => 202, 'msg' => '未获取到用户信息，缺少unionid']);
             }
         }
@@ -150,7 +152,7 @@ class User
 
         (new User())->change($uid, [
             'coin' => $coin,
-        ],[
+        ], [
             'type' => 10
         ]);
 

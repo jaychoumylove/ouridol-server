@@ -56,31 +56,33 @@ class UserSprite extends Base
     public static function settle($uid, $self)
     {
         $userSprite = self::getInfo($uid);
-        Db::startTrans();
-        try {
-            self::where(['user_id' => $uid])->update([
-                'settle_time' => time() - 5,
-            ]);
+        if ($userSprite['earn'] > 0) {
+            Db::startTrans();
+            try {
+                self::where(['user_id' => $uid])->update([
+                    'settle_time' => time() - 5,
+                ]);
 
-            if ($uid != $self) {
-                // 他人帮收
-                $log = [
-                    'type' => 7,
-                    'target_user_id' => $self
-                ];
-            } else {
-                $log = [
-                    'type' => 9
-                ];
+                if ($uid != $self) {
+                    // 他人帮收
+                    $log = [
+                        'type' => 7,
+                        'target_user_id' => $self
+                    ];
+                } else {
+                    $log = [
+                        'type' => 9
+                    ];
+                }
+
+                (new User())->change($uid, [
+                    'coin' => $userSprite['earn'],
+                ], $log);
+                Db::commit();
+            } catch (\Exception $e) {
+                Db::rollBack();
+                Common::res(['code' => 400, 'data' => $e->getMessage()]);
             }
-
-            (new User())->change($uid, [
-                'coin' => $userSprite['earn'],
-            ], $log);
-            Db::commit();
-        } catch (\Exception $e) {
-            Db::rollBack();
-            Common::res(['code' => 400, 'data' => $e->getMessage()]);
         }
         return $userSprite['earn'];
     }
@@ -118,7 +120,7 @@ class UserSprite extends Base
 
             (new User())->change($uid, [
                 'stone' => $need_stone / -1,
-            ],[
+            ], [
                 'type' => 11
             ]);
             Db::commit();

@@ -13,6 +13,7 @@ use think\Cache;
 use app\base\service\WxAPI;
 use think\Exception;
 use app\base\controller\Base;
+use app\base\service\WxMsg;
 
 class Test extends Base
 {
@@ -24,7 +25,9 @@ class Test extends Base
 
     public function index()
     {
-        echo strtotime('06:00:00');
+        dump(file_get_contents('https://ww2.sinaimg.cn/large/005BYqpggy1g2u2xti6raj305k05ka9v.jpg'));
+        // dump((new WxMsg())->getMediaId(ROOT_PATH . 'public/uploads/cust-0.jpg'));
+        // echo strtotime('06:00:00');
         // dump((new WxAPI('gzh'))->addMaterial($realPath));
         // echo urlencode('https://rank.xiaolishu.com/#/pages/signin/signin');
 
