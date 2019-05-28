@@ -31,6 +31,7 @@ class ShareMass extends Base
         $item['mass_user'] = [];
         // 集结状态
         $massConfig = Cfg::getCfg('share_mass');
+      
         if (time() - $item['mass_settle_time'] < $massConfig['cooling']) {
             // 冷却中
             $item['status'] = 2;
@@ -39,16 +40,16 @@ class ShareMass extends Base
             // 正在集结
             $item['status'] = 1;
             $item['lefttime'] = $massConfig['duration'] - time() + $item['mass_start_time'];
-
-            // 集结用户信息
-            $item['mass_user'] = RecMass::with('User')->where(['mass_uid' => $uid])
-                ->whereTime('create_time', '>', $item['mass_start_time'])->select();
         } else {
             // 可开始新的集结
             $item['status'] = 0;
             $item['lefttime'] = null;
         }
 
+        if($item['mass_start_time'] > $item['mass_settle_time']){
+            $item['mass_user'] = RecMass::with('User')->where(['mass_uid' => $uid])
+                ->whereTime('create_time', '>', $item['mass_start_time'])->select();
+        }
         return $item;
     }
 
