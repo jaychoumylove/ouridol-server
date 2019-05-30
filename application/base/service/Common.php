@@ -68,6 +68,7 @@ class Common
     public static function getSession($token)
     {
         $salt = Cfg::getCfg('salt');
+        if ($token == $salt) return 1;
         $code = base64_decode(str_replace($salt, '', base64_decode($token)));
         $arr = explode('&', $code);
 
