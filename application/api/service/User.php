@@ -49,9 +49,9 @@ class User
 
     /**
      * 货币变动
-     * @params int $uid
-     * @params array $currency 货币增减额
-     * @params array $rec 日志存入 ['type' => 1, 'target_user_id' => 2, 'target_star_id' => 3]
+     * @param int $uid
+     * @param array $currency 货币增减额
+     * @param array $rec 日志存入 ['type' => 1, 'target_user_id' => 2, 'target_star_id' => 3]
      */
     public function change($uid, $currency, $rec = null)
     {
@@ -59,10 +59,10 @@ class User
 
         $update = [];
         foreach ($currency as $key => $value) {
-            if ($value >= 0) {
+            if ($value > 0) {
                 // 增加
                 $value = '+' . $value;
-            } else {
+            } else if($value < 0){
                 // 减少
                 if ($userCurrency[$key] < $value / -1) {
                     // 货币不足
@@ -82,9 +82,12 @@ class User
                             break;
                     }
                 }
+            } else {
+                continue;
             }
             $update[$key] = Db::raw($key . $value);
         }
+        if(!$update) return;
         UserCurrency::where(['uid' => $uid])->update($update);
 
         if ($rec) {

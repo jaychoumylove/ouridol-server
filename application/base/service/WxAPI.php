@@ -110,7 +110,7 @@ class WxAPI
     }
 
     /**
-     * 发送客服消息
+     * (主动)发送客服消息
      * customerServiceMessage.send
      * @param string $openid 用户openid
      * @param array $msgType

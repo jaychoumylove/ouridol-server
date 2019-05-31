@@ -31,7 +31,7 @@ class Page extends Base
             // 拉新关系
             UserRelation::saveNew($this->uid, $rer_user_id);
             // 加入集结
-            ShareMass::join($rer_user_id, $this->uid);
+            $res['massUser'] = ShareMass::join($rer_user_id, $this->uid);
             // 师徒关系
             UserFather::join($rer_user_id, $this->uid);
         }

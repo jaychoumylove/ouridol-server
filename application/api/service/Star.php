@@ -20,6 +20,7 @@ class Star
         return StarRankModel::where($field, 'GT', $score)->count() + 1;
     }
 
+    /**打榜 */
     public function sendHot($starid, $hot, $uid)
     {
         if (Cache::get('lockSend')['isLock'] == 1) {
@@ -38,15 +39,7 @@ class Star
                 'type' => 2,
                 'target_star_id' => $starid,
             ]);
-            //===DESERT===
-
-            // 徒弟送能量 师傅获得贡献度30%的能量 
-            // $father = UserFather::where(['son' => $uid])->value('father');
-            // if ($father) {
-            //     (new User())->change($father, [
-            //         'coin' => ceil($hot * Cfg::getCfg('father_earn_per')),
-            //     ]);
-            // }
+         
             // 徒弟贡献 
             UserFather::where(['son' => $uid])->update([
                 'cur_contribute' => Db::raw('cur_contribute+' . $hot)

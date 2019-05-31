@@ -79,6 +79,7 @@ class ShareMass extends Base
             // 检查今日是否已加入集结
             if (!RecMass::where(['be_mass_uid' => $uid])->whereTime('create_time', 'd')->value('id')) {
                 RecMass::create(['be_mass_uid' => $uid, 'mass_uid' => $rer]);
+                return User::where(['id' => $rer])->value('nickname');
             }
         }
     }

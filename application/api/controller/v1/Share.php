@@ -36,11 +36,13 @@ class Share extends Base
         // 拉新关系
         UserRelation::saveNew($this->uid, $rer_user_id);
         // 加入集结
-        ShareMass::join($rer_user_id, $this->uid);
+        $massRerUser = ShareMass::join($rer_user_id, $this->uid);
         // 师徒关系
         UserFather::join($rer_user_id, $this->uid);
 
-        Common::res([]);
+        Common::res(['data' => [
+            'massRerUser' => $massRerUser
+        ]]);
     }
 
     public function massSettle()

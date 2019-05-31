@@ -21,26 +21,28 @@ class Notify extends Base
         // "MsgType":"text","Content":"99","MsgId":"22306477788296821"}
         Log::record(json_encode($msg));
 
-        $media_id = $wxMsg->getMediaId(ROOT_PATH . 'public/uploads/cust-0.jpg');
+        if ($msg['MsgType'] == 'text') {
+            $media_id = $wxMsg->getMediaId(ROOT_PATH . 'public/uploads/cust-0.jpg');
 
-        if (isset($msg['Content'])) {
-            if ($msg['Content'] == '1') {
-                // 充值
-                $media_id = $wxMsg->getMediaId(ROOT_PATH . 'public/uploads/cust-1.jpg');
-            } else if ($msg['Content'] == '2') {
-                // 打卡
-                $media_id = $wxMsg->getMediaId(ROOT_PATH . 'public/uploads/cust-2.jpg');
+            if (isset($msg['Content'])) {
+                if ($msg['Content'] == '1') {
+                    // 充值
+                    $media_id = $wxMsg->getMediaId(ROOT_PATH . 'public/uploads/cust-1.jpg');
+                } else if ($msg['Content'] == '2') {
+                    // 打卡
+                    $media_id = $wxMsg->getMediaId(ROOT_PATH . 'public/uploads/cust-2.jpg');
+                }
             }
+
+            $ret = (new WxAPI(input('appid')))->sendCustomerMsg(
+                $msg['FromUserName'],
+                'image',
+                [
+                    'media_id' => $media_id
+                ]
+            );
         }
 
-        $ret = (new WxAPI(input('appid')))->sendCustomerMsg(
-            $msg['FromUserName'],
-            'image',
-            [
-                'media_id' => $media_id
-            ]
-        );
-        Log::record(json_encode($ret));
         // 1 Rhb7Ve9i_o4CTDHFEEDLxLrezUmYLgtHJX4ygFnU6ByqyfNKc7AqO4fV4xbOW_0b 1558604812
         // 2 OcmHYC1bg8SEP0RQBEJixn4ob6a-fTNba6KIwBXgHf5P0FsDWigvNnwfe0dbu0UF 1558604866
         // 3 lK7m2JjQpaoYn20rXe8D2-DbT3Ne9a7QKKp1jWkSopqIQMNZ1MzxE2CJAueJNaqW 1558604886
