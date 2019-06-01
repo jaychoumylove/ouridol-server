@@ -7,7 +7,7 @@ use app\api\model\StarRank as StarRankModel;
 class H5 extends Base
 {
 
-    private $starUrl = 'https://cs.huamufang.com/h5/star/';
+    private $starUrl = 'https://ouridol.xiaolishu.com/h5/star/';
     
     // star首页
     public function star()
