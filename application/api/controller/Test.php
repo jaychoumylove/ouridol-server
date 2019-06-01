@@ -21,7 +21,7 @@ class Test extends Base
     private function test()
     {
         return 1;
-    }
+    }    
 
     public function index()
     {
