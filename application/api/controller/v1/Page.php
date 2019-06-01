@@ -81,6 +81,7 @@ class Page extends Base
 
         $res['article'] = Article::where('1=1')->order('create_time desc,id desc')->find();
 
+        // 师傅收益
         $cur_contribute = UserFather::where(['father' => $this->uid])->max('cur_contribute');
         $res['fatherEarn'] = floor($cur_contribute * Cfg::getCfg('father_earn_per'));
 

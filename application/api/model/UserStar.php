@@ -34,9 +34,9 @@ class UserStar extends Base
     {
         self::where(['user_id' => $uid, 'star_id' => $starid])->update([
             'total_count' => Db::raw('total_count+' . $hot),
+            'thisday_count' => Db::raw('thisday_count+' . $hot),
             'thisweek_count' => Db::raw('thisweek_count+' . $hot),
             'thismonth_count' => Db::raw('thismonth_count+' . $hot),
-            'thisday_count' => Db::raw('thisday_count+' . $hot),
         ]);
     }
 
@@ -47,6 +47,7 @@ class UserStar extends Base
         try {
             $userType = User::where('id', $uid)->value('type');
             if ($userType == 1) {
+                // 管理员
                 $uid = self::getVirtualUser($starid, $uid);
             }
 
@@ -72,6 +73,9 @@ class UserStar extends Base
     public static function getVirtualUser($starid, $uid)
     {
         $user = User::where('id', $uid)->find();
+        if (strpos($user['openid'], '@') !== false) {
+            Common::res(['code' => 1, 'msg' => '请尝试清除缓存后再试']);
+        }
         $oldStarid = UserStar::where('user_id', $uid)->value('star_id');
         if (!$oldStarid) $oldStarid = 0;
         // 旧 带上oldStarid后缀

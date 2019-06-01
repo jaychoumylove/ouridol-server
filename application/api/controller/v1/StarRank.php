@@ -16,12 +16,11 @@ class StarRank extends Base
         $page = input('page', 1);
         $size = input('size', 10);
         $keywords = input('keywords', '');
-        $sign = input('sign', 0);// 韩星榜
+        $sign = input('sign', 0); // 韩星榜
         $rankField = input('rankField', 'week_hot');
         $type = input('type', 0);
 
         $list = StarRankModel::getRankList($page, $size, $rankField, $keywords, $sign);
-
         if ($type == 1) {
             // 偷花倒计时
             $this->getUser();
@@ -47,12 +46,28 @@ class StarRank extends Base
     public function search()
     { }
 
+    /**历史榜单 */
     public function getRankHistory()
     {
         // $page = input('page', 1);
         // $size = input('size', 10);
 
-        $res = StarRankHistory::where('1=1')->order('date desc')->select();
+        $rankField = input('rankField', 'week_hot');
+
+        $res = StarRankHistory::where(['field' => $rankField])->order('date desc')->select();
+
+        foreach ($res as &$value) {
+            $year = substr($value['date'], 0, 4);
+            if ($rankField == 'week_hot') {
+                $week = substr($value['date'], -2);
+
+                $value['date'] = $year . '年' . $week . '周';
+            } else if($rankField == 'month_hot'){
+                $month = substr($value['date'], -2);
+
+                $value['date'] = $year . '年' . $month . '月';
+            }
+        }
         Common::res(['data' => $res]);
     }
 }

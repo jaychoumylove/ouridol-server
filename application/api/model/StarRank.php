@@ -16,7 +16,7 @@ class StarRank extends Base
             $ids = Star::where('name', 'like', '%' . $keywords . '%')->column('id');
             $w = ['star_id' => ['in', $ids]];
         } else {
-            $w = false;
+            $w = '1=1';
         }
 
         $list = self::with('star')->where($w)->order($rankField . ' desc,id asc')

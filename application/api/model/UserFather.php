@@ -17,7 +17,7 @@ class UserFather extends Base
 
     public static function getFatherList($uid)
     {
-        self::initFather($uid);
+        // self::initFather($uid);
         $res = self::with('User')->where(['father' => $uid])->order('cur_contribute desc,create_time desc')->select();
 
         if ($res) {
@@ -25,8 +25,9 @@ class UserFather extends Base
                 $value['user_earn'] = floor($value['cur_contribute'] * Cfg::getCfg('father_earn_per'));
             }
         }
-
-        return $res;
+        $data['list'] = $res;
+        $data['earn'] = Rec::where(['type' => 5, 'user_id' => $uid])->whereTime('create_time', 'd')->sum('coin');
+        return $data;
     }
 
     /**结成师徒关系 */
@@ -96,7 +97,7 @@ class UserFather extends Base
 
     public static function initFather($uid)
     {
-        $opTime = self::where(['father' => $uid])->order('update_time desc')->value('update_time');
+        $opTime = self::where(['father' => $uid])->max('update_time');
         $opTime = date('Ymd', strtotime($opTime));
 
         if (date('Ymd', time()) != $opTime) {

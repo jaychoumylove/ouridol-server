@@ -31,7 +31,7 @@ class ShareMass extends Base
         $item['mass_user'] = [];
         // 集结状态
         $massConfig = Cfg::getCfg('share_mass');
-      
+
         if (time() - $item['mass_settle_time'] < $massConfig['cooling']) {
             // 冷却中
             $item['status'] = 2;
@@ -46,7 +46,7 @@ class ShareMass extends Base
             $item['lefttime'] = null;
         }
 
-        if($item['mass_start_time'] > $item['mass_settle_time']){
+        if ($item['mass_start_time'] > $item['mass_settle_time']) {
             $item['mass_user'] = RecMass::with('User')->where(['mass_uid' => $uid])
                 ->whereTime('create_time', '>', $item['mass_start_time'])->select();
         }
@@ -79,6 +79,12 @@ class ShareMass extends Base
             // 检查今日是否已加入集结
             if (!RecMass::where(['be_mass_uid' => $uid])->whereTime('create_time', 'd')->value('id')) {
                 RecMass::create(['be_mass_uid' => $uid, 'mass_uid' => $rer]);
+
+                // 望帮别人集结成功也有100能量奖励
+                (new UserService())->change($uid, [
+                    'coin' => 100
+                ], ['type' => 14]);
+
                 return User::where(['id' => $rer])->value('nickname');
             }
         }

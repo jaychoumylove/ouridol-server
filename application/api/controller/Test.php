@@ -25,7 +25,10 @@ class Test extends Base
 
     public function index()
     {
-        dump(file_get_contents('https://ww2.sinaimg.cn/large/005BYqpggy1g2u2xti6raj305k05ka9v.jpg'));
+
+        echo date('Ym', time() - 3600);
+
+        // dump(file_get_contents('https://ww2.sinaimg.cn/large/005BYqpggy1g2u2xti6raj305k05ka9v.jpg'));
         // dump((new WxMsg())->getMediaId(ROOT_PATH . 'public/uploads/cust-0.jpg'));
         // echo strtotime('06:00:00');
         // dump((new WxAPI('gzh'))->addMaterial($realPath));

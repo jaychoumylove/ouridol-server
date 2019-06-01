@@ -59,7 +59,7 @@ class Share extends Base
         $this->getUser();
 
         $res = UserFather::getFatherList($this->uid);
-
+        
         Common::res(['data' => $res]);
     }
 

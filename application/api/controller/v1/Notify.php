@@ -43,10 +43,6 @@ class Notify extends Base
             );
         }
 
-        // 1 Rhb7Ve9i_o4CTDHFEEDLxLrezUmYLgtHJX4ygFnU6ByqyfNKc7AqO4fV4xbOW_0b 1558604812
-        // 2 OcmHYC1bg8SEP0RQBEJixn4ob6a-fTNba6KIwBXgHf5P0FsDWigvNnwfe0dbu0UF 1558604866
-        // 3 lK7m2JjQpaoYn20rXe8D2-DbT3Ne9a7QKKp1jWkSopqIQMNZ1MzxE2CJAueJNaqW 1558604886
-
         // $wxMsg->autoSend($msg, 'text', [
         //     'Content' =>
         //     "欢迎！回复：\n1 签到\n2 补充能量\n3 人工服务",

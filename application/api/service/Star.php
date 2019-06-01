@@ -48,7 +48,7 @@ class Star
             // 明星增加人气
             StarRankModel::where(['star_id' => $starid])->update([
                 'week_hot' => Db::raw('week_hot+' . $hot),
-                'month_hot' =>  Db::raw('month_hot+' . $hot),
+                'month_hot' => Db::raw('month_hot+' . $hot),
             ]);
 
             Db::commit();
