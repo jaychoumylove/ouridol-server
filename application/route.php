@@ -4,6 +4,9 @@ use think\Route;
 
 // Test
 Route::rule('test', 'api/Test/index');
+// H5
+Route::rule('h5/star', 'api/v1.H5/star');
+
 // Clearner
 Route::rule('api/:version/clean', 'api/v1.Cleaner/index');
 
