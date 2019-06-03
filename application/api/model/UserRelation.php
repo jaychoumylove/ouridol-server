@@ -116,15 +116,14 @@ class UserRelation extends Base
             }
         } else {
             $res = self::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2]]])->page($page, $size)->select();
-            if (count($res) < $size && $page <= 10) {
-                for ($i = 0; $i < ($size - count($res)); $i++) {
+            $len = count($res);
+            if ($len < $size && $page <= 10) {
+                for ($i = 0; $i < ($size - $len); $i++) {
                     $res[] = [
                         'status' => 0,
-                        'user' => [
-                            'avatarurl' => 'https://wx.qlogo.cn/mmhead/gBSelbQM7M19TeazvLwo3f8znKS8KR1CuibicFHc1GTWI/132',
-                        ]
                     ];
                 }
+                
             }
         }
 
