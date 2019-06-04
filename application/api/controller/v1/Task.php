@@ -36,9 +36,17 @@ class Task extends Base
         $weiboUrl = input('weiboUrl');
         if (!$weiboUrl) Common::res(['code' => 100]);
 
+        $type = input('type', 0);
+
+        if ($type == 0) {
+            $text = Cfg::getCfg('appname');
+        } else if ($type == 1) {
+            $text = Cfg::getCfg('weibo_zhuanfa')['pick_text'];
+        }
+
         $taskService = new TaskService();
         $weiboUrl = $taskService->getWeiboUrl($weiboUrl);
-        $taskService->saveWeibo($weiboUrl, $this->uid, Cfg::getCfg('appname'));
+        $taskService->saveWeibo($weiboUrl, $this->uid, $text, $type);
         Common::res([]);
     }
 
@@ -60,6 +68,9 @@ class Task extends Base
         $text = str_replace('STARRANK', $rank, $text);
         $text = str_replace('APPNAME', Cfg::getCfg('appname'), $text);
 
-        Common::res(['data' => $text]);
+        Common::res(['data' => [
+            'share_text' => $text,
+            'weibo_zhuanfa' => Cfg::getCfg('weibo_zhuanfa'),
+        ]]);
     }
 }

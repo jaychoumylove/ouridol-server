@@ -110,7 +110,7 @@ class Task
                     if (in_array($task['id'], $recTask)) {
                         $task['status'] = 2;
                     } else {
-                        $isDone = RecWeibo::where(['user_id' => $uid])->whereTime('create_time', 'd')->find();
+                        $isDone = RecWeibo::where(['user_id' => $uid, 'type' => 0])->whereTime('create_time', 'd')->find();
                         if ($isDone) {
                             $task['status'] = 1;
                         }
@@ -181,6 +181,18 @@ class Task
                         $task['status'] = 2;
                     }
                     break;
+
+                case 14:
+                    // 微博转发
+                    if (in_array($task['id'], $recTask)) {
+                        $task['status'] = 2;
+                    } else {
+                        $isDone = RecWeibo::where(['user_id' => $uid, 'type' => 1])->whereTime('create_time', 'd')->find();
+                        if ($isDone) {
+                            $task['status'] = 1;
+                        }
+                    }
+                    break;
                 default:
                     # code...
                     break;
@@ -236,7 +248,7 @@ class Task
         return $update;
     }
 
-    public function saveWeibo($weiboUrl, $uid, $text)
+    public function saveWeibo($weiboUrl, $uid, $text, $type)
     {
         $weiboUrlExist = RecWeibo::get(['md5' => md5($weiboUrl)]);
         if ($weiboUrlExist) Common::res(['code' => 1, 'msg' => '该链接已经提交使用']);
@@ -250,6 +262,7 @@ class Task
                 'user_id' => $uid,
                 'url' => $weiboUrl,
                 'md5' => md5($weiboUrl),
+                'type' => $type,
             ]);
         }
     }
