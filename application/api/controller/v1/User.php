@@ -54,9 +54,10 @@ class User extends Base
         require_once APP_PATH . 'wx/aes/wxBizDataCrypt.php';
         $pc = new \WXBizDataCrypt($appid, $sessionKey);
         $pc->decryptData($encryptedData, $iv, $data);
-
         $data = json_decode($data, true);
-        if (!isset($data['unionId'])) Common::res(['code' => 1, 'msg' => '更新失败，请稍后再试', 'data' => $data]);
+        
+        // 未获取到unionid 重新登录更新session_key再试
+        if (!isset($data['unionId'])) Common::res(['code' => 201, 'data' => $data]);
         $saveData['nickname'] = $data['nickName'];
         $saveData['gender'] = $data['gender'];
         $saveData['language'] = $data['language'];

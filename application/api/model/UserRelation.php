@@ -100,7 +100,6 @@ class UserRelation extends Base
 
                 array_multisort($sort, SORT_DESC, $res);
             }
-       
         } else if ($type == 2) {
             $res = self::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2]]])->page($page, $size)->select();
 
@@ -115,6 +114,7 @@ class UserRelation extends Base
                 array_multisort($sort, SORT_DESC, $res);
             }
         } else {
+            if ($page > 10) $page = 10;
             $res = self::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2]]])->page($page, $size)->select();
             $len = count($res);
             if ($len < $size && $page <= 10) {
@@ -123,7 +123,6 @@ class UserRelation extends Base
                         'status' => 0,
                     ];
                 }
-                
             }
         }
 

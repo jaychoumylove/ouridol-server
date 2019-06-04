@@ -39,11 +39,18 @@ class Star
                 'type' => 2,
                 'target_star_id' => $starid,
             ]);
-         
+
             // 徒弟贡献 
-            UserFather::where(['son' => $uid])->update([
-                'cur_contribute' => Db::raw('cur_contribute+' . $hot)
-            ]);
+            $opTime = UserFather::where(['son' => $uid])->value('update_time');
+            if (date('Ymd', $opTime) != date('Ymd', time())) {
+                UserFather::where(['son' => $uid])->update([
+                    'cur_contribute' => $hot,
+                ]);
+            } else {
+                UserFather::where(['son' => $uid])->update([
+                    'cur_contribute' => Db::raw('cur_contribute+' . $hot)
+                ]);
+            }
 
             // 明星增加人气
             StarRankModel::where(['star_id' => $starid])->update([
