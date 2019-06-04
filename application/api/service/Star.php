@@ -42,7 +42,7 @@ class Star
 
             // 徒弟贡献 
             $opTime = UserFather::where(['son' => $uid])->value('update_time');
-            if (date('Ymd', $opTime) != date('Ymd', time())) {
+            if (date('Ymd', strtotime($opTime)) != date('Ymd', time())) {
                 UserFather::where(['son' => $uid])->update([
                     'cur_contribute' => $hot,
                 ]);
