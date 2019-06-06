@@ -17,6 +17,7 @@ use app\api\model\Star as AppStar;
 use app\api\model\RecStarChart;
 use GatewayClient\Gateway;
 use app\api\model\Article;
+use app\api\model\UserSprite;
 
 class Page extends Base
 {
@@ -48,6 +49,13 @@ class Page extends Base
         // 顺便获取分享信息
         $res['config'] = Cfg::getList();
         $res['config']['share_text'] = CfgShare::getOne();
+
+        $spriteUpgrade = UserSprite::getInfo($this->uid)['need_stone'];
+        $stone = UserCurrency::where(['uid' => $this->uid])->value('stone');
+
+        if ($stone >= $spriteUpgrade) {
+            $res['upSprite'] = true;
+        }
 
         Common::res(['data' => $res]);
     }

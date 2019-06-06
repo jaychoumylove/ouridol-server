@@ -53,19 +53,15 @@ class User extends Base
 
         require_once APP_PATH . 'wx/aes/wxBizDataCrypt.php';
         $pc = new \WXBizDataCrypt($appid, $sessionKey);
-        $pc->decryptData($encryptedData, $iv, $data);
+        $errcode = $pc->decryptData($encryptedData, $iv, $data);
         $data = json_decode($data, true);
-        
-        // 未获取到unionid 重新登录更新session_key再试
-        if (!isset($data['unionId'])) Common::res(['code' => 201, 'data' => $data]);
-        $saveData['nickname'] = $data['nickName'];
-        $saveData['gender'] = $data['gender'];
-        $saveData['language'] = $data['language'];
-        $saveData['city'] = $data['city'];
-        $saveData['province'] = $data['province'];
-        $saveData['country'] = $data['country'];
-        $saveData['avatarurl'] = $data['avatarUrl'];
-        $saveData['unionid'] = $data['unionId'];
+
+        if ($errcode) Common::res(['code' => 201, 'data' => $data]);
+        // 保存
+        foreach ($data as $key => $value) {
+            $saveData[strtolower($key)] = $value;
+        }
+        unset($saveData['watermark']);
 
         UserModel::where(['id' => $this->uid])->update($saveData);
         Common::res([]);

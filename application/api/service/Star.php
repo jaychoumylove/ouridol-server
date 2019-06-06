@@ -11,6 +11,7 @@ use app\api\model\UserRelation;
 use app\api\model\UserFather;
 use app\api\model\OtherLock;
 use think\Cache;
+use app\api\model\UserExt;
 
 class Star
 {
@@ -70,18 +71,30 @@ class Star
     public function steal($starid, $uid)
     {
         $hot = Cfg::getCfg('stealCount');
+
+        $stealTimes = UserExt::where(['user_id' => $uid])->value('steal_times');
+        $stealLimit = Cfg::getCfg('steal_limit');
+        if ($stealTimes >= $stealLimit) {
+            Common::res(['code' => 1, 'msg' => '今日次数已达上限']);
+        }
+
         Db::startTrans();
         try {
+
             StarRankModel::where(['star_id' => $starid])->update([
                 'week_hot' => Db::raw('week_hot-' . $hot),
-                // 'month_hot' =>  Db::raw('month_hot-' . $hot),
+                'month_hot' => Db::raw('month_hot-' . $hot),
             ]);
 
             (new User())->change($uid, [
-                'coin' => $hot / 1,
+                'coin' => $hot,
             ], [
                 'type' => 1,
                 'target_star_id' => $starid,
+            ]);
+
+            UserExt::where(['user_id' => $uid])->update([
+                'steal_times' => Db::raw('steal_times+1')
             ]);
 
 

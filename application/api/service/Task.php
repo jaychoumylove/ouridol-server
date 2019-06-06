@@ -49,7 +49,7 @@ class Task
                     break;
                 case 3:
                     // 偷能量
-                    $task['doneTimes'] = Rec::where(['user_id' => $uid, 'type' => 1])->whereTime('create_time', 'd')->count();
+                    $task['doneTimes'] = UserExt::where(['user_id' => $uid])->value('steal_times');
 
                     if (in_array($task['id'], $recTask)) {
                         $task['status'] = 2;
