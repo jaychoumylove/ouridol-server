@@ -72,9 +72,8 @@ class Star
     {
         $hot = Cfg::getCfg('stealCount');
 
-        $stealTimes = UserExt::where(['user_id' => $uid])->value('steal_times');
-        $stealLimit = Cfg::getCfg('steal_limit');
-        if ($stealTimes >= $stealLimit) {
+        $userExt = UserExt::where(['user_id' => $uid])->field('steal_times,update_time')->find();
+        if ($userExt['steal_times'] >= Cfg::getCfg('steal_limit')) {
             Common::res(['code' => 1, 'msg' => '今日次数已达上限']);
         }
 
@@ -93,9 +92,16 @@ class Star
                 'target_star_id' => $starid,
             ]);
 
-            UserExt::where(['user_id' => $uid])->update([
-                'steal_times' => Db::raw('steal_times+1')
-            ]);
+            if (date('Ymd', strtotime($userExt['update_time'])) != date('Ymd', time())) {
+                // 偷取次数清零
+                UserExt::where(['user_id' => $uid])->update([
+                    'steal_times' => 1
+                ]);
+            } else {
+                UserExt::where(['user_id' => $uid])->update([
+                    'steal_times' => Db::raw('steal_times+1')
+                ]);
+            }
 
 
             Db::commit();
