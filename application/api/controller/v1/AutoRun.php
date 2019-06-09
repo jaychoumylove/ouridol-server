@@ -77,6 +77,15 @@ class AutoRun extends Base
                 'week_hot' => 10000,
             ]);
 
+            // 前三
+            $topThreeAward = [300000, 200000, 100000];
+            $topThreeIds = array_slice(array_column($rankList, 'star_id'), 0, 3);
+            foreach ($topThreeAward as $key => $value) {
+                StarRank::where(['star_id' => $topThreeIds[$key]])->update([
+                    'week_hot' => $value,
+                ]);
+            }
+
             Db::commit();
         } catch (\Exception $e) {
             Db::rollBack();
@@ -119,7 +128,7 @@ class AutoRun extends Base
 
             // 转存历史排名
             $rankList = StarRank::getRankList(1, 10, 'month_hot', '', 0);
-            
+
             StarRankHistory::create([
                 'date' => date('Ym', time() - 3600),
                 'value' => json_encode($rankList, JSON_UNESCAPED_UNICODE),
@@ -137,7 +146,7 @@ class AutoRun extends Base
 
             die('rollBack:' . $e->getMessage());
         }
-        
+
         die('done');
     }
 }
