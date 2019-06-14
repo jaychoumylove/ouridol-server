@@ -1,7 +1,7 @@
 <?php
 namespace app\push\service;
 
-use GatewayClient\Gateway;
+use GatewayWorker\Lib\Gateway;
 
 class Bind
 {

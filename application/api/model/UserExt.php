@@ -33,4 +33,17 @@ class UserExt extends Base
         }
         return $time;
     }
+
+    /**偷取次数清零 */
+    public static function checkSteal($uid)
+    {
+        $update_time = self::where(['user_id' => $uid])->value('update_time');
+        if (date('Ymd', strtotime($update_time)) != date('Ymd', time())) {
+            // 偷取次数清零
+            self::where(['user_id' => $uid])->update([
+                'steal_times' => 0,
+                'steal_count' => 0,
+            ]);
+        }
+    }
 }

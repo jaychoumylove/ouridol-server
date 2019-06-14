@@ -7,7 +7,6 @@ use app\api\model\User as UserModel;
 use app\base\service\Common;
 use app\api\service\User as UserService;
 use app\api\model\UserItem as UserItemModel;
-use GatewayClient\Gateway;
 use app\api\model\UserCurrency;
 use app\api\model\UserStar;
 use app\api\model\UserRelation;
@@ -17,6 +16,7 @@ use app\api\model\CfgShare;
 use app\api\model\Cfg;
 use app\base\service\WxAPI;
 use app\api\model\CfgSignin;
+use GatewayWorker\Lib\Gateway;
 
 class User extends Base
 {

@@ -15,9 +15,12 @@ use app\api\model\UserFather;
 use app\api\service\Star;
 use app\api\model\Star as AppStar;
 use app\api\model\RecStarChart;
-use GatewayClient\Gateway;
 use app\api\model\Article;
 use app\api\model\UserSprite;
+use app\base\service\WxAPI;
+use app\api\model\CfgItem;
+use app\api\model\UserItem;
+use GatewayWorker\Lib\Gateway;
 
 class Page extends Base
 {
@@ -40,10 +43,32 @@ class Page extends Base
         $res['userInfo'] = User::where(['id' => $this->uid])->field('id,nickname,avatarurl,type')->find();
         $res['userCurrency'] = UserCurrency::getCurrency($this->uid);
 
-        $res['userStar'] = UserStar::with('Star')->where(['user_id' => $this->uid])->order('id desc')->find()['star'];
-        unset($res['userStar']['create_time']);
-        if (!$res['userStar']) {
+        $userStar = UserStar::with('Star')->where(['user_id' => $this->uid])->order('id desc')->find();
+        if (!$userStar) {
             $res['userStar'] = [];
+        } else {
+            $res['userStar'] = $userStar['star'];
+            // 二维码
+            if (!$userStar['qrcode']) {
+                // 获取二维码
+                $data = (new WxAPI())->getwxacode('/pages/index/index?starid=' . $userStar['star_id'] . '&referrer=' . $this->uid);
+
+                if (!isset($data['errcode'])) {
+                    // 上传图片并保存
+                    $filePath = ROOT_PATH . 'public/uploads/qrcode.jpg';
+                    file_put_contents($filePath, $data);
+                    $file = (new WxAPI('gzh'))->addMaterial($filePath);
+                    if (!isset($file['errcode'])) {
+                        unlink($filePath);
+                        $res['qrcode'] = str_replace('http', 'https', $file['url']);
+                        UserStar::where(['user_id' => $this->uid])->update([
+                            'qrcode' => $res['qrcode']
+                        ]);
+                    }
+                }
+            } else {
+                $res['qrcode'] = $userStar['qrcode'];
+            }
         }
 
         // 顺便获取分享信息
@@ -75,8 +100,9 @@ class Page extends Base
 
         $res['userRank'] = UserStar::getRank($starid, 'thisweek_count', 1, 5);
 
+        // 聊天内容
         $res['chartList'] = RecStarChart::getLeastChart($starid);
-
+        // 加入聊天室
         Gateway::joinGroup($client_id, 'star_' . $starid);
 
         $res['mass'] = ShareMass::getMass($this->uid);
@@ -108,7 +134,11 @@ class Page extends Base
         // 我的累计打卡
         $res['activeInfo']['my_card_days'] = $active_card['active_card_days'] ? $active_card['active_card_days'] : 0;
 
-
+        // 礼物
+        $res['itemList'] = CfgItem::where('1=1')->order('count asc')->select();
+        foreach ($res['itemList'] as &$value) {
+            $value['self'] = UserItem::where(['uid' => $this->uid, 'item_id' => $value['id']])->value('count');
+        }
 
         Common::res(['data' => $res]);
     }

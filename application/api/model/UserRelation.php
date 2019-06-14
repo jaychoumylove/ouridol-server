@@ -72,7 +72,7 @@ class UserRelation extends Base
     {
         if ($type == 1) { // 宠物页面邀请列表，统计收益
             // 我邀请的人
-            $res = UserRelation::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2, 3]]])->page($page, $size)->select();
+            $res = UserRelation::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2, 3]]])->select();
             if ($page == 1) {
                 // 邀请我的人
                 $ralUser = self::with('RerUser')->where(['ral_user_id' => $uid, 'status' => ['in', [1, 2]]])->find();
@@ -88,6 +88,14 @@ class UserRelation extends Base
 
             if ($res) {
                 foreach ($res as $key => &$value) {
+                    $update_time = UserStar::where(['user_id' => $value['user']['id']])->value('update_time');
+                    if (time() - strtotime($update_time) > 3 * 3600 * 24) {
+                        // 不活跃的不能收
+                        $value['off'] = true;
+                    } else {
+                        $value['off'] = false;
+                    }
+
                     $value['sprite'] = ['earn' => 0];
                     if (isset($value['user']['id'])) {
                         // 精灵收益
@@ -95,10 +103,15 @@ class UserRelation extends Base
                     }
 
                     // 排序
-                    $sort[$key] = $value['sprite']['earn'];
+                    if ($value['off']) {
+                        $sort[$key] = -1 / $value['sprite']['earn'];
+                    } else {
+                        $sort[$key] = $value['sprite']['earn'];
+                    }
                 }
 
                 array_multisort($sort, SORT_DESC, $res);
+                $res = array_slice($res, ($page - 1) * $size, $size);
             }
         } else if ($type == 2) {
             $res = self::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2]]])->page($page, $size)->select();

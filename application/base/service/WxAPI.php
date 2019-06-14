@@ -98,6 +98,7 @@ class WxAPI
 
             $res = Common::request($url, false);
             if (isset($res['access_token'])) {
+                // 将新的token保存到数据库
                 Appinfo::where(['id' => $this->appinfo['id']])->update([
                     'access_token' => $res['access_token'],
                     'access_token_expire' => date('Y-m-d H:i:s', time() + $res['expires_in']),
@@ -180,5 +181,21 @@ class WxAPI
 
         $data = ['media' => new \CURLFile($filePath, false, false)];
         return Common::request($url, $data);
+    }
+
+    /**
+     * 获取小程序码，适用于需要的码数量较少的业务场景。
+     * @param string $path 扫码进入的小程序页面路径
+     */
+    public function getwxacode($path = '/pages/index/index')
+    {
+        $url = 'https://api.weixin.qq.com/wxa/getwxacode?access_token=ACCESS_TOKEN';
+
+        $accessToken = $this->getAccessToken();
+        if (!$accessToken) return false;
+        $url = str_replace('ACCESS_TOKEN', $accessToken, $url);
+
+        $data = ['path' => $path];
+        return Common::request($url, json_encode($data, JSON_UNESCAPED_UNICODE));
     }
 }

@@ -7,6 +7,7 @@ use app\base\service\Common;
 use app\api\model\StarRankHistory;
 use app\api\model\UserExt;
 use app\api\model\Cfg;
+use app\api\model\UserSprite;
 
 class StarRank extends Base
 {
@@ -33,10 +34,11 @@ class StarRank extends Base
                 }
                 $value = $time;
             }
+            $spriteLevel = UserSprite::where(['user_id' => $this->uid])->value('sprite_level');
             Common::res(['data' => [
                 'list' => $list,
                 'steal' => $leftTime,
-                'steal_count' => Cfg::getCfg('stealCount')
+                'steal_count' => Cfg::getCfg('stealCount') * $spriteLevel
             ]]);
         } else {
             Common::res(['data' => $list]);

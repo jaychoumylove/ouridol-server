@@ -18,14 +18,14 @@ class Base extends Model
     {
         return date('Y-m-d H:i:s', $value);
     }
+    protected function setDeleteTimeAttr($value)
+    {
+        return date('Y-m-d H:i:s', $value);
+    }
 
 
     // 软删除
     use SoftDelete;
     protected $deleteTime = 'delete_time';
     protected $update = ['delete_time'];
-    protected function setDeleteTimeAttr($value)
-    {
-        return date('Y-m-d H:i:s', $value);
-    }
 }

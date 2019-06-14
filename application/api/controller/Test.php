@@ -7,13 +7,14 @@ use app\base\service\Common;
 use app\api\model\StarRank;
 use app\api\model\Star;
 use think\Db;
-use GatewayClient\Gateway;
 use think\Log;
 use think\Cache;
 use app\base\service\WxAPI;
 use think\Exception;
 use app\base\controller\Base;
 use app\base\service\WxMsg;
+use app\api\model\PayOrder;
+use app\api\model\RecPayOrder;
 
 class Test extends Base
 {
@@ -21,17 +22,26 @@ class Test extends Base
     private function test()
     {
         return 1;
-    }    
+    }
 
     public function index()
     {
 
-        echo date('Ym', time() - 3600);
+
+        
+
+        // test('hello');
+        // $wxApi = new WxAPI();
+        // $data = $wxApi->getwxacode('/pages/index/index?starid=' . 1);
+
+        // file_put_contents(ROOT_PATH . 'public/uploads/1.jpg', $data);
+
+        // echo date('Ym', time() - 3600);
 
         // dump(file_get_contents('https://ww2.sinaimg.cn/large/005BYqpggy1g2u2xti6raj305k05ka9v.jpg'));
         // dump((new WxMsg())->getMediaId(ROOT_PATH . 'public/uploads/cust-0.jpg'));
         // echo strtotime('06:00:00');
-        // dump((new WxAPI('gzh'))->addMaterial($realPath));
+        // dump((new WxAPI('gzh'))->addMaterial(ROOT_PATH . 'public/uploads/test/4.png'));
         // echo urlencode('https://rank.xiaolishu.com/#/pages/signin/signin');
 
         // $wxApi = new WxAPI('wx7dc912994c80d9ac');

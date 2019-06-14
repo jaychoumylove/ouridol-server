@@ -6,7 +6,6 @@ use app\api\service\Star as StarService;
 use app\api\model\Star as StarModel;
 use app\base\service\Common;
 use app\api\model\RecStarChart;
-use GatewayClient\Gateway;
 use app\api\model\User as UserModel;
 use think\Db;
 use app\api\model\UserStar;
@@ -14,6 +13,9 @@ use app\api\model\UserRelation;
 use app\api\model\UserExt;
 use app\api\model\Rec;
 use app\api\model\Cfg;
+use app\base\service\WxAPI;
+use app\api\model\UserSprite;
+use GatewayWorker\Lib\Gateway;
 
 class Star extends Base
 {
@@ -94,11 +96,12 @@ class Star extends Base
     public function sendHot()
     {
         $starid = input('starid');
-        $hot = input('hot');
+        $hot = input('hot');// type=1 为礼物id
+        $type = input('type', 0);
         if (!$starid || !$hot) Common::res(['code' => 100]);
         $this->getUser();
 
-        (new StarService())->sendHot($starid, $hot, $this->uid);
+        (new StarService())->sendHot($starid, $hot, $this->uid, $type);
         Common::res([]);
     }
 
@@ -123,9 +126,12 @@ class Star extends Base
         if (!$starid) Common::res(['code' => 100]);
         $this->getUser();
 
-        (new StarService())->steal($starid, $this->uid);
+        $spriteLevel = UserSprite::where(['user_id' => $this->uid])->value('sprite_level');
+        $stealCount = Cfg::getCfg('stealCount') * $spriteLevel;
+        (new StarService())->steal($starid, $this->uid, $stealCount);
+
         UserExt::setTime($this->uid, $index);
-        Common::res(['data' => ['count' => Cfg::getCfg('stealCount')]]);
+        Common::res(['data' => ['count' => $stealCount]]);
     }
 
     /**明星动态 */

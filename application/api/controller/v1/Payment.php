@@ -10,12 +10,13 @@ use app\api\model\User;
 use app\base\service\WxPay as WxPayService;
 use app\api\service\User as UserService;
 use think\Db;
+use app\api\model\UserItem;
 
 class Payment extends Base
 {
     public function goods()
     {
-        Common::res(['data' => PayGoods::all()]);
+        Common::res(['data' => PayGoods::with('Item')->where('1=1')->select()]);
     }
 
     /**下单 */
@@ -37,6 +38,7 @@ class Payment extends Base
             'total_fee' => $totalFee,
             'coin' => $goods['coin'],
             'stone' => $goods['stone'],
+            'item_id' => $goods['item_id'],
         ]);
         // 预支付
         $res = (new WxAPI())->unifiedorder([
@@ -48,7 +50,7 @@ class Payment extends Base
             'openid' => User::get($this->uid)['openid'],
         ]);
         // 返回数据
-        (new WxPayService())->returnFont($res);
+        (new WxPayService())->returnFront($res);
     }
 
     /**支付通知 */
@@ -61,15 +63,29 @@ class Payment extends Base
             // 处理订单状态和业务
             Db::startTrans();
             try {
+                // 更改订单状态
                 $res = RecPayOrder::where(['id' => $data['out_trade_no']])->update(['pay_time' => $data['time_end']]);
                 if (!$res) die();
 
+                // 货币
                 (new UserService())->change($order['user_id'], [
                     'coin' => $order['coin'],
                     'stone' => $order['stone'],
-                ],[
+                ], [
                     'type' => 8
                 ]);
+
+                // 道具
+                $itemIsUpdate = UserItem::where(['uid' => $order['user_id'], 'item_id' => $order['item_id']])->update([
+                    'count' => Db::raw('count+1')
+                ]);
+                if (!$itemIsUpdate) {
+                    UserItem::create([
+                        'uid' => $order['user_id'],
+                        'item_id' => $order['item_id'],
+                        'count' => 1
+                    ]);
+                }
 
                 Db::commit();
             } catch (\Exception $e) {

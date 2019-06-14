@@ -7,12 +7,12 @@ class WxPay
     {
         $this->appinfo = Common::getAppinfo($w);
     }
-    
+
     /**
      * 返回给客服端预支付信息
      * @param array $res 
      */
-    public function returnFont($res)
+    public function returnFront($res)
     {
         if ($res['result_code'] == 'SUCCESS') {
             if ($res['trade_type'] == 'JSAPI') {
@@ -37,18 +37,18 @@ class WxPay
     /**获取签名 */
     public function makeSign($params)
     {
-        ksort($params);        //将参数数组按照参数名ASCII码从小到大排序
+        ksort($params);
         foreach ($params as $key => $item) {
-            if (!empty($item)) {         //剔除参数值为空的参数
-                $newArr[] = $key . '=' . $item;     // 整合新的参数数组
+            if (!empty($item)) {
+                $newArr[] = $key . '=' . $item;
             }
         }
-        $stringA = implode("&", $newArr);         //使用 & 符号连接参数
-        $payapikey = $this->appinfo['payapikey'];
-        $stringSignTemp = $stringA . "&key=" . $payapikey;        //拼接key
+        $stringA = implode("&", $newArr);
         // key是在商户平台API安全里自己设置的
-        $stringSignTemp = MD5($stringSignTemp);       //将字符串进行MD5加密
-        $sign = strtoupper($stringSignTemp);      //将所有字符转换为大写
+        $payapikey = $this->appinfo['payapikey'];
+        $stringSignTemp = $stringA . "&key=" . $payapikey;
+        $stringSignTemp = MD5($stringSignTemp);
+        $sign = strtoupper($stringSignTemp);
         return $sign;
     }
 
