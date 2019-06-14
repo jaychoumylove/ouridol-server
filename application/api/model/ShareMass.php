@@ -78,8 +78,10 @@ class ShareMass extends Base
             // 正在集结
             // 每天最多助力集结3次
             $dayLimitTimes = 3;
+            $leastTime = RecMass::where(['be_mass_uid' => $uid])->whereTime('create_time', 'd')->max('create_time');
             $todayTimes = RecMass::where(['be_mass_uid' => $uid])->whereTime('create_time', 'd')->count();
-            if ($todayTimes < $dayLimitTimes) {
+
+            if ($todayTimes < $dayLimitTimes && time() - strtotime($leastTime) > 3600) {
                 RecMass::create(['be_mass_uid' => $uid, 'mass_uid' => $rer]);
 
                 // 望帮别人集结成功也有100能量奖励
