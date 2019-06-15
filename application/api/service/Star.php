@@ -42,7 +42,7 @@ class Star
 
                 // 礼物减少
                 $count = UserItem::where(['uid' => $uid, 'item_id' => $item_id])->value('count');
-                if (!$count || $count <= 0) Common::res(['code' => 1, 'msg' => '礼物不足']);
+                if (!$count || $count <= 0) Common::res(['data' => ['noItem' => true]]);
 
                 UserItem::where(['uid' => $uid, 'item_id' => $item_id])->update([
                     'count' => Db::raw('count-1')
@@ -60,6 +60,9 @@ class Star
                         'avatar' => $userInfo['avatarurl']
                     ]
                 ], JSON_UNESCAPED_UNICODE));
+
+                // 日志
+                Rec::create(['user_id' => $uid, 'content' => json_encode([$itemInfo['name']], JSON_UNESCAPED_UNICODE), 'type' => 15]);
             }
 
             // 用户贡献度增加

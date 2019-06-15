@@ -113,6 +113,7 @@ Route::rule('api/:version/treasure', 'api/v1.Treasure/index');//
 Route::rule('api/:version/article', 'api/v1.Article/getArticle');// 获取文章
 Route::rule('api/:version/article/list', 'api/v1.Article/getList');// 获取文章列表
 
+Route::rule('api/:version/page/gift_package', 'api/v1.Page/giftPackage');// 礼物背包
 
 
 

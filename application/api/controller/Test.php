@@ -28,7 +28,7 @@ class Test extends Base
     {
 
 
-        
+        // dump(json_decode('{"a":1}', true));
 
         // test('hello');
         // $wxApi = new WxAPI();

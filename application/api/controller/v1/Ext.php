@@ -33,7 +33,7 @@ class Ext extends Base
     {
         $key = input('key');
         if ($key) Common::res(['data' => Cfg::getCfg($key)]);
-        
+
         $res = Cfg::getList();
         // 顺便获取分享信息
         $res['share_text'] = CfgShare::getOne();
@@ -143,8 +143,7 @@ class Ext extends Base
         $this->getUser();
         $page = input('page', 1);
         $size = input('size', 10);
-
-        $logList = Rec::with('Type,TargetUser,TargetStar')->where(['user_id' => $this->uid])->order('id desc')->page($page, $size)->select();
+        $logList = Rec::getList($this->uid, $page, $size);
 
         Common::res(['data' => $logList]);
     }

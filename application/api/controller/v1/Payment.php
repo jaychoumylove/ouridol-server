@@ -11,6 +11,7 @@ use app\base\service\WxPay as WxPayService;
 use app\api\service\User as UserService;
 use think\Db;
 use app\api\model\UserItem;
+use app\api\model\CfgItem;
 
 class Payment extends Base
 {
@@ -67,12 +68,14 @@ class Payment extends Base
                 $res = RecPayOrder::where(['id' => $data['out_trade_no']])->update(['pay_time' => $data['time_end']]);
                 if (!$res) die();
 
+                $itemName = CfgItem::where(['id' => $order['item_id']])->value('name');
                 // 货币
                 (new UserService())->change($order['user_id'], [
                     'coin' => $order['coin'],
                     'stone' => $order['stone'],
                 ], [
-                    'type' => 8
+                    'type' => 8,
+                    'content' => json_encode([$itemName], JSON_UNESCAPED_UNICODE)
                 ]);
 
                 // 道具

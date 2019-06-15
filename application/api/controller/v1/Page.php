@@ -138,6 +138,19 @@ class Page extends Base
         $res['itemList'] = CfgItem::where('1=1')->order('count asc')->select();
         foreach ($res['itemList'] as &$value) {
             $value['self'] = UserItem::where(['uid' => $this->uid, 'item_id' => $value['id']])->value('count');
+            if(!$value['self']) $value['self'] = 0;
+        }
+
+        Common::res(['data' => $res]);
+    }
+
+    public function giftPackage()
+    {
+        $this->getUser();
+        $res['itemList'] = CfgItem::where('1=1')->order('count asc')->select();
+        foreach ($res['itemList'] as &$value) {
+            $value['self'] = UserItem::where(['uid' => $this->uid, 'item_id' => $value['id']])->value('count');
+            if(!$value['self']) $value['self'] = 0;
         }
 
         Common::res(['data' => $res]);

@@ -98,6 +98,7 @@ class User
             $recSave['trumpet'] = isset($currency['trumpet']) ? $currency['trumpet'] : 0;
             $recSave['target_user_id'] = isset($rec['target_user_id']) ? $rec['target_user_id'] : null;
             $recSave['target_star_id'] = isset($rec['target_star_id']) ? $rec['target_star_id'] : null;
+            $recSave['content'] = isset($rec['content']) ? $rec['content'] : null;
 
             Rec::create($recSave);
         }
