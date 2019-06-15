@@ -114,6 +114,7 @@ Route::rule('api/:version/article', 'api/v1.Article/getArticle');// 获取文章
 Route::rule('api/:version/article/list', 'api/v1.Article/getList');// 获取文章列表
 
 Route::rule('api/:version/page/gift_package', 'api/v1.Page/giftPackage');// 礼物背包
+Route::rule('api/:version/page/gift_num', 'api/v1.Page/giftCount');// 礼物数量
 
 
 
