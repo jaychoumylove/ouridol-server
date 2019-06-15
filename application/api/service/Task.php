@@ -220,7 +220,7 @@ class Task
         // $this->daily($task, $uid);
 
         Db::startTrans();
-        try {
+        try {   
             RecTask::create([
                 'task_id' => $task_id,
                 'user_id' => $uid,

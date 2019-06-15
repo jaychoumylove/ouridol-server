@@ -109,7 +109,7 @@ class Star
     public function steal($starid, $uid, $hot)
     {
         UserExt::checkSteal($uid);
-        $userExt = UserExt::where(['user_id' => $uid])->field('steal_times,steal_count,update_time')->find();
+        $userExt = UserExt::where(['user_id' => $uid])->field('steal_times,steal_count')->find();
         if ($userExt['steal_times'] >= Cfg::getCfg('steal_limit')) {
             Common::res(['code' => 1, 'msg' => '今日偷取次数已达上限']);
         }
@@ -135,6 +135,7 @@ class Star
             UserExt::where(['user_id' => $uid])->update([
                 'steal_times' => Db::raw('steal_times+1'),
                 'steal_count' => Db::raw('steal_count+' . $hot),
+                'steal_time' => time(),
             ]);
 
             Db::commit();
