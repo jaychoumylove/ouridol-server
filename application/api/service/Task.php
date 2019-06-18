@@ -13,6 +13,7 @@ use app\api\model\RecPayOrder;
 use app\api\model\RecWeibo;
 use app\api\model\UserRelation;
 use app\api\model\UserExt;
+use app\api\model\RecItem;
 
 class Task
 {
@@ -38,7 +39,8 @@ class Task
                 case 2:
                     // 每日打榜
                     $task['doneTimes'] = Rec::where(['user_id' => $uid, 'type' => 2])->whereTime('create_time', 'd')->sum('coin') / -1;
-
+                    $task['doneTimes'] += RecItem::where(['user_id' => $uid])->whereTime('create_time', 'd')->sum('valueof');
+                    // 礼物
                     if (in_array($task['id'], $recTask)) {
                         $task['status'] = 2;
                     } else {
@@ -49,13 +51,17 @@ class Task
                     break;
                 case 3:
                     // 偷能量
-                    $task['doneTimes'] = UserExt::where(['user_id' => $uid])->value('steal_times');
+                    $task['doneTimes'] = 0;
+                    $steal = UserExt::where(['user_id' => $uid])->field('steal_times,steal_time')->find();
 
                     if (in_array($task['id'], $recTask)) {
                         $task['status'] = 2;
                     } else {
-                        if ($task['doneTimes'] >= $task['times']) {
-                            $task['status'] = 1;
+                        if (date('Ymd', $steal['steal_time']) == date('Ymd', time())) {
+                            $task['doneTimes'] = $steal['steal_times'];
+                            if ($task['doneTimes'] >= $task['times']) {
+                                $task['status'] = 1;
+                            }
                         }
                     }
                     break;
@@ -220,7 +226,7 @@ class Task
         // $this->daily($task, $uid);
 
         Db::startTrans();
-        try {   
+        try {
             RecTask::create([
                 'task_id' => $task_id,
                 'user_id' => $uid,

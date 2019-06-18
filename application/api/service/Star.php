@@ -17,6 +17,7 @@ use app\api\model\CfgItem;
 use app\api\model\UserItem;
 use app\api\model\User as UserModel;
 use GatewayWorker\Lib\Gateway;
+use app\api\model\RecItem;
 
 class Star
 {
@@ -48,8 +49,16 @@ class Star
                     'count' => Db::raw('count-1')
                 ]);
 
+                $itemInfo = CfgItem::where(['id' => $item_id])->field('name,icon,count')->find();
+                // 送礼物记录
+                RecItem::create([
+                    'user_id' => $uid,
+                    'item_id' => $item_id,
+                    'star_id' => $starid,
+                    'valueof' => $itemInfo['count']
+                ]);
+
                 // 推送
-                $itemInfo = CfgItem::where(['id' => $item_id])->field('name,icon')->find();
                 $userInfo = UserModel::where(['id' => $uid])->field('nickname,avatarurl')->find();
                 Gateway::sendToGroup('star_' . $starid, json_encode([
                     'type' => 'sendItem',
