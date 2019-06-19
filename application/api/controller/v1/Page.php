@@ -59,7 +59,11 @@ class Page extends Base
                     file_put_contents($filePath, $data);
                     $file = (new WxAPI('gzh'))->addMaterial($filePath);
                     if (!isset($file['errcode'])) {
-                        unlink($filePath);
+                        try {
+                            unlink($filePath);
+                        } catch (\Throwable $th) {
+                            //throw $th;
+                        }
                         $res['qrcode'] = str_replace('http', 'https', $file['url']);
                         UserStar::where(['user_id' => $this->uid])->update([
                             'qrcode' => $res['qrcode']

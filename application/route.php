@@ -67,6 +67,8 @@ Route::rule('api/:version/user/saveformid', 'api/v1.Ext/saveFormId');// 保存fo
 Route::rule('api/:version/user/exit', 'api/v1.User/exit');// 退出偶像圈
 Route::rule('api/:version/user/signin', 'api/v1.User/signin');// 连续签到
 
+Route::rule('api/:version/user/recharge', 'api/v1.User/recharge');// 礼物兑换能量
+
 // Share
 Route::rule('api/:version/share/mass', 'api/v1.Share/mass');// 分享集结
 Route::rule('api/:version/share/start', 'api/v1.Share/massStart');// 分享集结开始
@@ -115,6 +117,7 @@ Route::rule('api/:version/article/list', 'api/v1.Article/getList');// 获取文�
 
 Route::rule('api/:version/page/gift_package', 'api/v1.Page/giftPackage');// 礼物背包
 Route::rule('api/:version/page/gift_num', 'api/v1.Page/giftCount');// 礼物数量
+
 
 
 

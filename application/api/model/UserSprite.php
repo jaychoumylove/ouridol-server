@@ -32,15 +32,18 @@ class UserSprite extends Base
         // 能量收益
         $duratime = time() - $item['settle_time'];
         $spriteLimitTime =  Cfg::getCfg('spriteLimitTime');
-        if ($duratime / $spriteLimitTime >= 1) {
+        if ($duratime >= $spriteLimitTime) {
             $item['isFull'] = true;
             $duratime = $spriteLimitTime;
         }
         $earnPer = CfgSprite::where(['level' => $item['sprite_level']])->value('earn');
         // 每100秒收益
         $item['earnPer'] = $earnPer;
-
-        $item['earn'] = floor($duratime / 100) * $earnPer;
+        if ($duratime) {
+            $item['earn'] = floor($duratime / 100) * $earnPer;
+        } else {
+            $item['earn'] = 0;
+        }
         // 下一级所需灵丹
         $item['need_stone'] = CfgSprite::where(['level' => $item['sprite_level'] + 1])->value('need_stone');
 

@@ -209,4 +209,16 @@ class User extends Base
 
         Common::res(['data' => $res]);
     }
+
+    public function recharge()
+    {
+        $item_id = input('item_id');
+        $num = input('num');
+        if (!$item_id || !$num || $num < 0) Common::res(['code' => 100]);
+        $this->getUser();
+
+        UserItemModel::recharge($this->uid, $item_id, $num);
+
+        Common::res([]);
+    }
 }
