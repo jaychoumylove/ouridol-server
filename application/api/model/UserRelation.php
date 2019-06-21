@@ -127,10 +127,10 @@ class UserRelation extends Base
                 array_multisort($sort, SORT_DESC, $res);
             }
         } else {
-            if ($page > 10) $page = 10;
+            if ($page > 30) return [];
             $res = self::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2]]])->page($page, $size)->select();
             $len = count($res);
-            if ($len < $size && $page <= 10) {
+            if ($len < $size) {
                 for ($i = 0; $i < ($size - $len); $i++) {
                     $res[] = [
                         'status' => 0,

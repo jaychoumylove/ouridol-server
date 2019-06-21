@@ -52,6 +52,7 @@ class WxPay
         return $sign;
     }
 
+    /**支付成功返回数据 */
     public function notifyHandle()
     {
         //接收微信返回的数据数据,返回的xml格式

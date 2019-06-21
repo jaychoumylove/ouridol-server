@@ -62,13 +62,13 @@ class User
             if ($value > 0) {
                 // 增加
                 $value = '+' . $value;
-            } else if($value < 0){
+            } else if ($value < 0) {
                 // 减少
                 if ($userCurrency[$key] < $value / -1) {
                     // 货币不足
                     switch ($key) {
                         case 'coin':
-                            Common::res(['code' => 1, 'msg' => '能量不足']);
+                            Common::res(['msg' => '能量不足', 'data' => ['nomore' => true]]);
                             break;
                         case 'stone':
                             Common::res(['code' => 1, 'msg' => '灵丹不足']);
@@ -87,7 +87,7 @@ class User
             }
             $update[$key] = Db::raw($key . $value);
         }
-        if(!$update) return;
+        if (!$update) return;
         UserCurrency::where(['uid' => $uid])->update($update);
 
         if ($rec) {
@@ -116,7 +116,9 @@ class User
             ]);
             if (!$res) Common::res(['code' => 1]);
 
-            $this->change($uid, Cfg::getCfg('invitAward'));
+            $this->change($uid, Cfg::getCfg('invitAward'), [
+                'type' => 17
+            ]);
 
             Db::commit();
         } catch (\Exception $e) {

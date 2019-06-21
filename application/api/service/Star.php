@@ -43,7 +43,7 @@ class Star
 
                 // 礼物减少
                 $count = UserItem::where(['uid' => $uid, 'item_id' => $item_id])->value('count');
-                if (!$count || $count <= 0) Common::res(['data' => ['noItem' => true]]);
+                if (!$count || $count <= 0) Common::res(['msg' => '礼物不足', 'data' => ['nomore' => true]]);
 
                 UserItem::where(['uid' => $uid, 'item_id' => $item_id])->update([
                     'count' => Db::raw('count-1')

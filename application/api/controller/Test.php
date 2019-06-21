@@ -27,7 +27,7 @@ class Test extends Base
     public function index()
     {
 
-        echo date('w');        
+        // echo ceil(-1);
         // dump(json_decode('{"a":1}', true));
 
         // test('hello');

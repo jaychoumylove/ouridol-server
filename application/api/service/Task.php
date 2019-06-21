@@ -62,7 +62,7 @@ class Task
                     }
                     if (in_array($task['id'], $recTask)) {
                         $task['status'] = 2;
-                    } 
+                    }
                     break;
                 case 4:
                     // 每日充值
@@ -126,7 +126,7 @@ class Task
                     if (in_array($task['id'], $recTask)) {
                         $task['status'] = 2;
                     } else {
-                        $isDone = UserRelation::where(['rer_user_id' => $uid])->where('status', 'neq', 3)->whereTime('create_time', 'd')->find();
+                        $isDone = UserRelation::where(['rer_user_id' => $uid])->where('status', 'in', [1, 2])->whereTime('create_time', 'd')->find();
                         if ($isDone) {
                             $task['status'] = 1;
                         }
