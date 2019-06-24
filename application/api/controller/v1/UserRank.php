@@ -25,7 +25,9 @@ class UserRank extends Base
         $page = input('page', 1);
         $size = input('size', 10);
 
-        $list = UserStar::getRank($starid, $field, $page, $size);
-        Common::res(['data' => $list]);
+        $res['list'] = UserStar::getRank($starid, $field, $page, $size);
+        $this->getUser();
+        $res['my'] = UserStar::getMyRankInfo($this->uid, $starid, $field);
+        Common::res(['data' => $res]);
     }
 }

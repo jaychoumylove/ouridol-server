@@ -18,6 +18,7 @@ class UserStar extends Base
         return $this->belongsTo('Star', 'star_id', 'id');
     }
 
+    /**用户贡献排名 */
     public static function getRank($starid, $field, $page, $size)
     {
         if ($starid) {
@@ -124,5 +125,18 @@ class UserStar extends Base
         } else {
             Common::res(['code' => 1, 'msg' => '退出偶像圈失败，上次退出偶像圈时间为' . date('Y-m-d', $ext['exit_group_time'])]);
         }
+    }
+
+    /**我在圈子里的排名信息 */
+    public static function getMyRankInfo($uid, $starid, $field)
+    {
+        $res['score'] = self::where(['user_id' => $uid, 'star_id' => $starid])->value($field);
+        if($res['score']) {
+            $res['rank'] = self::where('star_id', $starid)->where($field, '>', $res['score'])->count() + 1;
+        } else {
+            $res['rank'] = '未上榜';
+        }
+
+        return $res;
     }
 }

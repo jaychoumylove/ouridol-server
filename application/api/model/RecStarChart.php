@@ -20,7 +20,7 @@ class RecStarChart extends Base
     {
         $list = self::with(['User' => ['UserStar']])->where(['star_id' => $starid])->order('id desc')->limit(10)->select();
 
-        // // 粉丝等级
+        // 粉丝等级
         // foreach ($list as &$value) {
         //     $totalCount = $value['user']['user_star']['total_count'];
         //     $value['level'] = CfgUserLevel::where('total', '<=', $totalCount)->max('level');

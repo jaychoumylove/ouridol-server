@@ -15,6 +15,11 @@ class UserFather extends Base
         return $this->belongsTo('User', 'son', 'id')->field('id,nickname,avatarurl');
     }
 
+    public function f()
+    {
+        return $this->belongsTo('User', 'father', 'id')->field('id,nickname,avatarurl');
+    }
+
     public static function getFatherList($uid)
     {
         // self::initFather($uid);
@@ -27,6 +32,8 @@ class UserFather extends Base
         }
         $data['list'] = $res;
         $data['earn'] = Rec::where(['type' => 5, 'user_id' => $uid])->whereTime('create_time', 'd')->sum('coin');
+        $father_uid = self::where('son', $uid)->value('father');
+        $data['father'] = User::where('id', $father_uid)->value('nickname');
         return $data;
     }
 
@@ -54,7 +61,7 @@ class UserFather extends Base
             return;
         }
         // 徒弟必须是师傅拉进来的
-        if (!UserRelation::get(['rer_user_id' => $father, 'ral_user_id' => $son])) { 
+        if (!UserRelation::get(['rer_user_id' => $father, 'ral_user_id' => $son])) {
             return;
         }
         self::create([

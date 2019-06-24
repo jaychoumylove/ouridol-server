@@ -111,11 +111,11 @@ class Page extends Base
 
         $res['mass'] = ShareMass::getMass($this->uid);
 
-        $res['invitList'] = [
-            'list' => UserRelation::fixByType(1, $this->uid, 1, 10),
-            'award' => Cfg::getCfg('invitAward'),
-            'hasInvitcount' => UserRelation::with('User')->where(['rer_user_id' => $this->uid, 'status' => ['in', [1, 2]]])->count()
-        ];
+        // $res['invitList'] = [
+        //     'list' => UserRelation::fixByType(1, $this->uid, 1, 10),
+        //     'award' => Cfg::getCfg('invitAward'),
+        //     'hasInvitcount' => UserRelation::with('User')->where(['rer_user_id' => $this->uid, 'status' => ['in', [1, 2]]])->count()
+        // ];
 
         $res['article'] = Article::where('1=1')->order('create_time desc,id desc')->find();
 
