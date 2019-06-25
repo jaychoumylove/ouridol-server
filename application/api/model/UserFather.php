@@ -115,4 +115,13 @@ class UserFather extends Base
             ]);
         }
     }
+
+    /**脱离师傅 */
+    public static function breakFather($uid)
+    {
+        $isDone = self::destroy([
+            'son' => $uid,
+        ], true);
+        if (!$isDone) Common::res(['code' => 1]);
+    }
 }

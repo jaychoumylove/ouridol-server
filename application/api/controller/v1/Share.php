@@ -59,7 +59,7 @@ class Share extends Base
         $this->getUser();
 
         $res = UserFather::getFatherList($this->uid);
-        
+
         Common::res(['data' => $res]);
     }
 
@@ -78,5 +78,12 @@ class Share extends Base
         $cur_contribute = UserFather::where(['father' => $this->uid])->max('cur_contribute');
         $earn = floor($cur_contribute * Cfg::getCfg('father_earn_per'));
         Common::res(['data' => $earn]);
+    }
+
+    public function breakFather()
+    {
+        $this->getUser();
+        UserFather::breakFather($this->uid);
+        Common::res([]);
     }
 }

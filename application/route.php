@@ -58,6 +58,7 @@ Route::rule('api/:version/user/rank', 'api/v1.UserRank/getRank');// 用户贡献
 Route::rule('api/:version/user/father', 'api/v1.Share/father');// 师徒关系
 Route::rule('api/:version/user/sonearn', 'api/v1.Share/sonEarn');// 领取徒弟收益
 Route::rule('api/:version/user/checkearn', 'api/v1.Share/checkEarn');// 检查是否有徒弟收益
+Route::rule('api/:version/user/breakFather', 'api/v1.Share/breakFather');// 脱离师傅
 
 Route::rule('api/:version/user/sayworld', 'api/v1.User/sayworld');// 世界喊话
 Route::rule('api/:version/user/bind', 'api/v1.User/bindClientId');// 绑定client_id
