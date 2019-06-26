@@ -61,9 +61,9 @@ class UserFather extends Base
             return;
         }
         // 徒弟必须是师傅拉进来的
-        if (!UserRelation::get(['rer_user_id' => $father, 'ral_user_id' => $son])) {
-            return;
-        }
+        // if (!UserRelation::get(['rer_user_id' => $father, 'ral_user_id' => $son])) {
+        //     return;
+        // }
         self::create([
             'father' => $father,
             'son' => $son,
