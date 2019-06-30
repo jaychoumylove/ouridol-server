@@ -103,20 +103,11 @@ class AutoRun extends Base
 
     public function monthHander()
     {
-        // if (date("w") != 1) {
-        //     die('今日不是星期一');
-        // }
-
-        // $opTime = Cache::get('lockSend')['time'];
-        // if (date('oW', time()) == date('oW', $opTime)) {
-        //     die('本周已执行过');
-        // }
-
-        // // lock
-        // Cache::set('lockSend', [
-        //     'isLock' => 1,
-        //     'time' => time()
-        // ]);
+        $opTime = Cache::get('monthOptime');
+        if (date('Ym', time()) == date('Ym', $opTime)) {
+            die('本月已执行过');
+        }
+        Cache::set('monthOptime',  time());
 
         Db::startTrans();
         try {
