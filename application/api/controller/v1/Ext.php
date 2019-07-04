@@ -10,7 +10,7 @@ use app\api\model\Cfg;
 use app\api\model\UserStar;
 use think\Db;
 use app\base\service\WxAPI;
-use app\api\model\Funclub;
+use app\api\model\Fanclub;
 use app\api\model\Rec;
 
 class Ext extends Base
@@ -119,11 +119,11 @@ class Ext extends Base
     /**
      * 后援会入住
      */
-    public function funclubJoin()
+    public function FanclubJoin()
     {
         $this->getUser();
 
-        $find = Funclub::where(['user_id' => $this->uid])->find();
+        $find = Fanclub::where(['user_id' => $this->uid])->find();
         if ($find) Common::res(['code' => 1, 'msg' => '请勿重复提交']);
 
         $res['user_id'] = $this->uid;
@@ -134,8 +134,37 @@ class Ext extends Base
         $res['wx'] = input('wx');
         $res['qualify'] = input('qualify');
 
-        Funclub::create($res);
+        $res['star_id'] = UserStar::where('user_id', $this->uid)->value('star_id');
+
+        Fanclub::create($res);
         Common::res([]);
+    }
+
+    public function fanclubList()
+    {
+        $star_id = input('star_id');
+        $status = input('status', 2);
+        $this->getUser();
+
+        $list = Fanclub::getList($this->uid, $star_id, $status);
+        Common::res(['data' => $list]);
+    }
+
+    public function joinFanclub()
+    {
+        $f_id = input('fanclub_id');
+        $this->getUser();
+
+        Fanclub::joinFanclub($this->uid, $f_id);
+        Common::res();
+    }
+
+    public function exitFanclub()
+    {
+        $this->getUser();
+
+        Fanclub::exitFanclub($this->uid);
+        Common::res();
     }
 
     public function log()

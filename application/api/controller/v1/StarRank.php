@@ -38,7 +38,10 @@ class StarRank extends Base
             Common::res(['data' => [
                 'list' => $list,
                 'steal' => $leftTime,
-                'steal_count' => Cfg::getCfg('stealCount') * $spriteLevel
+                'steal_count' => Cfg::getCfg('stealCount') * $spriteLevel,
+                'sprite_level' => $spriteLevel,
+                'steal_num' => $res['steal_count'],
+                'steal_num_max' => Cfg::getCfg('steal_count_limit')
             ]]);
         } else {
             Common::res(['data' => $list]);

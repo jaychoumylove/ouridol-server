@@ -8,7 +8,7 @@ use app\base\model\Appinfo;
 class Common
 {
     /**接口数据返回 */
-    public static function res($res)
+    public static function res($res = [])
     {
         if (isset($res['code'])) {
             $return['code'] = $res['code'];

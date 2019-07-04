@@ -71,6 +71,11 @@ Route::rule('api/:version/user/signin', 'api/v1.User/signin');// 连续签到
 
 Route::rule('api/:version/user/recharge', 'api/v1.User/recharge');// 礼物兑换能量
 
+Route::rule('api/:version/user/addFriend', 'api/v1.User/addFriend');// 加好友
+Route::rule('api/:version/user/delFriend', 'api/v1.User/delFriend');// 删好友
+Route::rule('api/:version/user/sendStoneToOther', 'api/v1.User/sendStoneToOther');// 送灵丹给别人
+Route::rule('api/:version/user/sendItemToOther', 'api/v1.User/sendItemToOther');// 送礼物给他人
+
 // Share
 Route::rule('api/:version/share/mass', 'api/v1.Share/mass');// 分享集结
 Route::rule('api/:version/share/start', 'api/v1.Share/massStart');// 分享集结开始
@@ -107,7 +112,10 @@ Route::rule('api/:version/ext/log', 'api/v1.Ext/log');// 用户日志
 // 
 Route::rule('api/:version/upload', 'api/v1.Ext/upload');// 文件上传
 
-Route::rule('api/:version/funclub/join', 'api/v1.Ext/funclubJoin');// 后援会
+Route::rule('api/:version/Fanclub/join', 'api/v1.Ext/FanclubJoin');// 后援会
+Route::rule('api/:version/ext/fanclubList', 'api/v1.Ext/fanclubList');// 后援会列表
+Route::rule('api/:version/ext/joinFanclub', 'api/v1.Ext/joinFanclub');// 加入后援会
+Route::rule('api/:version/ext/exitFanclub', 'api/v1.Ext/exitFanclub');// 退出后援会
 
 // Treasure
 Route::rule('api/:version/treasure/settle', 'api/v1.Treasure/settle');// 寻宝结算

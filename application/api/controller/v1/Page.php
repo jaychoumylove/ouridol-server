@@ -21,6 +21,7 @@ use app\base\service\WxAPI;
 use app\api\model\CfgItem;
 use app\api\model\UserItem;
 use GatewayWorker\Lib\Gateway;
+use app\api\model\UserExt;
 
 class Page extends Base
 {
@@ -96,6 +97,7 @@ class Page extends Base
         $this->getUser();
 
         if (!$starid) Common::res(['code' => 100]);
+        UserExt::checkSteal($this->uid);
 
         $res['starInfo'] = AppStar::with('StarRank')->where(['id' => $starid])->find();
 

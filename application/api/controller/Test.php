@@ -19,6 +19,12 @@ use app\api\model\RecPayOrder;
 class Test extends Base
 {
 
+    public function fanclub()
+    {
+        
+    }
+
+
     private function test()
     {
         return 1;
@@ -26,8 +32,8 @@ class Test extends Base
 
     public function index()
     {
-
-        echo date('i');
+        Cache::set('monthOptime', 0);
+        // echo date('Ym');
         // echo ceil(-1);
         // dump(json_decode('{"a":1}', true));
 

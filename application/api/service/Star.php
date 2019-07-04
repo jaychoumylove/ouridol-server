@@ -1,4 +1,5 @@
 <?php
+
 namespace app\api\service;
 
 use app\api\model\StarRank as StarRankModel;
@@ -18,6 +19,7 @@ use app\api\model\UserItem;
 use app\api\model\User as UserModel;
 use GatewayWorker\Lib\Gateway;
 use app\api\model\RecItem;
+use app\api\model\Fanclub;
 
 class Star
 {
@@ -72,12 +74,8 @@ class Star
 
                 // 日志
                 Rec::create(['user_id' => $uid, 'content' => json_encode([$itemInfo['name']], JSON_UNESCAPED_UNICODE), 'type' => 15]);
-            }
-
-            // 用户贡献度增加
-            UserStar::change($uid, $starid, $hot);
-
-            if ($type == 0) {
+            } else if ($type == 0) {
+                // 送能量
                 // 用户货币减少
                 (new UserService())->change($uid, [
                     'coin' => $hot / -1,
@@ -86,6 +84,11 @@ class Star
                     'target_star_id' => $starid,
                 ]);
             }
+
+            // 用户贡献度增加
+            UserStar::change($uid, $starid, $hot);
+            // 后援会贡献度增加
+            Fanclub::change($uid, $hot);
 
             // 徒弟贡献 
             $opTime = UserFather::where(['son' => $uid])->value('update_time');

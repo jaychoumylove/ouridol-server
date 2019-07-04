@@ -76,6 +76,8 @@ class User extends Base
         }
 
         $res = UserModel::where(['id' => $uid])->field('id,nickname,avatarurl,type')->find();
+        $res['userStar'] = UserStar::where('user_id', $uid)->field('total_count,thismonth_count,thisweek_count')->find();
+        $res['level'] = UserSprite::where('user_id', $uid)->value('sprite_level');
         Common::res(['data' => $res]);
     }
 
@@ -220,5 +222,52 @@ class User extends Base
         UserItemModel::recharge($this->uid, $item_id, $num);
 
         Common::res([]);
+    }
+
+    /**加好友 */
+    public function addFriend()
+    {
+        $user_id = input('user_id');
+        $this->getUser();
+
+        UserRelation::addFriend($this->uid, $user_id);
+
+        Common::res();
+    }
+
+    /**加好友 */
+    public function delFriend()
+    {
+        $user_id = input('user_id');
+        $this->getUser();
+
+        UserRelation::delFriend($this->uid, $user_id);
+        Common::res();
+    }
+
+    public function sendStoneToOther()
+    {
+        $user_id = input('user_id');
+
+        $num = input('num');
+        $type = input('type', 'stone');
+        if (!$user_id || !$num) Common::res(['code' => 100]);
+        $this->getUser();
+
+        UserCurrency::sendStoneToOther($this->uid, $user_id, $num, $type);
+        Common::res();
+    }
+
+    public function sendItemToOther()
+    {
+        $user_id = input('user_id');
+        $item_id = input('item_id'); // 礼物id
+        if (!$user_id || !$item_id) Common::res(['code' => 100]);
+
+        $num = input('num', 1);
+        $this->getUser();
+
+        UserItemModel::sendItemToOther($this->uid, $user_id, $num, $item_id);
+        Common::res();
     }
 }

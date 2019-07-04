@@ -131,7 +131,7 @@ class UserStar extends Base
     public static function getMyRankInfo($uid, $starid, $field)
     {
         $res['score'] = self::where(['user_id' => $uid, 'star_id' => $starid])->value($field);
-        if($res['score']) {
+        if ($res['score']) {
             $res['rank'] = self::where('star_id', $starid)->where($field, '>', $res['score'])->count() + 1;
         } else {
             $res['rank'] = '未上榜';

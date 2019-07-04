@@ -3,6 +3,7 @@
 namespace app\api\model;
 
 use app\base\model\Base;
+use app\base\service\Common;
 
 class UserRelation extends Base
 {
@@ -68,23 +69,23 @@ class UserRelation extends Base
         }
     }
 
+    /**
+     * status 0 邀请的用户 没有加入圈子
+     *        1 邀请的用户 已加入圈子 未领取拉新奖励
+     *        3 系统分配的圈内用户
+     *        4 手动加的用户
+     */
     public static function fixByType($type, $uid, $page, $size)
     {
         if ($type == 1) { // 宠物页面邀请列表，统计收益
-            // 我邀请的人
-            $res = UserRelation::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2, 3]]])->order('create_time desc')->limit(300)->select();
-            if ($page == 1) {
-                // 邀请我的人
-                $ralUser = self::with('RerUser')->where(['ral_user_id' => $uid, 'status' => ['in', [1, 2]]])->find();
-                if ($ralUser) {
-                    $ralUser['user'] = $ralUser['rer_user'];
-                    $ralUser = [$ralUser];
-                } else {
-                    $ralUser = [];
-                }
-
-                $res = array_merge($res, $ralUser);
+            // 我邀请的人、、加的好友
+            $res = UserRelation::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2, 3, 4]]])->order('create_time desc')->limit(100)->select();
+            // 邀请我的人、手动被加的好友
+            $ralUser = self::with('RerUser')->where(['ral_user_id' => $uid, 'status' => ['in', [1, 2, 4]]])->limit(100)->select();
+            foreach ($ralUser as &$value) {
+                $value['user'] = $value['rer_user'];
             }
+            $res = array_merge($res, $ralUser);
 
             if ($res) {
                 foreach ($res as $key => &$value) {
@@ -127,6 +128,7 @@ class UserRelation extends Base
                 array_multisort($sort, SORT_DESC, $res);
             }
         } else {
+            // 拉票列表页
             if ($page > 30) return [];
             $res = self::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2]]])->page($page, $size)->select();
             $len = count($res);
@@ -140,5 +142,38 @@ class UserRelation extends Base
         }
 
         return $res;
+    }
+
+    /**手动加好友 */
+    public static function addFriend($self, $other)
+    {
+        if ($self == $other) Common::res(['code' => 100]);
+        // 好友数量上限
+        $selfFriendCount = self::where('rer_user_id', $self)->count('id');
+        $selfFriendCount += self::where('ral_user_id', $self)->count('id');
+        if (Cfg::getCfg('friend_max') <= $selfFriendCount) Common::res(['code' => 1, 'msg' => '你已经有足够多的好友了']);
+
+        $isExist = self::where(['rer_user_id' => $self, 'ral_user_id' => $other])->find();
+        if (!$isExist) $isExist = self::where(['rer_user_id' => $other, 'ral_user_id' => $self])->find();
+        if ($isExist) {
+            Common::res(['code' => 1, 'msg' => 'TA已经是你的好友了']);
+        } else {
+            self::create([
+                'rer_user_id' => $self,
+                'ral_user_id' => $other,
+                'status' => 4
+            ]);
+        }
+    }
+
+    /**删除好友 */
+    public static function delFriend($self, $other)
+    {
+        $isDone = self::where(['rer_user_id' => $self, 'ral_user_id' => $other])->delete(true);
+        if (!$isDone) $isDone = self::where(['rer_user_id' => $other, 'ral_user_id' => $self])->delete(true);
+
+        if (!$isDone) {
+            Common::res(['code' => 1, 'msg' => '删除失败']);
+        }
     }
 }

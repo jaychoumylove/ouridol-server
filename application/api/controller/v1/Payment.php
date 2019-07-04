@@ -1,4 +1,5 @@
 <?php
+
 namespace app\api\controller\v1;
 
 use app\base\controller\Base;
@@ -12,6 +13,7 @@ use app\api\service\User as UserService;
 use think\Db;
 use app\api\model\UserItem;
 use app\api\model\CfgItem;
+use app\api\model\Rec;
 
 class Payment extends Base
 {
@@ -26,11 +28,15 @@ class Payment extends Base
         $this->getUser();
         $goodsId = input('goods_id');
         $goodsNum = input('goods_num', 1);
+        $user_id = input('user_id', 0);// 代充值uid
+        if($user_id == $this->uid) $user_id = 0;
         if (!$goodsId) Common::res(['code' => 100]);
+
         // 商品
         $goods = PayGoods::get($goodsId);
         if (!$goods) Common::res(['code' => 303]);
 
+        // 总价
         $totalFee = $goods['fee'] * $goodsNum;
         // 下单
         $order = RecPayOrder::create([
@@ -40,6 +46,7 @@ class Payment extends Base
             'coin' => $goods['coin'],
             'stone' => $goods['stone'],
             'item_id' => $goods['item_id'],
+            'friend_uid' => $user_id,
         ]);
         // 预支付
         $res = (new WxAPI())->unifiedorder([
@@ -66,33 +73,17 @@ class Payment extends Base
             try {
                 // 更改订单状态
                 $res = RecPayOrder::where(['id' => $data['out_trade_no']])->update(['pay_time' => $data['time_end']]);
-                if (!$res) die();
-
-                $itemName = CfgItem::where(['id' => $order['item_id']])->value('name');
-                // 货币
-                (new UserService())->change($order['user_id'], [
-                    'coin' => $order['coin'],
-                    'stone' => $order['stone'],
-                ], [
-                    'type' => 8,
-                    'content' => json_encode([$itemName], JSON_UNESCAPED_UNICODE)
-                ]);
-
-                // 道具
-                $itemIsUpdate = UserItem::where(['uid' => $order['user_id'], 'item_id' => $order['item_id']])->update([
-                    'count' => Db::raw('count+1')
-                ]);
-                if (!$itemIsUpdate) {
-                    UserItem::create([
-                        'uid' => $order['user_id'],
-                        'item_id' => $order['item_id'],
-                        'count' => 1
-                    ]);
+                if (!$res) {
+                    // 订单不存在或已完成支付
+                    Db::rollback();
+                    die();
                 }
+                // 支付成功 处理业务
+                RecPayOrder::paySuccess($order);
 
                 Db::commit();
             } catch (\Exception $e) {
-                Db::rollBack();
+                Db::rollback();
             }
         }
     }
