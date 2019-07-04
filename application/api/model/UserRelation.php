@@ -149,9 +149,8 @@ class UserRelation extends Base
     {
         if ($self == $other) Common::res(['code' => 100]);
         // 好友数量上限
-        // $selfFriendCount = self::where('rer_user_id', $self)->count('id');
-        // $selfFriendCount += self::where('ral_user_id', $self)->count('id');
-        // if (Cfg::getCfg('friend_max') <= $selfFriendCount) Common::res(['code' => 1, 'msg' => '你已经有足够多的好友了']);
+        $selfFriendCount = self::where('rer_user_id', $self)->count('id');
+        if (Cfg::getCfg('friend_max') <= $selfFriendCount) Common::res(['code' => 1, 'msg' => '你已经有足够多的好友了']);
 
         $isExist = self::where(['rer_user_id' => $self, 'ral_user_id' => $other])->find();
         if (!$isExist) $isExist = self::where(['rer_user_id' => $other, 'ral_user_id' => $self])->find();
