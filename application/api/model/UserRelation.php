@@ -104,7 +104,7 @@ class UserRelation extends Base
                     }
 
                     // 排序
-                    if ($value['off']) {
+                    if ($value['off'] && $value['sprite']['earn']) {
                         $sort[$key] = -1 / $value['sprite']['earn'];
                     } else {
                         $sort[$key] = $value['sprite']['earn'];
