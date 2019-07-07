@@ -78,11 +78,12 @@ class AutoRun extends Base
             ]);
 
             // 前三
-            $topThreeAward = [300000, 200000, 100000];
+            $topThreeAward = [290000, 190000, 90000];
             $topThreeIds = array_slice(array_column($rankList, 'star_id'), 0, 3);
             foreach ($topThreeAward as $key => $value) {
                 StarRank::where(['star_id' => $topThreeIds[$key]])->update([
-                    'week_hot' => $value,
+                    'week_hot' => Db::raw('week_hot+' . $value),
+                    'month_hot' => Db::raw('month_hot+' . $value),
                 ]);
             }
 
