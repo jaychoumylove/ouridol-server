@@ -10,6 +10,7 @@ use app\api\model\UserStar;
 use app\api\model\UserCurrency;
 use app\api\model\OtherLock;
 use think\Cache;
+use app\api\model\Fanclub;
 
 class AutoRun extends Base
 {
@@ -86,6 +87,9 @@ class AutoRun extends Base
                     'month_hot' => Db::raw('month_hot+' . $value),
                 ]);
             }
+
+            // 后援会
+            Fanclub::where('1=1')->update(['week_count'])
 
             Db::commit();
         } catch (\Exception $e) {
