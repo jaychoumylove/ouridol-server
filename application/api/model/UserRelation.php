@@ -4,6 +4,7 @@ namespace app\api\model;
 
 use app\base\model\Base;
 use app\base\service\Common;
+use think\Db;
 
 class UserRelation extends Base
 {
@@ -43,6 +44,12 @@ class UserRelation extends Base
 
         if ($relation) {
             self::where(['ral_user_id' => $uid])->update(['status' => 1]);
+            // 新用户打卡活动解锁10次
+
+            UserStar::where('user_id', $relation['rer_user_id'])->update([
+                'active_card_days' => Db::raw('active_card_days+10'),
+                'active_newbie_cards' => Db::raw('active_newbie_cards+10'),
+            ]);
             // 判断是否结成师徒关系
             UserFather::join($relation['rer_user_id'], $uid);
         }
@@ -78,15 +85,18 @@ class UserRelation extends Base
     public static function fixByType($type, $uid, $page, $size)
     {
         if ($type == 1) { // 宠物页面邀请列表，统计收益
+            $friend_max = Cfg::getCfg('friend_max');
+            if (!$friend_max) $friend_max = 100;
             // 我邀请的人、、加的好友
-            $res = UserRelation::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2, 3, 4]]])->order('create_time desc')->limit(100)->select();
-            // 邀请我的人、手动被加的好友
-            $ralUser = self::with('RerUser')->where(['ral_user_id' => $uid, 'status' => ['in', [1, 2, 4]]])->limit(100)->select();
-            foreach ($ralUser as &$value) {
-                $value['user'] = $value['rer_user'];
+            $res = UserRelation::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2, 3, 4]]])->order('create_time desc')->limit($friend_max)->select();
+            if (count($res) < $friend_max) {
+                // 邀请我的人、手动被加的好友
+                $ralUser = self::with('RerUser')->where(['ral_user_id' => $uid, 'status' => ['in', [1, 2, 4]]])->limit($friend_max - count($res))->select();
+                foreach ($ralUser as &$value) {
+                    $value['user'] = $value['rer_user'];
+                }
+                $res = array_merge($res, $ralUser);
             }
-            $res = array_merge($res, $ralUser);
-
             if ($res) {
                 foreach ($res as $key => &$value) {
                     $update_time = UserStar::where(['user_id' => $value['user']['id']])->value('update_time');
@@ -112,7 +122,9 @@ class UserRelation extends Base
                 }
 
                 array_multisort($sort, SORT_DESC, $res);
-                $res = array_slice($res, ($page - 1) * $size, $size);
+                $data['total_count'] = count($res);
+                $data['list'] = array_slice($res, ($page - 1) * $size, $size);
+                $res = $data;
             }
         } else if ($type == 2) {
             $res = self::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2]]])->page($page, $size)->select();
@@ -127,6 +139,9 @@ class UserRelation extends Base
                 }
                 array_multisort($sort, SORT_DESC, $res);
             }
+        } else if ($type == 3) {
+            // 打卡解锁活动拉新
+            $res = self::with('User')->where(['rer_user_id' => $uid, 'create_time' => ['>', date('Y-m-d H:i:s', Cfg::getCfg('active_date')[0])], 'status' => ['in', [1, 2]]])->order('id desc')->limit(5)->select();
         } else {
             // 拉票列表页
             if ($page > 30) return [];
@@ -147,10 +162,15 @@ class UserRelation extends Base
     /**手动加好友 */
     public static function addFriend($self, $other)
     {
-        if ($self == $other) Common::res(['code' => 100]);
+        if (!$self || !$other || $self == $other) Common::res(['code' => 100]);
         // 好友数量上限
-        $selfFriendCount = self::where('rer_user_id', $self)->count('id');
+        $selfFriendCount = self::where('rer_user_id', $self)->where('status', 'in', [1, 2, 3, 4])->count('id');
+        $selfFriendCount += self::with('RerUser')->where(['ral_user_id' => $self, 'status' => ['in', [1, 2, 4]]])->count('id');
         if (Cfg::getCfg('friend_max') <= $selfFriendCount) Common::res(['code' => 1, 'msg' => '你已经有足够多的好友了']);
+
+        $otherFriendCount = self::where('rer_user_id', $other)->where('status', 'in', [1, 2, 3, 4])->count('id');
+        $otherFriendCount += self::with('RerUser')->where(['ral_user_id' => $other, 'status' => ['in', [1, 2, 4]]])->count('id');
+        if (Cfg::getCfg('friend_max') <= $otherFriendCount) Common::res(['code' => 1, 'msg' => 'TA的好友已满']);
 
         $isExist = self::where(['rer_user_id' => $self, 'ral_user_id' => $other])->find();
         if (!$isExist) $isExist = self::where(['rer_user_id' => $other, 'ral_user_id' => $self])->find();

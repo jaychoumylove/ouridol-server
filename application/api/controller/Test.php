@@ -15,16 +15,23 @@ use app\base\controller\Base;
 use app\base\service\WxMsg;
 use app\api\model\PayOrder;
 use app\api\model\RecPayOrder;
+use app\api\model\Cfg;
 
 class Test extends Base
 {
 
     public function fanclub()
+    { }
+
+    public function getToken()
     {
-        
+        echo Common::setSession(input('uid') / 1234);
     }
 
-
+    public function getUid()
+    {
+        echo Common::getSession(input('token'));
+    }
     private function test()
     {
         return 1;
@@ -32,7 +39,33 @@ class Test extends Base
 
     public function index()
     {
-        Cache::set('monthOptime', 0);
+
+        echo date('Y-m-d H:i:s', Cfg::getCfg('active_date')[0]);
+        // echo (int) !0;
+
+        // echo json_encode(
+        //     [
+        //         [
+        //             'fee' => 100,
+        //             'count' => 3000
+        //         ],
+        //         [
+        //             'fee' => 200,
+        //             'count' => 6000
+        //         ],
+        //         [
+        //             'fee' => 500,
+        //             'count' => 15000
+        //         ],
+        //         [
+        //             'fee' => 1000,
+        //             'count' => 30000
+        //         ]
+        //     ],
+        //     JSON_UNESCAPED_UNICODE
+        // );
+
+        // Cache::set('monthOptime', 0);
         // echo date('Ym');
         // echo ceil(-1);
         // dump(json_decode('{"a":1}', true));

@@ -125,20 +125,7 @@ class Page extends Base
         $cur_contribute = UserFather::where(['father' => $this->uid])->max('cur_contribute');
         $res['fatherEarn'] = floor($cur_contribute * Cfg::getCfg('father_earn_per'));
 
-
-        // 活动信息
-        $res['activeInfo']['active_info'] = Cfg::getCfg('active_info');
-        // 参与人数
-        $res['activeInfo']['join_people'] = UserStar::where(['star_id' => $starid])->where('active_card_days', '>', 0)->count();
-        // 完成人数
-        $res['activeInfo']['complete_people'] = UserStar::where(['star_id' => $starid])->where('active_card_days', '>=', 7)->count();
-
-
-        $active_card = UserStar::where(['user_id' => $this->uid, 'star_id' => $starid])->field('active_card_days,active_card_time')->find();
-        // 今日是否已打卡
-        $res['activeInfo']['can_card'] = date('ymd', time()) != date('ymd', $active_card['active_card_time']);
-        // 我的累计打卡
-        $res['activeInfo']['my_card_days'] = $active_card['active_card_days'] ? $active_card['active_card_days'] : 0;
+        $res['activeInfo'] = UserStar::getActiveInfo($this->uid, $starid);
 
         // 礼物
         $res['itemList'] = CfgItem::where('1=1')->order('count asc')->select();

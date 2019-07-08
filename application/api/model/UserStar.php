@@ -139,4 +139,90 @@ class UserStar extends Base
 
         return $res;
     }
+
+    /**活动信息 */
+    public static function getActiveInfo($uid, $starid)
+    {
+        // 活动信息
+        $res['active_info'] = Cfg::getCfg('active_info');
+        // 活动时间
+        $activeTime = Cfg::getCfg('active_date');
+        $res['active_end'] = $activeTime[1] - time();
+        // 参与人数
+        // $res['join_people'] = self::where(['star_id' => $starid])->where('active_card_days', '>', 0)->count();
+        // 累计打卡次数
+        $res['complete_people'] = self::where(['star_id' => $starid])->sum('active_card_days');
+        foreach ($res['active_info'] as $value) {
+            if ($res['complete_people'] < $value['count']) {
+                // 下一目标次数与金额
+                $res['nextCount'] = $value['count'];
+                $res['nextFee'] = $value['fee'];
+                break;
+            } else {
+                // 已达成次数与金额
+                $res['finishedCount'] = $value['count'];
+                $res['finishedFee'] = $value['fee'];
+            }
+        }
+        // 预计每天需要多少人次打卡才能达成下一目标
+        $gapCount = $res['nextCount'] - $res['complete_people'];
+        $avgSpriteLv = UserSprite::where('user_id', 'in', self::where('star_id', $starid)->column('user_id'))->avg('sprite_level') * 3;
+        $res['remainPeople'] = ceil($gapCount / $avgSpriteLv / ($res['active_end'] / 3600 / 24));
+
+        $active_card = self::where(['user_id' => $uid, 'star_id' => $starid])->field('active_card_days,active_card_time,active_subscribe,active_newbie_cards')->find();
+        // 今日是否已打卡
+        $res['can_card'] = date('ymd', time()) != date('ymd', $active_card['active_card_time']) ? UserSprite::where('user_id', $uid)->value('sprite_level') * 1 : false;
+        // 我的累计打卡
+        $res['my_card_days'] = $active_card['active_card_days'] ? $active_card['active_card_days'] : 0;
+        $res['my_newbie_cards'] = $active_card['active_newbie_cards'] ? $active_card['active_newbie_cards'] : 0;
+        // 是否订阅
+        $res['active_subscribe'] = $active_card['active_subscribe'];
+        // canvas活动挑剔
+        $res['canvas_title'] = Cfg::getCfg('canvas_title_active');
+        return $res;
+    }
+
+    /**活动 打卡 */
+    public static function setCard($uid)
+    {
+        $activeEnd = Cfg::getCfg('active_date')[1];
+        if ($activeEnd - time() < 0) Common::res(['code' => 1, 'msg' => '活动已结束']);
+
+        $active_card = self::where(['user_id' => $uid])->field('active_card_time,active_subscribe')->find();
+        if (date('ymd', time()) == date('ymd', $active_card['active_card_time'])) {
+            Common::res(['code' => 1, 'msg' => '你今天已经打卡了哦']);
+        }
+        // 打卡之前
+        // $beforeCardFee = 
+        Db::startTrans();
+        try {
+            // 订阅
+            $res = [];
+            $active_subscribe = $active_card['active_subscribe'];
+            if ($active_subscribe == 0) {
+                $active_subscribe = 2;
+                $res['subscribe'] = true;
+            }
+            // 打卡数额由用户精灵等级决定
+            $count = UserSprite::where('user_id', $uid)->value('sprite_level') * 1;
+
+            self::where(['user_id' => $uid])->update([
+                'active_card_days' => Db::raw('active_card_days+' . $count),
+                'active_card_time' => time(),
+                'active_subscribe' => $active_subscribe
+            ]);
+
+            // 记录
+            RecActive::create(['user_id' => $uid, 'card_count' => $count, 'card_time' => (int) date('Ymd')]);
+
+            // 自动推送订阅
+
+            Db::commit();
+        } catch (\Exception $e){
+            Db::rollback();
+            Common::res(['code' => 400, 'data' => $e->getMessage()]);
+        }
+
+        return $res;
+    }
 }

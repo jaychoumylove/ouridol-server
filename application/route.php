@@ -4,6 +4,8 @@ use think\Route;
 
 // Test
 Route::rule('test', 'api/Test/index');
+Route::rule('getToken', 'api/Test/getToken');
+Route::rule('getUid', 'api/Test/getUid');
 // H5
 Route::rule('h5/star', 'api/v1.H5/star');
 
@@ -128,6 +130,7 @@ Route::rule('api/:version/article/list', 'api/v1.Article/getList');// 获取文�
 Route::rule('api/:version/page/gift_package', 'api/v1.Page/giftPackage');// 礼物背包
 Route::rule('api/:version/page/gift_num', 'api/v1.Page/giftCount');// 礼物数量
 
+Route::rule('api/:version/subscribe', 'api/v1.Subscribe/index');// 订阅消息
 
 
 

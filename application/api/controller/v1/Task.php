@@ -1,4 +1,5 @@
 <?php
+
 namespace app\api\controller\v1;
 
 use app\base\controller\Base;
@@ -58,7 +59,15 @@ class Task extends Base
         $rank = (new Star())->getRank($user['user_star']['star']['star_rank']['week_hot'], 'week_hot');
         $type = input('type', 0);
         // $text = "我正在为#APPNAME#STARNAME打榜，STARNAME已经获得了STARSCORE票，实时排名第STARRANK，wx搜索小程序“APPNAME”，加入STARNAME的偶像圈，一起用爱解锁最强福利！";
-        $text = Cfg::getCfg('weibo_share_text');
+        if ($type == 0) {
+            $text = Cfg::getCfg('weibo_share_text');
+        } else if ($type == 1) {
+            $text = Cfg::getCfg('pyq_share_text');
+        } else if ($type == 2) {
+            $text = Cfg::getCfg('weibo_share_text_1');
+        } else if ($type == 3) {
+            $text = Cfg::getCfg('pyq_share_text_1');
+        }
         // $text = "#STARNAME[超话]#今天我已为爱豆打榜，STARNAME加油，我爱你，我会每天支持你，
         //     不离不弃。爱STARNAME的伙伴们，一起来支持STARNAME吧？微信小程序搜索：APPNAME，夺取冠军福利，就等
         //     你了。现在STARNAME排名第STARRANK，获得了STARSCORE票。@APPNAME";

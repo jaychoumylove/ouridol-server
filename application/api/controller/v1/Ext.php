@@ -12,6 +12,8 @@ use think\Db;
 use app\base\service\WxAPI;
 use app\api\model\Fanclub;
 use app\api\model\Rec;
+use app\api\model\UserSprite;
+use app\api\model\RecActive;
 
 class Ext extends Base
 {
@@ -41,25 +43,13 @@ class Ext extends Base
         Common::res(['data' => $res]);
     }
 
-    /**活动 明星信息 */
+    /**活动信息 */
     public function getActiveInfo()
     {
         $starid = input('starid');
         $this->getUser();
 
-        // 活动信息
-        $res['active_info'] = Cfg::getCfg('active_info');
-        // 参与人数
-        $res['join_people'] = UserStar::where(['star_id' => $starid])->where('active_card_days', '>', 0)->count();
-        // 完成人数
-        $res['complete_people'] = UserStar::where(['star_id' => $starid])->where('active_card_days', '>=', 7)->count();
-
-
-        $active_card = UserStar::where(['user_id' => $this->uid, 'star_id' => $starid])->field('active_card_days,active_card_time')->find();
-        // 今日是否已打卡
-        $res['can_card'] = date('ymd', time()) != date('ymd', $active_card['active_card_time']);
-        // 我的累计打卡
-        $res['my_card_days'] = $active_card['active_card_days'] ? $active_card['active_card_days'] : 0;
+        $res = UserStar::getActiveInfo($this->uid, $starid);
 
         Common::res(['data' => $res]);
     }
@@ -68,16 +58,9 @@ class Ext extends Base
     public function setCard()
     {
         $this->getUser();
-        $active_card_time = UserStar::where(['user_id' => $this->uid])->value('active_card_time');
-        if (date('ymd', time()) == date('ymd', $active_card_time)) {
-            Common::res(['code' => 1, 'msg' => '你今天已经打卡了哦']);
-        }
-        UserStar::where(['user_id' => $this->uid])->update([
-            'active_card_days' => Db::raw('active_card_days+1'),
-            'active_card_time' => time()
-        ]);
 
-        Common::res([]);
+        $res = UserStar::setCard($this->uid);
+        Common::res(['data' => $res]);
     }
 
     public function userRank()
@@ -86,7 +69,7 @@ class Ext extends Base
         $page =  input('page', 1);
         $size =  input('size', 10);
 
-        $list = UserStar::with('User')->where(['star_id' => $starid])->where('active_card_days', '>', 0)
+        $list = UserStar::with(['user'])->where(['star_id' => $starid])->where('active_card_days', '>', 0)
             ->order('active_card_days desc')->page($page, $size)->select();
 
         Common::res(['data' => $list]);
