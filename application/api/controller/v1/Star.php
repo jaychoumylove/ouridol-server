@@ -1,4 +1,5 @@
 <?php
+
 namespace app\api\controller\v1;
 
 use app\base\controller\Base;
@@ -70,33 +71,43 @@ class Star extends Base
 
         $this->getUser();
 
-        // 保存聊天记录
-        $res = RecStarChart::create([
-            'user_id' => $this->uid,
-            'star_id' => $starid,
-            'content' => $content,
-            'create_time' => time(),
-        ]);
-        $res['user'] = UserModel::where(['id' => $this->uid])->field('nickname,avatarurl')->find();
-        $res['user']['user_star'] = UserStar::get(['user_id' => $this->uid, 'star_id' => $starid]);
+        Db::startTrans();
+        try {
+            // 保存聊天记录
+            $res = RecStarChart::create([
+                'user_id' => $this->uid,
+                'star_id' => $starid,
+                'content' => $content,
+                'create_time' => time(),
+            ]);
 
-        // 推送socket消息
-        Gateway::sendToGroup('star_' . $starid, json_encode([
-            'type' => 'chartMsg',
-            'data' => $res
-        ], JSON_UNESCAPED_UNICODE));
-        if ($res) {
-            Common::res([]);
-        } else {
-            Common::res(['code' => 500]);
+            $res['user'] = UserModel::where(['id' => $this->uid])->field('nickname,avatarurl,type')->find();
+            $res['user']['user_star'] = UserStar::get(['user_id' => $this->uid, 'star_id' => $starid]);
+
+            if ($res['user']['type'] == 2) {
+                Db::rollback();
+                Common::res(['code' => 1, 'msg' => '你已被禁言']);
+            }
+
+            // 推送socket消息
+            Gateway::sendToGroup('star_' . $starid, json_encode([
+                'type' => 'chartMsg',
+                'data' => $res
+            ], JSON_UNESCAPED_UNICODE));
+
+            Db::commit();
+        } catch (\Exception $e) {
+            Db::rollback();
+            Common::res(['code' => 400, 'data' => $e->getMessage()]);
         }
+        Common::res();
     }
 
     /**贡献人气 */
     public function sendHot()
     {
         $starid = input('starid');
-        $hot = input('hot');// type=1 为礼物id
+        $hot = input('hot'); // type=1 为礼物id
         $type = input('type', 0);
         if (!$starid || !$hot) Common::res(['code' => 100]);
         $this->getUser();
