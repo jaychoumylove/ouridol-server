@@ -122,10 +122,23 @@ class Page extends Base
         $res['article'] = Article::where('1=1')->order('create_time desc,id desc')->find();
 
         // 师傅收益
-        $cur_contribute = UserFather::where(['father' => $this->uid])->max('cur_contribute');
-        $res['fatherEarn'] = floor($cur_contribute * Cfg::getCfg('father_earn_per'));
+        // $cur_contribute = UserFather::where(['father' => $this->uid])->max('cur_contribute');
+        // $res['fatherEarn'] = floor($cur_contribute * Cfg::getCfg('father_earn_per'));
 
-        $res['activeInfo'] = UserStar::getActiveInfo($this->uid, $starid);
+        $res['active_info'] = Cfg::getCfg('active_info');
+        $res['activeInfo']['complete_people'] = UserStar::where(['star_id' => $starid])->sum('active_card_days');
+        foreach ($res['active_info'] as $value) {
+            if ($res['activeInfo']['complete_people'] < $value['count']) {
+                // 下一目标次数与金额
+                $res['activeInfo']['nextCount'] = $value['count'];
+                $res['activeInfo']['nextFee'] = $value['fee'];
+                break;
+            } else {
+                // 已达成次数与金额
+                $res['activeInfo']['finishedCount'] = $value['count'];
+                $res['activeInfo']['finishedFee'] = $value['fee'];
+            }
+        }
 
         // 礼物
         $res['itemList'] = CfgItem::where('1=1')->order('count asc')->select();
