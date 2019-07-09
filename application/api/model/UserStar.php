@@ -166,7 +166,7 @@ class UserStar extends Base
         }
         // 预计每天需要多少人次打卡才能达成下一目标
         $gapCount = $res['nextCount'] - $res['complete_people'];
-        $avgSpriteLv = UserSprite::where('user_id', 'in', self::where('star_id', $starid)->column('user_id'))->avg('sprite_level') * 3;
+        $avgSpriteLv = UserSprite::where('user_id', 'in', self::where('star_id', $starid)->where('active_card_days', '>', 0)->column('user_id'))->avg('sprite_level') * 3;
         $res['remainPeople'] = ceil($gapCount / $avgSpriteLv / ($res['active_end'] / 3600 / 24));
 
         $active_card = self::where(['user_id' => $uid, 'star_id' => $starid])->field('active_card_days,active_card_time,active_subscribe,active_newbie_cards')->find();
@@ -218,7 +218,7 @@ class UserStar extends Base
             // 自动推送订阅
 
             Db::commit();
-        } catch (\Exception $e){
+        } catch (\Exc   eption   $e){
             Db::rollback();
             Common::res(['code' => 400, 'data' => $e->getMessage()]);
         }
