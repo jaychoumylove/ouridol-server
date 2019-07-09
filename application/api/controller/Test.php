@@ -39,8 +39,10 @@ class Test extends Base
 
     public function index()
     {
-
-        echo date('Y-m-d H:i:s', Cfg::getCfg('active_date')[0]);
+        $start = time();
+        for ($i = 0; $i < 1000000000; $i++) { }
+        echo time() - $start;
+        // echo date('Y-m-d H:i:s', Cfg::getCfg('active_date')[0]);
         // echo (int) !0;
 
         // echo json_encode(

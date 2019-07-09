@@ -9,6 +9,7 @@ use app\api\service\Task as TaskService;
 use app\api\model\User;
 use app\api\service\Star;
 use app\api\model\Cfg;
+use app\api\model\UserStar;
 
 class Task extends Base
 {
@@ -76,6 +77,16 @@ class Task extends Base
         $text = str_replace('STARSCORE', $user['user_star']['star']['star_rank']['week_hot'], $text);
         $text = str_replace('STARRANK', $rank, $text);
         $text = str_replace('APPNAME', Cfg::getCfg('appname'), $text);
+
+        // 活动
+        $star_id = UserStar::where('user_id', $this->uid)->order('id desc')->value('star_id');
+        $activeInfo = UserStar::getActiveInfo($this->uid, $star_id);
+
+        if (isset($activeInfo['finishedFee'])) {
+            $text = str_replace('ACTIVE', '目前已经解锁' . $activeInfo['finishedFee'] . '元应援金', $text);
+        } else {
+            $text = str_replace('ACTIVE', '目前累计解锁' . $activeInfo['complete_people'] . '次', $text);
+        }
 
         Common::res(['data' => [
             'share_text' => $text,

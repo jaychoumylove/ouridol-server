@@ -177,7 +177,7 @@ class UserStar extends Base
         $res['my_newbie_cards'] = $active_card['active_newbie_cards'] ? $active_card['active_newbie_cards'] : 0;
         // 是否订阅
         $res['active_subscribe'] = $active_card['active_subscribe'];
-        // canvas活动挑剔
+        // canvas活动标题
         $res['canvas_title'] = Cfg::getCfg('canvas_title_active');
         return $res;
     }

@@ -88,8 +88,8 @@ class AutoRun extends Base
                 ]);
             }
 
-            // 后援会
-            Fanclub::where('1=1')->update(['week_count'])
+            // 后援会贡献重置
+            Fanclub::where('1=1')->update(['week_count' => 0]);
 
             Db::commit();
         } catch (\Exception $e) {
