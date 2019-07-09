@@ -218,7 +218,7 @@ class UserStar extends Base
             // 自动推送订阅
 
             Db::commit();
-        } catch (\Exc   eption   $e){
+        } catch (\Exception   $e){
             Db::rollback();
             Common::res(['code' => 400, 'data' => $e->getMessage()]);
         }
