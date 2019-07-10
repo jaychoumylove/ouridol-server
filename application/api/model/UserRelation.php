@@ -144,15 +144,20 @@ class UserRelation extends Base
             $res = self::with('User')->where(['rer_user_id' => $uid, 'create_time' => ['>', date('Y-m-d H:i:s', Cfg::getCfg('active_date')[0])], 'status' => ['in', [1, 2]]])->order('id desc')->limit(5)->select();
         } else {
             // 拉票列表页
-            if ($page > 30) return [];
-            $res = self::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2]]])->page($page, $size)->select();
-            $len = count($res);
-            if ($len < $size) {
-                for ($i = 0; $i < ($size - $len); $i++) {
-                    $res[] = [
-                        'status' => 0,
-                    ];
+            // 已领取人数
+            $res['hasEarnCount'] = self::where(['rer_user_id' => $uid, 'status' => ['in', [2]]])->count('id');
+            if ($res['hasEarnCount'] <= 300) {
+                $res['list'] = self::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1]]])->page($page, $size)->select();
+                $len = count($res['list']);
+                if ($len < $size) {
+                    for ($i = 0; $i < ($size - $len); $i++) {
+                        $res['list'][] = [
+                            'status' => 0,
+                        ];
+                    }
                 }
+            } else {
+                $res['list'] = [];
             }
         }
 
@@ -165,11 +170,11 @@ class UserRelation extends Base
         if (!$self || !$other || $self == $other) Common::res(['code' => 100]);
         // 好友数量上限
         $selfFriendCount = self::where('rer_user_id', $self)->where('status', 'in', [1, 2, 3, 4])->count('id');
-        $selfFriendCount += self::with('RerUser')->where(['ral_user_id' => $self, 'status' => ['in', [1, 2, 4]]])->count('id');
+        $selfFriendCount += self::where(['ral_user_id' => $self, 'status' => ['in', [1, 2, 4]]])->count('id');
         if (Cfg::getCfg('friend_max') <= $selfFriendCount) Common::res(['code' => 1, 'msg' => '你已经有足够多的好友了']);
 
         $otherFriendCount = self::where('rer_user_id', $other)->where('status', 'in', [1, 2, 3, 4])->count('id');
-        $otherFriendCount += self::with('RerUser')->where(['ral_user_id' => $other, 'status' => ['in', [1, 2, 4]]])->count('id');
+        $otherFriendCount += self::where(['ral_user_id' => $other, 'status' => ['in', [1, 2, 4]]])->count('id');
         if (Cfg::getCfg('friend_max') <= $otherFriendCount) Common::res(['code' => 1, 'msg' => 'TA的好友已满']);
 
         $isExist = self::where(['rer_user_id' => $self, 'ral_user_id' => $other])->find();
