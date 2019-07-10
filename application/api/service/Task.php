@@ -198,6 +198,17 @@ class Task
                         }
                     }
                     break;
+                case 15:
+                    // 加好友
+                    $task['doneTimes'] = UserRelation::where('rer_user_id', $uid)->where('status', 4)->whereTime('create_time', 'd')->count('id');
+                    if (in_array($task['id'], $recTask)) {
+                        $task['status'] = 2;
+                    } else {
+                        if ($task['doneTimes'] >= $task['times']) {
+                            $task['status'] = 1;
+                        }
+                    }
+                    break;
                 default:
                     # code...
                     break;
