@@ -5,6 +5,7 @@ namespace app\api\model;
 use app\base\model\Base;
 use think\Db;
 use app\base\service\Common;
+use app\base\service\WxAPI;
 
 class UserStar extends Base
 {
@@ -168,7 +169,7 @@ class UserStar extends Base
         $gapCount = $res['nextCount'] - $res['complete_people'];
         $avgSpriteLv = UserSprite::where('user_id', 'in', self::where('star_id', $starid)->where('active_card_days', '>', 0)->column('user_id'))->avg('sprite_level') * 3;
         $res['remainPeople'] = ceil($gapCount / $avgSpriteLv / ($res['active_end'] / 3600 / 24));
-        if($res['remainPeople'] == 0) $res['remainPeople'] = 10;
+        if ($res['remainPeople'] == 0) $res['remainPeople'] = 10;
         $active_card = self::where(['user_id' => $uid, 'star_id' => $starid])->field('active_card_days,active_card_time,active_subscribe,active_newbie_cards')->find();
         // 今日是否已打卡
         $res['can_card'] = date('ymd', time()) != date('ymd', $active_card['active_card_time']) ? UserSprite::where('user_id', $uid)->value('sprite_level') * 1 : false;
@@ -188,23 +189,52 @@ class UserStar extends Base
         $activeEnd = Cfg::getCfg('active_date')[1];
         if ($activeEnd - time() < 0) Common::res(['code' => 1, 'msg' => '活动已结束']);
 
-        $active_card = self::where(['user_id' => $uid])->field('active_card_time,active_subscribe')->find();
+        $active_card = self::where(['user_id' => $uid])->field('star_id,active_card_time,active_subscribe')->find();
         if (date('ymd', time()) == date('ymd', $active_card['active_card_time'])) {
             Common::res(['code' => 1, 'msg' => '你今天已经打卡了哦']);
         }
-        // 打卡之前
-        // $beforeCardFee = 
+
         Db::startTrans();
         try {
-            // 订阅
             $res = [];
+
+            // 打卡数额由用户精灵等级决定
+            $count = UserSprite::where('user_id', $uid)->value('sprite_level') * 1;
+
+            // 是否要推送
+            $activeInfo = Cfg::getCfg('active_info');
+            $beforeCards = self::where('star_id', $active_card['star_id'])->sum('active_card_days');
+            $afterCards = $beforeCards + $count;
+            $beforeFee = 0;
+            $afterFee = 0;
+            foreach ($activeInfo as $value) {
+                if ($beforeCards < $value['count']) {
+                    break;
+                } else {
+                    $beforeFee = $value['fee'];
+                }
+            }
+            foreach ($activeInfo as $value) {
+                if ($afterCards < $value['count']) {
+                    break;
+                } else {
+                    $afterFee = $value['fee'];
+                }
+            }
+            if ($beforeFee != $afterFee) {
+                // 确认推送
+                Common::requestAsync('https://' . $_SERVER['SERVER_NAME'] . '/api/v1/auto/sendTmp', http_build_query([
+                    'starid' => $active_card['star_id'],
+                    'fee' => $afterFee
+                ]));
+            }
+
+            // 是否订阅
             $active_subscribe = $active_card['active_subscribe'];
             if ($active_subscribe == 0) {
                 $active_subscribe = 2;
                 $res['subscribe'] = true;
             }
-            // 打卡数额由用户精灵等级决定
-            $count = UserSprite::where('user_id', $uid)->value('sprite_level') * 1;
 
             self::where(['user_id' => $uid])->update([
                 'active_card_days' => Db::raw('active_card_days+' . $count),
@@ -218,10 +248,11 @@ class UserStar extends Base
             // 自动推送订阅
 
             Db::commit();
-        } catch (\Exception $e){
+        } catch (\Exception $e) {
             Db::rollback();
             Common::res(['code' => 400, 'data' => $e->getMessage()]);
         }
+
 
         return $res;
     }

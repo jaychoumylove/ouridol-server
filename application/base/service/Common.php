@@ -33,13 +33,11 @@ class Common
     }
 
     /**服务端基础curl */
-    public static function request($url, $data)
+    public static function request($url, $data = null)
     {
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        // curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 1);
-        // curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
         if ($data) {
             //设置post方式提交
             curl_setopt($curl, CURLOPT_POST, 1);
@@ -54,6 +52,28 @@ class Common
         } else {
             return $res;
         }
+    }
+
+    /**fsockopen发送的异步POST请求 */
+    public static function requestAsync($url, $data = null)
+    {
+        $urlInfo = parse_url($url);
+
+        $host = $urlInfo['host'];
+        $port = $urlInfo['scheme'] == 'http' ? 80 : 443;
+        $path = isset($urlInfo['query']) ? $urlInfo['path'] . '?' . $urlInfo['query'] : $urlInfo['path'];
+
+        $fp = fsockopen($port == 80 ? $host : 'ssl://' . $host, $port);
+
+        $out  = "POST " . $path . " HTTP/1.1\r\n";
+        $out .= "host: " . $host . "\r\n";
+        $out .= "content-length: " . strlen($data) . "\r\n";
+        $out .= "content-type: application/x-www-form-urlencoded\r\n";
+        $out .= "connection: close\r\n\r\n";
+        $out .= $data;
+
+        fwrite($fp, $out);
+        fclose($fp);
     }
 
     /**加密uid生成token */

@@ -11,6 +11,9 @@ use app\api\model\UserCurrency;
 use app\api\model\OtherLock;
 use think\Cache;
 use app\api\model\Fanclub;
+use app\api\model\Star;
+use app\base\service\WxAPI;
+use think\Log;
 
 class AutoRun extends Base
 {
@@ -136,6 +139,9 @@ class AutoRun extends Base
                 'month_hot' => 10000,
             ]);
 
+            // 后援会贡献重置
+            Fanclub::where('1=1')->update(['month_count' => 0]);
+
             Db::commit();
         } catch (\Exception $e) {
             Db::rollBack();
@@ -144,5 +150,47 @@ class AutoRun extends Base
         }
 
         die('done');
+    }
+
+    /**解锁消息推送 */
+    public function sendTmp()
+    {
+        $starid = input('starid');
+        $fee = input('fee');
+        $template_id = "T54MtDdRAPe8kNNtt2tQlj7P7ut7yEe-F8-CaMrKcvw";
+
+        $starname = Star::where('id', $starid)->value('name');
+        $pushUser = Db::query("SELECT u.openid,f.form_id
+                        FROM `f_user_star` as s 
+                        join f_user as u on u.id = s.user_id 
+                        join   
+                            (
+                        select * from f_rec_user_formid ORDER BY create_time desc
+                        )
+                        as f on f.user_id = s.user_id
+                        
+                        where s.star_id = " . $starid . " GROUP BY u.openid");
+
+        foreach ($pushUser as $value) {
+            if (!$value['openid'] || !$value['form_id']) continue;
+            $pushDatas[] = [
+                "touser" => $value['openid'],
+                "template_id" => $template_id,
+                "page" => "/pages/index/index",
+                "form_id" => $value['form_id'],
+                "data" => [
+                    "keyword1" => [
+                        "value" => $fee . "元"
+                    ],
+                    "keyword2" => [
+                        "value" =>  $starname . "已成功解锁" . $fee . "元应援金，赶快邀请后援会入驻领取吧，活动进行中，最多可解锁1000元。"
+                    ]
+                ],
+                "emphasis_keyword" => "keyword1.DATA"
+            ];
+        }
+
+        $wxApi = new WxAPI();
+        $wxApi->sendTemplate($pushDatas);
     }
 }

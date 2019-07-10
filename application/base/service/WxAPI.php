@@ -90,7 +90,7 @@ class WxAPI
      */
     public function getAccessToken()
     {
-        if (strtotime($this->appinfo['access_token_expire']) < time()) {
+        if (strtotime($this->appinfo['access_token_expire']) - 600 < time()) {
             // 更新accessToken
             $url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET';
             $url = str_replace('APPID', $this->appinfo['appid'], $url);
@@ -197,5 +197,24 @@ class WxAPI
 
         $data = ['path' => $path];
         return Common::request($url, json_encode($data, JSON_UNESCAPED_UNICODE));
+    }
+
+    /**
+     * 发送模板消息
+     * method post
+     */
+    public function sendTemplate($datas)
+    {
+        $url = 'https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=ACCESS_TOKEN';
+
+        $accessToken = $this->getAccessToken();
+        if (!$accessToken) return false;
+        $url = str_replace('ACCESS_TOKEN', $accessToken, $url);
+
+        foreach ($datas as $data) {
+            Common::requestAsync($url, json_encode($data, JSON_UNESCAPED_UNICODE));
+        }
+
+        // return Common::request($url, json_encode($data, JSON_UNESCAPED_UNICODE));
     }
 }
