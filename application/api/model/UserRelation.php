@@ -45,13 +45,16 @@ class UserRelation extends Base
         if ($relation) {
             self::where(['ral_user_id' => $uid])->update(['status' => 1]);
             // 新用户打卡活动解锁10次
+            $rerType = User::where('id', $relation['rer_user_id'])->value('type');
 
-            UserStar::where('user_id', $relation['rer_user_id'])->update([
-                'active_card_days' => Db::raw('active_card_days+10'),
-                'active_newbie_cards' => Db::raw('active_newbie_cards+10'),
-            ]);
-            // 判断是否结成师徒关系
-            UserFather::join($relation['rer_user_id'], $uid);
+            if ($rerType == 0) {
+                UserStar::where('user_id', $relation['rer_user_id'])->update([
+                    'active_card_days' => Db::raw('active_card_days+10'),
+                    'active_newbie_cards' => Db::raw('active_newbie_cards+10'),
+                ]);
+                // 判断是否结成师徒关系
+                UserFather::join($relation['rer_user_id'], $uid);
+            }
         }
 
         self::giveFriend($starid, $uid);
