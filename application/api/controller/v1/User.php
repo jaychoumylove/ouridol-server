@@ -228,6 +228,8 @@ class User extends Base
     public function addFriend()
     {
         $user_id = input('user_id');
+        if (!$user_id || $user_id == 'undefined') Common::res(['code' => 100]);
+
         $this->getUser();
 
         UserRelation::addFriend($this->uid, $user_id);
@@ -235,10 +237,12 @@ class User extends Base
         Common::res();
     }
 
-    /**加好友 */
+    /**删好友 */
     public function delFriend()
     {
         $user_id = input('user_id');
+        if (!$user_id || $user_id == 'undefined') Common::res(['code' => 100]);
+
         $this->getUser();
 
         UserRelation::delFriend($this->uid, $user_id);
