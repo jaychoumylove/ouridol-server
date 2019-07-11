@@ -29,7 +29,7 @@ class UserCurrency extends Base
     /**送灵丹给他人 */
     public static function sendStoneToOther($self, $other, $num, $type)
     {
-        if ($self == $other) Common::res(['code' => 1, 'msg' => '操作失败']);
+        if (!$self || !$other || $self == $other) Common::res(['code' => 1, 'msg' => '操作失败']);
         Db::startTrans();
         try {
             $userService = new UserService();

@@ -57,7 +57,7 @@ class UserItem extends Base
     /**送给他人礼物 */
     public static function sendItemToOther($self, $other, $num, $item_id)
     {
-        if ($self == $other) Common::res(['code' => 1, 'msg' => '操作失败']);
+        if (!$self || !$other || $self == $other) Common::res(['code' => 1, 'msg' => '操作失败']);
         Db::startTrans();
         try {
             $selfRemain = self::where(['uid' => $self, 'item_id' => $item_id])->value('count');

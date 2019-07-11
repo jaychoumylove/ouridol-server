@@ -220,8 +220,6 @@ class UserStar extends Base
             // 记录
             RecActive::create(['user_id' => $uid, 'card_count' => $count, 'card_time' => (int) date('Ymd')]);
 
-            // 自动推送订阅
-
             Db::commit();
         } catch (\Exception $e) {
             Db::rollback();
