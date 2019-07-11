@@ -201,33 +201,8 @@ class UserStar extends Base
             // 打卡数额由用户精灵等级决定
             $count = UserSprite::where('user_id', $uid)->value('sprite_level') * 1;
 
-            // 是否要推送
-            $activeInfo = Cfg::getCfg('active_info');
-            $beforeCards = self::where('star_id', $active_card['star_id'])->sum('active_card_days');
-            $afterCards = $beforeCards + $count;
-            $beforeFee = 0;
-            $afterFee = 0;
-            foreach ($activeInfo as $value) {
-                if ($beforeCards < $value['count']) {
-                    break;
-                } else {
-                    $beforeFee = $value['fee'];
-                }
-            }
-            foreach ($activeInfo as $value) {
-                if ($afterCards < $value['count']) {
-                    break;
-                } else {
-                    $afterFee = $value['fee'];
-                }
-            }
-            if ($beforeFee != $afterFee) {
-                // 确认推送
-                Common::requestAsync('https://' . $_SERVER['SERVER_NAME'] . '/api/v1/auto/sendTmp', http_build_query([
-                    'starid' => $active_card['star_id'],
-                    'fee' => $afterFee
-                ]));
-            }
+            // 推送解锁进度
+            self::push($active_card['star_id'], $count);
 
             // 是否订阅
             $active_subscribe = $active_card['active_subscribe'];
@@ -255,5 +230,38 @@ class UserStar extends Base
 
 
         return $res;
+    }
+
+    /**推送解锁 */
+    public static function push($starid, $count)
+    {
+        $activeInfo = Cfg::getCfg('active_info');
+        // 当前打卡数
+        $beforeCards = self::where('star_id', $starid)->sum('active_card_days');
+        // 之后打卡数
+        $afterCards = $beforeCards + $count;
+        $beforeFee = 0;
+        $afterFee = 0;
+        foreach ($activeInfo as $value) {
+            if ($beforeCards < $value['count']) {
+                break;
+            } else {
+                $beforeFee = $value['fee'];
+            }
+        }
+        foreach ($activeInfo as $value) {
+            if ($afterCards < $value['count']) {
+                break;
+            } else {
+                $afterFee = $value['fee'];
+            }
+        }
+        if ($beforeFee != $afterFee) {
+            // 确认推送
+            Common::requestAsync('https://' . $_SERVER['SERVER_NAME'] . '/api/v1/auto/sendTmp', http_build_query([
+                'starid' => $starid,
+                'fee' => $afterFee
+            ]));
+        }
     }
 }

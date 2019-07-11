@@ -48,9 +48,13 @@ class UserRelation extends Base
             $rerType = User::where('id', $relation['rer_user_id'])->value('type');
 
             if ($rerType == 0) {
+                $count = 10;
+                // 推送解锁进度
+                UserStar::push($starid, $count);
+
                 UserStar::where('user_id', $relation['rer_user_id'])->update([
-                    'active_card_days' => Db::raw('active_card_days+10'),
-                    'active_newbie_cards' => Db::raw('active_newbie_cards+10'),
+                    'active_card_days' => Db::raw('active_card_days+' . $count),
+                    'active_newbie_cards' => Db::raw('active_newbie_cards+' . $count),
                 ]);
                 // 判断是否结成师徒关系
                 UserFather::join($relation['rer_user_id'], $uid);
