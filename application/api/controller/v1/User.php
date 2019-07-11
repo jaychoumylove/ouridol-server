@@ -251,7 +251,7 @@ class User extends Base
 
         $num = input('num');
         $type = input('type', 'stone');
-        if (!$user_id || !$num) Common::res(['code' => 100]);
+        if (!$user_id || !$num || $user_id == 'undefined') Common::res(['code' => 100]);
         $this->getUser();
 
         UserCurrency::sendStoneToOther($this->uid, $user_id, $num, $type);
@@ -262,7 +262,7 @@ class User extends Base
     {
         $user_id = input('user_id');
         $item_id = input('item_id'); // 礼物id
-        if (!$user_id || !$item_id) Common::res(['code' => 100]);
+        if (!$user_id || !$item_id || $user_id == 'undefined') Common::res(['code' => 100]);
 
         $num = input('num', 1);
         $this->getUser();
