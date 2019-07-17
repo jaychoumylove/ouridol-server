@@ -202,7 +202,7 @@ class UserStar extends Base
             $count = UserSprite::where('user_id', $uid)->value('sprite_level') * 1;
 
             // 推送解锁进度
-            self::push($active_card['star_id'], $count);
+            // self::push($active_card['star_id'], $count);
 
             // 是否订阅
             $active_subscribe = $active_card['active_subscribe'];

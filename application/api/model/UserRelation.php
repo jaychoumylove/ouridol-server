@@ -50,7 +50,7 @@ class UserRelation extends Base
             if ($rerType == 0) {
                 $count = 10;
                 // 推送解锁进度
-                UserStar::push($starid, $count);
+                // UserStar::push($starid, $count);
 
                 UserStar::where('user_id', $relation['rer_user_id'])->update([
                     'active_card_days' => Db::raw('active_card_days+' . $count),
@@ -91,7 +91,7 @@ class UserRelation extends Base
      */
     public static function fixByType($type, $uid, $page, $size)
     {
-        if ($type == 1) { // 宠物页面邀请列表，统计收益
+        if ($type == 1) { // 宠物页面邀请列表，统计收益 好友
             $friend_max = Cfg::getCfg('friend_max');
             if (!$friend_max) $friend_max = 100;
             // 我邀请的人、、加的好友
