@@ -1,4 +1,5 @@
 <?php
+
 namespace app\api\controller\v1;
 
 use app\base\controller\Base;
@@ -14,15 +15,24 @@ class Treasure extends Base
     public function index()
     {
         $this->getUser();
-        $time = UserExt::getTreasure($this->uid);
-        Common::res(['data' => $time]);
+        $info = UserExt::getTreasure($this->uid);
+        Common::res(['data' => $info]);
+    }
+
+    public function start()
+    {
+        $this->getUser();
+
+        $res = UserExt::lotteryStart($this->uid);
+
+        Common::res(['data' => $res]);
     }
 
     public function settle()
     {
         $this->getUser();
         $time = UserExt::getTreasure($this->uid);
-        if($time != 0) Common::res(['code' => 1]);
+        if ($time != 0) Common::res(['code' => 1]);
 
         Db::startTrans();
         try {
@@ -30,7 +40,7 @@ class Treasure extends Base
                 'treasure_time' => time()
             ]);
 
-            (new User)->change($this->uid,[
+            (new User)->change($this->uid, [
                 'coin' => Cfg::getCfg('treasure_earn'),
             ]);
 

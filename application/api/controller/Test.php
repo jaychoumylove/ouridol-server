@@ -16,6 +16,7 @@ use app\base\service\WxMsg;
 use app\api\model\PayOrder;
 use app\api\model\RecPayOrder;
 use app\api\model\Cfg;
+use app\api\model\CfgLottery;
 
 class Test extends Base
 {
@@ -39,9 +40,33 @@ class Test extends Base
 
     public function index()
     {
-        $start = time();
-        for ($i = 0; $i < 1000000000; $i++) { }
-        echo time() - $start;
+
+        // $lotteryList = CfgLottery::where('1=1')->order('chance asc')->select();
+        // $totalPt = CfgLottery::where('1=1')->sum('chance');
+        // $randPt = mt_rand(0, $totalPt);
+        // $base = 0;
+        // foreach ($lotteryList as $value) {
+        //     if ($randPt < $value['chance'] + $base) {
+        //         $lottery = $value;
+        //         break;
+        //     } else {
+        //         $base += $value['chance'];
+        //     }
+        // }
+
+        // Common::res(['data' => $lottery]);
+        // echo strtotime('00:00:00');
+        // Log::record(111);
+        // Common::requestAsync('https://' . $_SERVER['SERVER_NAME'] . '/api/v1/auto/sendTmp',[
+        //     'starid' => 35,
+        //     'fee' => 100
+        // ]);
+        // dump(fsockopen("www.baidu.com", 80, $errno, $errstr, 30));
+        // $wxApi = new WxAPI();
+        // dump($wxApi->sendTemplateSync());
+        // $start = time();
+        // for ($i = 0; $i < 1000000000; $i++) { }
+        // echo time() - $start;
         // echo date('Y-m-d H:i:s', Cfg::getCfg('active_date')[0]);
         // echo (int) !0;
 

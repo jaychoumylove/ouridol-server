@@ -179,13 +179,14 @@ class User extends Base
             'type' => 3
         ]);
 
-        $avatarUrl = UserModel::where(['id' => $this->uid])->value('avatarurl');
+        $user = UserModel::where(['id' => $this->uid])->field('nickname,avatarurl')->find();
         // 推送socket消息
         Gateway::sendToAll(json_encode([
             'type' => 'sayworld',
             'data' => [
-                'avatarurl' => $avatarUrl,
+                'avatarurl' => $user['avatarurl'],
                 'content' => $content,
+                'nickname' => $user['nickname'],
             ],
         ], JSON_UNESCAPED_UNICODE));
 
@@ -212,6 +213,7 @@ class User extends Base
         Common::res(['data' => $res]);
     }
 
+    /**礼物兑换能量 */
     public function recharge()
     {
         $item_id = input('item_id');
@@ -249,6 +251,7 @@ class User extends Base
         Common::res();
     }
 
+    /**送灵丹给他人 */
     public function sendStoneToOther()
     {
         $user_id = input('user_id');
@@ -262,6 +265,7 @@ class User extends Base
         Common::res();
     }
 
+    
     public function sendItemToOther()
     {
         $user_id = input('user_id');

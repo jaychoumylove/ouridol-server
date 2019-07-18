@@ -217,4 +217,38 @@ class WxAPI
 
         // return Common::request($url, json_encode($data, JSON_UNESCAPED_UNICODE));
     }
+
+    /**
+     * 发送模板消息
+     * method post
+     */
+    public function sendTemplateSync()
+    {
+        $url = 'https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=ACCESS_TOKEN';
+
+        $accessToken = $this->getAccessToken();
+        if (!$accessToken) return false;
+        $url = str_replace('ACCESS_TOKEN', $accessToken, $url);
+
+
+        $data = [
+            "touser" => 'oj77y5LIpHuIWUU2kW8BHVP4goPc',
+            "template_id" => "T54MtDdRAPe8kNNtt2tQlj7P7ut7yEe-F8-CaMrKcvw",
+            "page" => "/pages/index/index",
+            "form_id" => "b5664ec137d44c4c8332130d065a4e48",
+            "data" => [
+                "keyword1" => [
+                    "value" => 100 . "元"
+                ],
+                "keyword2" => [
+                    "value" =>  11 . "已成功解锁" . 100 . "元应援金，赶快邀请后援会入驻领取吧，活动进行中，最多可解锁1000元。"
+                ]
+            ],
+            "emphasis_keyword" => "keyword1.DATA"
+        ];
+
+        // Common::requestAsync($url, json_encode($data, JSON_UNESCAPED_UNICODE));
+
+        return Common::request($url, json_encode($data, JSON_UNESCAPED_UNICODE));
+    }
 }

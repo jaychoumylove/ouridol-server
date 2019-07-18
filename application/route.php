@@ -124,6 +124,7 @@ Route::rule('api/:version/ext/exitFanclub', 'api/v1.Ext/exitFanclub');// 退出�
 // Treasure
 Route::rule('api/:version/treasure/settle', 'api/v1.Treasure/settle');// 寻宝结算
 Route::rule('api/:version/treasure', 'api/v1.Treasure/index');// 
+Route::rule('api/:version/lottery/start', 'api/v1.Treasure/start');// 
 
 // Article
 Route::rule('api/:version/article', 'api/v1.Article/getArticle');// 获取文章

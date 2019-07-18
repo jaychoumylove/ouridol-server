@@ -1,4 +1,5 @@
 <?php
+
 namespace app\api\controller\v1;
 
 use app\base\controller\Base;
@@ -57,6 +58,7 @@ class Share extends Base
     public function father()
     {
         $this->getUser();
+        $page = input('page', 1);
 
         $res = UserFather::getFatherList($this->uid);
 

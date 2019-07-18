@@ -1,4 +1,5 @@
 <?php
+
 namespace app\base\model;
 
 use think\Model;
@@ -28,4 +29,12 @@ class Base extends Model
     use SoftDelete;
     protected $deleteTime = 'delete_time';
     protected $update = ['delete_time'];
+
+    /**数据库清理 */
+    public function clear()
+    {
+        $clearTime =  time() - 3600 * 24 * 30;
+
+
+    }
 }

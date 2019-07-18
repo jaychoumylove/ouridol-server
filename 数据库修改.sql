@@ -1,5 +1,5 @@
 ALTER TABLE `f_user_star`
-ADD COLUMN `active_subscribe`  tinyint NULL DEFAULT 1 COMMENT '活动消息订阅' AFTER `fanclub_id`;
+ADD COLUMN `active_subscribe`  tinyint NULL DEFAULT 0 COMMENT '活动消息订阅' AFTER `fanclub_id`;
 
 ALTER TABLE `f_user_star`
 ADD COLUMN `active_newbie_cards`  int UNSIGNED NULL DEFAULT 0 COMMENT '我拉的新人助力我解锁打卡的次数' AFTER `active_subscribe`;

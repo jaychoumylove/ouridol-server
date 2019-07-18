@@ -166,10 +166,10 @@ class UserStar extends Base
             }
         }
         // 预计每天需要多少人次打卡才能达成下一目标
+        $res['remainPeople'] = 10;// 初步预计每天10人
         $gapCount = $res['nextCount'] - $res['complete_people'];
         $avgSpriteLv = UserSprite::where('user_id', 'in', self::where('star_id', $starid)->where('active_card_days', '>', 0)->column('user_id'))->avg('sprite_level') * 3;
-        $res['remainPeople'] = ceil($gapCount / $avgSpriteLv / ($res['active_end'] / 3600 / 24));
-        if ($res['remainPeople'] == 0) $res['remainPeople'] = 10;
+        if ($avgSpriteLv) $res['remainPeople'] = ceil($gapCount / $avgSpriteLv / ($res['active_end'] / 3600 / 24));
         $active_card = self::where(['user_id' => $uid, 'star_id' => $starid])->field('active_card_days,active_card_time,active_subscribe,active_newbie_cards')->find();
         // 今日是否已打卡
         $res['can_card'] = date('ymd', time()) != date('ymd', $active_card['active_card_time']) ? UserSprite::where('user_id', $uid)->value('sprite_level') * 1 : false;
