@@ -42,10 +42,10 @@ class Rec extends Base
         return $logList;
     }
 
-    /**写入日志 */
-    // public static function create($log)
-    // {
-    //     // parent::clear();
-    //     return parent::create($log);
-    // }
+    /**存入日志 */
+    public static function addLog($log)
+    {
+        parent::clear();
+        return parent::create($log);
+    }
 }
