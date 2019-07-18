@@ -45,7 +45,7 @@ class Rec extends Base
     /**写入日志 */
     public static function create($log)
     {
-        parent::clear();
+        // parent::clear();
         return parent::create($log);
     }
 }
