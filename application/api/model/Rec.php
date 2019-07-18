@@ -43,9 +43,9 @@ class Rec extends Base
     }
 
     /**写入日志 */
-    public static function create($log)
-    {
-        // parent::clear();
-        return parent::create($log);
-    }
+    // public static function create($log)
+    // {
+    //     // parent::clear();
+    //     return parent::create($log);
+    // }
 }
