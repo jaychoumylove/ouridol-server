@@ -31,10 +31,9 @@ class Base extends Model
     protected $update = ['delete_time'];
 
     /**数据库清理 */
-    public function clear()
+    public static function clear()
     {
-        $clearTime =  time() - 3600 * 24 * 30;
-
-
+        $clearTime = time() - 3600 * 24 * 30;// 一个月前
+        static::where('1=1')->whereTime('create_time', '<', $clearTime)->limit(10)->delete(true);
     }
 }
