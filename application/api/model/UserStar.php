@@ -149,10 +149,12 @@ class UserStar extends Base
         // 活动时间
         $activeTime = Cfg::getCfg('active_date');
         $res['active_end'] = $activeTime[1] - time();
+        if ($res['active_end'] < 0) $res['active_end'] = 0;
         // 参与人数
         // $res['join_people'] = self::where(['star_id' => $starid])->where('active_card_days', '>', 0)->count();
         // 累计打卡次数
         $res['complete_people'] = self::where(['star_id' => $starid])->sum('active_card_days');
+        $res['nextCount'] = '已完成解锁！';
         foreach ($res['active_info'] as $value) {
             if ($res['complete_people'] < $value['count']) {
                 // 下一目标次数与金额
@@ -166,10 +168,16 @@ class UserStar extends Base
             }
         }
         // 预计每天需要多少人次打卡才能达成下一目标
-        $res['remainPeople'] = 10;// 初步预计每天10人
-        $gapCount = $res['nextCount'] - $res['complete_people'];
-        $avgSpriteLv = UserSprite::where('user_id', 'in', self::where('star_id', $starid)->where('active_card_days', '>', 0)->column('user_id'))->avg('sprite_level') * 3;
-        if ($avgSpriteLv) $res['remainPeople'] = ceil($gapCount / $avgSpriteLv / ($res['active_end'] / 3600 / 24));
+
+        if (isset($res['nextCount']) && gettype($res['nextCount']) == 'int') {
+            $res['remainPeople'] = 10; // 初步预计每天10人
+            $gapCount = $res['nextCount'] - $res['complete_people'];
+            $avgSpriteLv = UserSprite::where('user_id', 'in', self::where('star_id', $starid)->where('active_card_days', '>', 0)->column('user_id'))->avg('sprite_level') * 3;
+            if ($avgSpriteLv) $res['remainPeople'] = ceil($gapCount / $avgSpriteLv / ($res['active_end'] / 3600 / 24));
+        } else {
+            $res['remainPeople'] = 0;
+        }
+
         $active_card = self::where(['user_id' => $uid, 'star_id' => $starid])->field('active_card_days,active_card_time,active_subscribe,active_newbie_cards')->find();
         // 今日是否已打卡
         $res['can_card'] = date('ymd', time()) != date('ymd', $active_card['active_card_time']) ? UserSprite::where('user_id', $uid)->value('sprite_level') * 1 : false;
