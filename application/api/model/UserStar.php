@@ -168,8 +168,7 @@ class UserStar extends Base
             }
         }
         // 预计每天需要多少人次打卡才能达成下一目标
-
-        if (isset($res['nextCount']) && gettype($res['nextCount']) == 'int') {
+        if (isset($res['nextCount']) && gettype($res['nextCount']) == 'integer') {
             $res['remainPeople'] = 10; // 初步预计每天10人
             $gapCount = $res['nextCount'] - $res['complete_people'];
             $avgSpriteLv = UserSprite::where('user_id', 'in', self::where('star_id', $starid)->where('active_card_days', '>', 0)->column('user_id'))->avg('sprite_level') * 3;
