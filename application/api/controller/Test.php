@@ -40,7 +40,7 @@ class Test extends Base
 
     public function index()
     {
-
+        echo 1;
         // $lotteryList = CfgLottery::where('1=1')->order('chance asc')->select();
         // $totalPt = CfgLottery::where('1=1')->sum('chance');
         // $randPt = mt_rand(0, $totalPt);

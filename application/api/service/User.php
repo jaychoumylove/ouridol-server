@@ -100,7 +100,7 @@ class User
             $recSave['target_star_id'] = isset($rec['target_star_id']) ? $rec['target_star_id'] : null;
             $recSave['content'] = isset($rec['content']) ? $rec['content'] : null;
 
-            Rec::addLog($recSave);
+            Rec::addRec($recSave);
         }
     }
 
