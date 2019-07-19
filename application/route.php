@@ -26,7 +26,10 @@ Route::rule('api/:version/notify/auth', 'api/v1.Notify/getAuth');//
 // Page 
 Route::rule('api/:version/page/app', 'api/v1.Page/app');
 Route::rule('api/:version/page/group', 'api/v1.Page/group');
+Route::rule('api/:version/page/zuimei', 'api/v1.Page/zuimei');
 
+// Remote
+Route::rule('api/:version/remote/zuimei', 'api/v1.Remote/zuimei');
 
 // Star
 Route::rule('api/:version/star/info', 'api/v1.Star/getInfo');// 获取单个明星信息
@@ -130,11 +133,10 @@ Route::rule('api/:version/lottery/start', 'api/v1.Treasure/start');//
 Route::rule('api/:version/article', 'api/v1.Article/getArticle');// 获取文章
 Route::rule('api/:version/article/list', 'api/v1.Article/getList');// 获取文章列表
 
+//gift
 Route::rule('api/:version/page/gift_package', 'api/v1.Page/giftPackage');// 礼物背包
 Route::rule('api/:version/page/gift_num', 'api/v1.Page/giftCount');// 礼物数量
 
 Route::rule('api/:version/subscribe', 'api/v1.Subscribe/index');// 订阅消息
-
-
 
 
