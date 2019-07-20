@@ -127,6 +127,7 @@ class Page extends Base
 
         $res['active_info'] = Cfg::getCfg('active_info');
         $res['activeInfo']['complete_people'] = UserStar::where(['star_id' => $starid])->sum('active_card_days');
+        $res['activeInfo']['nextCount'] = '已完成解锁！';
         foreach ($res['active_info'] as $value) {
             if ($res['activeInfo']['complete_people'] < $value['count']) {
                 // 下一目标次数与金额
