@@ -102,7 +102,7 @@ class Common
                 return false;
             } else if ($ip != $_SERVER['REMOTE_ADDR']) {
                 // ip不一致
-                return false;
+                return $uid;
             } else {
                 return $uid;
             }
