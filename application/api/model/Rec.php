@@ -45,7 +45,7 @@ class Rec extends Base
     /**存入日志 */
     public static function addRec($log)
     {
-        parent::clear(10);
+        // parent::clear(10);
         return parent::create($log);
     }
 }

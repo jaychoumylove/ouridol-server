@@ -131,6 +131,7 @@ class UserRelation extends Base
                 array_multisort($sort, SORT_DESC, $res);
                 $data['total_count'] = count($res);
                 $data['list'] = array_slice($res, ($page - 1) * $size, $size);
+                if (!$data['list']) $data['list'] = [];
                 $res = $data;
             }
         } else if ($type == 2) {
