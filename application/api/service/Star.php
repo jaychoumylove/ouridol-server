@@ -20,6 +20,7 @@ use app\api\model\User as UserModel;
 use GatewayWorker\Lib\Gateway;
 use app\api\model\RecItem;
 use app\api\model\Fanclub;
+use app\api\model\Lock;
 
 class Star
 {
@@ -32,7 +33,7 @@ class Star
     /**打榜 */
     public function sendHot($starid, $hot, $uid, $type)
     {
-        if (Cache::get('lockSend')['isLock'] == 1) {
+        if (Lock::getVal('week_end')['value'] == 1) {
             Common::res(['code' => 1, 'msg' => '榜单结算中，请稍后再试！']);
         }
 

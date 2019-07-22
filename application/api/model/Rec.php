@@ -35,8 +35,10 @@ class Rec extends Base
         foreach ($logList as &$value) {
             // 转译$0
             $list = json_decode($value['content'], true);
-            for ($i = 0; $i < count($list); $i++) {
-                $value['type']['content'] = str_replace('$' . $i, $list[$i],  $value['type']['content']);
+            if ($list) {
+                for ($i = 0; $i < count($list); $i++) {
+                    $value['type']['content'] = str_replace('$' . $i, $list[$i],  $value['type']['content']);
+                }
             }
         }
         return $logList;

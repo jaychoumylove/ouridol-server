@@ -14,6 +14,7 @@ use app\api\model\Fanclub;
 use app\api\model\Star;
 use app\base\service\WxAPI;
 use think\Log;
+use app\api\model\Lock;
 
 class AutoRun extends Base
 {
@@ -42,20 +43,14 @@ class AutoRun extends Base
     /**每周执行 */
     public function weekHandle()
     {
-        // if (date("w") != 1) {
-        //     die('今日不是星期一');
-        // }
+        $lock = Lock::getVal('week_end');
 
-        $opTime = Cache::get('lockSend')['time'];
-        if (date('oW', time()) == date('oW', $opTime)) {
+        if (date('oW', time()) == date('oW', strtotime($lock['time']))) {
             die('本周已执行过');
         }
 
         // lock
-        Cache::set('lockSend', [
-            'isLock' => 1,
-            'time' => time()
-        ]);
+        Lock::setVal('week_end', 1);
 
         Db::startTrans();
         try {
@@ -100,22 +95,19 @@ class AutoRun extends Base
 
             die('rollBack:' . $e->getMessage());
         }
-
-        Cache::set('lockSend', [
-            'isLock' => 0,
-            'time' => time()
-        ]);
-
+        // 解锁
+        Lock::setVal('week_end', 0);
         die('done');
     }
 
     public function monthHander()
     {
-        $opTime = Cache::get('monthOptime');
-        if (date('Ym', time()) == date('Ym', $opTime)) {
+        $lock = Lock::getVal('month_end');
+        if (date('Ym', time()) == date('Ym', strtotime($lock['time']))) {
             die('本月已执行过');
         }
-        Cache::set('monthOptime',  time());
+
+        Lock::setVal('month_end', 1);
 
         Db::startTrans();
         try {
@@ -148,6 +140,8 @@ class AutoRun extends Base
 
             die('rollBack:' . $e->getMessage());
         }
+
+        Lock::setVal('month_end', 0);
 
         die('done');
     }
