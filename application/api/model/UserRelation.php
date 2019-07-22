@@ -48,6 +48,7 @@ class UserRelation extends Base
             $rerType = User::where('id', $relation['rer_user_id'])->value('type');
 
             if ($rerType == 0) {
+                // 解锁活动
                 $count = 10;
                 // 推送解锁进度
                 // UserStar::push($starid, $count);
@@ -60,8 +61,8 @@ class UserRelation extends Base
                 UserFather::join($relation['rer_user_id'], $uid);
             }
         }
-
-        self::giveFriend($starid, $uid);
+        // 分配好友
+        // self::giveFriend($starid, $uid);
     }
 
     /**给新加入圈子的用户5个本圈子内的用户作为初始好友 */
@@ -131,8 +132,9 @@ class UserRelation extends Base
                 array_multisort($sort, SORT_DESC, $res);
                 $data['total_count'] = count($res);
                 $data['list'] = array_slice($res, ($page - 1) * $size, $size);
-                if (!$data['list']) $data['list'] = [];
                 $res = $data;
+            } else {
+                $res = ['list' => []];
             }
         } else if ($type == 2) {
             $res = self::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2]]])->page($page, $size)->select();
