@@ -17,6 +17,7 @@ use app\api\model\Cfg;
 use app\base\service\WxAPI;
 use app\api\model\CfgSignin;
 use GatewayWorker\Lib\Gateway;
+use app\api\model\RecStarChart;
 
 class User extends Base
 {
@@ -172,6 +173,8 @@ class User extends Base
         $content = input('content');
         if (!$content) Common::res(['code' => 100]);
         $this->getUser();
+        // 格式化发言内容
+        $content = RecStarChart::verifyWord($content)[1];
         // 扣除喇叭
         (new UserService())->change($this->uid, [
             'trumpet' => -1
@@ -265,7 +268,7 @@ class User extends Base
         Common::res();
     }
 
-    
+
     public function sendItemToOther()
     {
         $user_id = input('user_id');

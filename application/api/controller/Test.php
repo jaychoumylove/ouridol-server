@@ -17,6 +17,7 @@ use app\api\model\PayOrder;
 use app\api\model\RecPayOrder;
 use app\api\model\Cfg;
 use app\api\model\CfgLottery;
+use app\api\model\RecStarChart;
 
 class Test extends Base
 {
@@ -40,7 +41,10 @@ class Test extends Base
 
     public function index()
     {
-        echo 1;
+
+        $res = RecStarChart::verifyWord('1231313', true);
+
+        dump($res);
         // $lotteryList = CfgLottery::where('1=1')->order('chance asc')->select();
         // $totalPt = CfgLottery::where('1=1')->sum('chance');
         // $randPt = mt_rand(0, $totalPt);

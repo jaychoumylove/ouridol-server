@@ -71,35 +71,7 @@ class Star extends Base
 
         $this->getUser();
 
-        Db::startTrans();
-        try {
-            // 保存聊天记录
-            $res = RecStarChart::create([
-                'user_id' => $this->uid,
-                'star_id' => $starid,
-                'content' => $content,
-                'create_time' => time(),
-            ]);
-
-            $res['user'] = UserModel::where(['id' => $this->uid])->field('nickname,avatarurl,type')->find();
-            $res['user']['user_star'] = UserStar::get(['user_id' => $this->uid, 'star_id' => $starid]);
-
-            if ($res['user']['type'] == 2) {
-                Db::rollback();
-                Common::res(['code' => 1, 'msg' => '你已被禁言']);
-            }
-
-            // 推送socket消息
-            Gateway::sendToGroup('star_' . $starid, json_encode([
-                'type' => 'chartMsg',
-                'data' => $res
-            ], JSON_UNESCAPED_UNICODE));
-
-            Db::commit();
-        } catch (\Exception $e) {
-            Db::rollback();
-            Common::res(['code' => 400, 'data' => $e->getMessage()]);
-        }
+        RecStarChart::sendMsg($this->uid, $starid, $content);
         Common::res();
     }
 
@@ -113,7 +85,7 @@ class Star extends Base
         $this->getUser();
 
         (new StarService())->sendHot($starid, $hot, $this->uid, $type);
-        Common::res([]);
+        Common::res();
     }
 
     /**加入圈子 */
