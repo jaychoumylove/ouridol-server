@@ -56,14 +56,14 @@ class RecStarChart extends Base
         // return [$flag, $text];
 
         $res = (new WxAPI())->msgCheck($text);
-        if ($res['errcode'] != 0) Common::res(['code' => 1, 'msg' => '内容被屏蔽']);
+        if ($res['errcode'] == 87014) Common::res(['code' => 1, 'msg' => '内容被屏蔽']);
     }
 
     /**留言 */
     public static function sendMsg($uid, $starid, $content)
     {
         // 校验
-        $content = self::verifyWord($content);
+        self::verifyWord($content);
 
         Db::startTrans();
         try {
