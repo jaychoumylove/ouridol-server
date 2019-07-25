@@ -57,8 +57,8 @@ class RecStarChart extends Base
         // return [$flag, $text];
 
         $res = (new WxAPI())->msgCheck($text);
-        Log::record(json_encode($res));
-        if ($res['errcode'] == 87014) Common::res(['code' => 1, 'msg' => '内容被屏蔽']);
+        Common::res(['code' => 0, 'data' => $res]);
+        // if ($res['errcode'] == 87014) Common::res(['code' => 0, 'data' => $res]);
     }
 
     /**留言 */
