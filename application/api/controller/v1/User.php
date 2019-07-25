@@ -174,7 +174,7 @@ class User extends Base
         if (!$content) Common::res(['code' => 100]);
         $this->getUser();
         // 格式化发言内容
-        $content = RecStarChart::verifyWord($content)[1];
+        RecStarChart::verifyWord($content);
         // 扣除喇叭
         (new UserService())->change($this->uid, [
             'trumpet' => -1
