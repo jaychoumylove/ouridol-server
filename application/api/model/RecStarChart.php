@@ -6,6 +6,7 @@ use app\base\model\Base;
 use think\Db;
 use app\base\service\Common;
 use GatewayWorker\Lib\Gateway;
+use app\base\service\WxAPI;
 
 class RecStarChart extends Base
 {
@@ -39,27 +40,30 @@ class RecStarChart extends Base
      */
     public static function verifyWord($text)
     {
-        $sensitiveWord = config('sensitive_word.words');
-        $flag = false;
-        foreach ($sensitiveWord as $word) {
-            if (strpos($text, $word) !== false) {
-                // 包含敏感词汇
-                $flag = true;
-                // 替换敏感词汇为*
-                $symbol = '';
-                for ($i = 0; $i < mb_strlen($word); $i++) $symbol .= '*';
-                $text = str_replace($word, $symbol, $text);
-            }
-        }
+        // $sensitiveWord = config('sensitive_word.words');
+        // $flag = false;
+        // foreach ($sensitiveWord as $word) {
+        //     if (strpos($text, $word) !== false) {
+        //         // 包含敏感词汇
+        //         $flag = true;
+        //         // 替换敏感词汇为*
+        //         $symbol = '';
+        //         for ($i = 0; $i < mb_strlen($word); $i++) $symbol .= '*';
+        //         $text = str_replace($word, $symbol, $text);
+        //     }
+        // }
 
-        return [$flag, $text];
+        // return [$flag, $text];
+
+        $res = (new WxAPI())->msgCheck($text);
+        if ($res['errcode'] != 0) Common::res(['code' => 1, 'msg' => '内容被屏蔽']);
     }
 
     /**留言 */
     public static function sendMsg($uid, $starid, $content)
     {
         // 校验
-        $content = self::verifyWord($content, true)[1];
+        $content = self::verifyWord($content);
 
         Db::startTrans();
         try {

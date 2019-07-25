@@ -41,10 +41,10 @@ class Test extends Base
 
     public function index()
     {
+        dump((new WxAPI())->msgCheck('习大大前妻'));
+        // $res = RecStarChart::verifyWord('1231313', true);
 
-        $res = RecStarChart::verifyWord('1231313', true);
-
-        dump($res);
+        // dump($res);
         // $lotteryList = CfgLottery::where('1=1')->order('chance asc')->select();
         // $totalPt = CfgLottery::where('1=1')->sum('chance');
         // $randPt = mt_rand(0, $totalPt);

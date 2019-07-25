@@ -251,4 +251,19 @@ class WxAPI
 
         return Common::request($url, json_encode($data, JSON_UNESCAPED_UNICODE));
     }
+
+
+    public function msgCheck($content)
+    {
+        $url = 'https://api.weixin.qq.com/wxa/msg_sec_check?access_token=ACCESS_TOKEN';
+
+        $accessToken = $this->getAccessToken();
+        if (!$accessToken) return false;
+        $url = str_replace('ACCESS_TOKEN', $accessToken, $url);
+
+        $data = [
+            'content' => $content
+        ];
+        return Common::request($url, json_encode($data, JSON_UNESCAPED_UNICODE));
+    }
 }
