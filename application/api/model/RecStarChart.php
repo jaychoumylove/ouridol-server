@@ -7,6 +7,7 @@ use think\Db;
 use app\base\service\Common;
 use GatewayWorker\Lib\Gateway;
 use app\base\service\WxAPI;
+use think\Log;
 
 class RecStarChart extends Base
 {
@@ -56,6 +57,7 @@ class RecStarChart extends Base
         // return [$flag, $text];
 
         $res = (new WxAPI())->msgCheck($text);
+        Log::record(json_encode($res));
         if ($res['errcode'] == 87014) Common::res(['code' => 1, 'msg' => '内容被屏蔽']);
     }
 
