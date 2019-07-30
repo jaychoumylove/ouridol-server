@@ -39,9 +39,18 @@ class Test extends Base
         return 1;
     }
 
+    public function __disconstruct()
+    {
+        
+    }
+
     public function index()
     {
-        dump((new WxAPI())->msgCheck('习大大前妻'));
+        
+        // echo $_SERVER['HTTP_HOST'];
+        // echo $_SERVER['HTTP_HOST'];
+        // Log::record(11);
+        // dump((new WxAPI())->msgCheck('中共的爆政'));
         // $res = RecStarChart::verifyWord('1231313', true);
 
         // dump($res);
@@ -61,7 +70,7 @@ class Test extends Base
         // Common::res(['data' => $lottery]);
         // echo strtotime('00:00:00');
         // Log::record(111);
-        // Common::requestAsync('https://' . $_SERVER['SERVER_NAME'] . '/api/v1/auto/sendTmp',[
+        // Common::requestAsync('https://' . $_SERVER['HTTP_HOST'] . '/api/v1/auto/sendTmp',[
         //     'starid' => 35,
         //     'fee' => 100
         // ]);

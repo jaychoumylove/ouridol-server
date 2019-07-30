@@ -1,9 +1,11 @@
 <?php
+
 namespace app\api\controller\v1;
 
 use app\base\controller\Base;
 use app\api\model\UserSprite as UserSpriteModel;
 use app\base\service\Common;
+use app\api\service\User;
 
 class UserSprite extends Base
 {
@@ -11,7 +13,8 @@ class UserSprite extends Base
     {
         $user_id = input('user_id');
         if (!$user_id) Common::res(['code' => 100]);
-        $res = UserSpriteModel::getInfo($user_id);
+        $this->getUser();
+        $res = UserSpriteModel::getInfo($user_id, $this->uid);
         Common::res(['data' => $res]);
     }
 
@@ -32,13 +35,33 @@ class UserSprite extends Base
         }
     }
 
+    public function shortEarn()
+    {
+        $this->getUser();
+
+        $info = UserSpriteModel::getInfo($this->uid, $this->uid);
+
+        if ($info['isUseCard']) {
+            (new User())->change($this->uid, [
+                'coin' => $info['earnPer']
+            ]);
+        }
+
+        Common::res([
+            'data' => [
+                'isUseCard' => $info['isUseCard'],
+                'earn' => $info['earnPer']
+            ]
+        ]);
+    }
+
     public function upgrade()
     {
         $this->getUser();
         $type = input('type', 0);
 
         UserSpriteModel::upgrade($this->uid, $type);
-        Common::res([]);
+        Common::res();
     }
 
     public function skill()

@@ -26,7 +26,8 @@ Route::rule('api/:version/notify/auth', 'api/v1.Notify/getAuth');//
 // Page 
 Route::rule('api/:version/page/app', 'api/v1.Page/app');
 Route::rule('api/:version/page/group', 'api/v1.Page/group');
-Route::rule('api/:version/page/zuimei', 'api/v1.Page/zuimei');
+Route::rule('api/:version/page/prop', 'api/v1.Page/prop');
+Route::rule('api/:version/page/myprop', 'api/v1.Page/myprop');
 
 // Remote
 Route::rule('api/:version/remote/zuimei', 'api/v1.Remote/zuimei');
@@ -82,6 +83,7 @@ Route::rule('api/:version/user/addFriend', 'api/v1.User/addFriend');// 加好友
 Route::rule('api/:version/user/delFriend', 'api/v1.User/delFriend');// 删好友
 Route::rule('api/:version/user/sendStoneToOther', 'api/v1.User/sendStoneToOther');// 送灵丹给别人
 Route::rule('api/:version/user/sendItemToOther', 'api/v1.User/sendItemToOther');// 送礼物给他人
+Route::rule('api/:version/user/forbidden', 'api/v1.User/forbidden');// 禁言
 
 // Share
 Route::rule('api/:version/share/mass', 'api/v1.Share/mass');// 分享集结
@@ -95,6 +97,7 @@ Route::rule('api/:version/sprite', 'api/v1.UserSprite/info');// 精灵信息
 Route::rule('api/:version/sprite/settle', 'api/v1.UserSprite/settle');// 精灵收益结算
 Route::rule('api/:version/sprite/upgrade', 'api/v1.UserSprite/upgrade');// 精灵升级
 Route::rule('api/:version/sprite/skill', 'api/v1.UserSprite/skill');// 精灵技能
+Route::rule('api/:version/sprite/shortEarn', 'api/v1.UserSprite/shortEarn');// 使用精灵加速卡
 
 // Pay
 Route::rule('api/:version/pay/order', 'api/v1.Payment/order');// 支付下单
@@ -139,4 +142,6 @@ Route::rule('api/:version/page/gift_num', 'api/v1.Page/giftCount');// 礼物数�
 
 Route::rule('api/:version/subscribe', 'api/v1.Subscribe/index');// 订阅消息
 
+// Prop
+Route::rule('api/:version/prop/use', 'api/v1.Prop/use');// 使用道具
 

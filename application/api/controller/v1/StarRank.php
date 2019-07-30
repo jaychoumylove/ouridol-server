@@ -1,4 +1,5 @@
 <?php
+
 namespace app\api\controller\v1;
 
 use app\base\controller\Base;
@@ -8,6 +9,7 @@ use app\api\model\StarRankHistory;
 use app\api\model\UserExt;
 use app\api\model\Cfg;
 use app\api\model\UserSprite;
+use app\api\service\Star;
 
 class StarRank extends Base
 {
@@ -40,8 +42,10 @@ class StarRank extends Base
                 'steal' => $leftTime,
                 'steal_count' => Cfg::getCfg('stealCount') * $spriteLevel,
                 'sprite_level' => $spriteLevel,
+                'steal_times' => $res['steal_times'],
+                'steal_times_max' => Cfg::getCfg('steal_limit'),
                 'steal_num' => $res['steal_count'],
-                'steal_num_max' => Cfg::getCfg('steal_count_limit')
+                'steal_num_max' => Star::stealCountLimit($this->uid)
             ]]);
         } else {
             Common::res(['data' => $list]);
@@ -67,7 +71,7 @@ class StarRank extends Base
                 $week = substr($value['date'], -2);
                 // TODO:
                 $value['date'] = $year . '年' . ($week - 19) . '期';
-            } else if($rankField == 'month_hot'){
+            } else if ($rankField == 'month_hot') {
                 $month = substr($value['date'], -2);
 
                 $value['date'] = $year . '年' . $month . '月';

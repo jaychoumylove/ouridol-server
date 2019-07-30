@@ -19,6 +19,12 @@ class UserStar extends Base
         return $this->belongsTo('Star', 'star_id', 'id');
     }
 
+    /**获取用户爱豆id */
+    public static function getStarId($uid)
+    {
+        return self::where('user_id', $uid)->order('id desc')->value('star_id');
+    }
+
     /**用户贡献排名 */
     public static function getRank($starid, $field, $page, $size)
     {
@@ -263,7 +269,7 @@ class UserStar extends Base
         }
         if ($beforeFee != $afterFee) {
             // 确认推送
-            Common::requestAsync('https://' . $_SERVER['SERVER_NAME'] . '/api/v1/auto/sendTmp', http_build_query([
+            Common::requestAsync('https://' . $_SERVER['HTTP_HOST'] . '/api/v1/auto/sendTmp', http_build_query([
                 'starid' => $starid,
                 'fee' => $afterFee
             ]));

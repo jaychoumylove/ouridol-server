@@ -24,14 +24,13 @@ class User extends Base
     /**用户登录 */
     public function login()
     {
-        $js_code = input('js_code'); // 微信小程序登录
-        $code = input('code'); // 微信授权登录
-        // $unionid = input('unionid'); // APP登录
-        if (!$js_code && !$code) Common::res(['code' => 100]);
+        $code = input('code'); // 登录code
+        $platform = input('platform', 'MP-WEIXIN'); // 平台
+        if (!$code) Common::res(['code' => 100]);
 
-        $res = (new UserService())->wxGetAuth($js_code, $code);
+        $res = (new UserService())->wxGetAuth($code, $platform);
 
-        $res['platform'] = input('platform', null); // 平台
+        $res['platform'] = $platform;
         $res['model'] = input('model', null); // 手机型号
 
         $uid = UserModel::searchUser($res);
@@ -46,7 +45,7 @@ class User extends Base
         $this->getUser();
 
         // 解密encryptedData
-        $appid = (new WxAPI('miniapp'))->appinfo['appid'];
+        $appid = (new WxAPI())->appinfo['appid'];
         $sessionKey = UserModel::where(['id' => $this->uid])->value('session_key');
 
         $encryptedData = input('encryptedData');
@@ -65,7 +64,7 @@ class User extends Base
         unset($saveData['watermark']);
 
         UserModel::where(['id' => $this->uid])->update($saveData);
-        Common::res([]);
+        Common::res();
     }
 
     public function getInfo()
@@ -280,5 +279,19 @@ class User extends Base
 
         UserItemModel::sendItemToOther($this->uid, $user_id, $num, $item_id);
         Common::res();
+    }
+
+    public function forbidden()
+    {
+        $user_id = input('user_id');
+
+        $type = 2;
+
+        $isDone = UserModel::where('id', $user_id)->update(['type' => $type]);
+        if ($isDone) {
+            Common::res();
+        } else {
+            Common::res(['code' => 1]);
+        }
     }
 }

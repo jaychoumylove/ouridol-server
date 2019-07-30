@@ -1,4 +1,5 @@
 <?php
+
 namespace app\api\service;
 
 use app\base\service\WxAPI;
@@ -19,13 +20,17 @@ class User
     /**
      * 获取用户openid等信息
      */
-    public function wxGetAuth($js_code, $code)
+    public function wxGetAuth($code, $platform)
     {
-        if ($js_code) {
+        if ($platform == 'MP-WEIXIN') {
             // 微信小程序登录
-            $wxApi = new WxAPI();
-            $res = $wxApi->code2session($js_code);
-        } else if ($code) {
+            $wxApi = new WxAPI('miniapp');
+            $res = $wxApi->code2session($code);
+        } else if ($platform == 'MP-QQ') {
+            // QQ小程序登录
+            $wxApi = new WxAPI('qq');
+            $res = $wxApi->code2session($code);
+        } else if ($platform == 'H5') {
             // 微信授权网页登录
             $wxApi = new WxAPI('wx00cf0e6d01bb8b01');
             $res = $wxApi->getAuth($code);

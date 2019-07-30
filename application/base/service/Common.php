@@ -4,6 +4,7 @@ namespace app\base\service;
 
 use app\api\model\Cfg;
 use app\base\model\Appinfo;
+use think\Db;
 
 class Common
 {
@@ -27,6 +28,7 @@ class Common
             $return['data'] = [];
         }
 
+        Db::rollback(); // 怀疑可能出现开启事务后不提交也不回滚的情况
         header('Access-Control-Allow-Origin:*');
         header('Content-Type:application/json');
         die(json_encode($return, JSON_UNESCAPED_UNICODE));
@@ -80,7 +82,7 @@ class Common
     public static function setSession($uid)
     {
         $salt = Cfg::getCfg('salt');
-        $token =  base64_encode($salt . base64_encode(time() . '&' . $_SERVER['REMOTE_ADDR'] . '&' . $uid));
+        $token = base64_encode($salt . base64_encode(time() . '&' . $_SERVER['REMOTE_ADDR'] . '&' . $uid));
         return $token;
     }
 

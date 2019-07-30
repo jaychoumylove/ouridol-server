@@ -118,7 +118,7 @@ class UserRelation extends Base
                     $value['sprite'] = ['earn' => 0];
                     if (isset($value['user']['id'])) {
                         // 精灵收益
-                        $value['sprite'] = UserSprite::getInfo($value['user']['id']);
+                        $value['sprite'] = UserSprite::getInfo($value['user']['id'], $uid);
                     }
 
                     // 排序

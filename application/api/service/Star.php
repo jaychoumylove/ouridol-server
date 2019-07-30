@@ -21,6 +21,7 @@ use GatewayWorker\Lib\Gateway;
 use app\api\model\RecItem;
 use app\api\model\Fanclub;
 use app\api\model\Lock;
+use app\api\model\UserProp;
 
 class Star
 {
@@ -39,10 +40,26 @@ class Star
 
         Db::startTrans();
         try {
+            $moreInfo = '';
             if ($type == 1) {
                 // 送礼物
                 $item_id = $hot;
+                // $hot 贡献度
                 $hot = CfgItem::where(['id' => $item_id])->value('count');
+
+                // 使用道具卡
+                $prop_id = 3;
+                $isDone = UserProp::where([
+                    'user_id' => $uid,
+                    'prop_id' => $prop_id,
+                ])->where('use_time', '<>', 0)->limit(1)->update(['use_time' => 0]);
+
+                if ($isDone) {
+                    // 贡献度提升20%
+                    $moreHot = floor($hot * 0.2);
+                    $hot += $moreHot;
+                    $moreInfo = '+' . $moreHot . '能量';
+                }
 
                 // 礼物减少
                 $count = UserItem::where(['uid' => $uid, 'item_id' => $item_id])->value('count');
@@ -51,7 +68,7 @@ class Star
                 UserItem::where(['uid' => $uid, 'item_id' => $item_id])->update([
                     'count' => Db::raw('count-1')
                 ]);
-
+                // 礼物信息
                 $itemInfo = CfgItem::where(['id' => $item_id])->field('name,icon,count')->find();
                 // 送礼物记录
                 RecItem::create([
@@ -74,7 +91,13 @@ class Star
                 ], JSON_UNESCAPED_UNICODE));
 
                 // 日志
-                Rec::create(['user_id' => $uid, 'content' => json_encode([$itemInfo['name']], JSON_UNESCAPED_UNICODE), 'type' => 15]);
+                Rec::create([
+                    'user_id' => $uid,
+                    'content' => json_encode(
+                        [$itemInfo['name'], $moreInfo],
+                        JSON_UNESCAPED_UNICODE
+                    ), 'type' => 15
+                ]);
             } else if ($type == 0) {
                 // 送能量
                 // 用户货币减少
@@ -118,6 +141,21 @@ class Star
         }
     }
 
+    /**今日偷取数额上限 */
+    public static function stealCountLimit($uid)
+    {
+        $cfg = Cfg::getCfg('steal_count_limit');
+
+        // 加上可偷能量增加卡的上限
+        $prop_id = 1;
+        $count = 1 + UserProp::where([
+            'user_id' => $uid,
+            'prop_id' => $prop_id,
+            'use_time' => ['>=', strtotime(date("Y-m-d"), time())] // 今日使用的
+        ])->count('id');
+        return $cfg * $count;
+    }
+
     /**偷能量 */
     public function steal($starid, $uid, $hot)
     {
@@ -127,7 +165,7 @@ class Star
             Common::res(['code' => 1, 'msg' => '今日偷取次数已达上限']);
         }
 
-        if ($userExt['steal_count'] >= Cfg::getCfg('steal_count_limit')) {
+        if ($userExt['steal_count'] >= self::stealCountLimit($uid)) {
             Common::res(['code' => 1, 'msg' => '今日偷取数额已达上限']);
         }
 

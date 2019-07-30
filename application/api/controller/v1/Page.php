@@ -22,6 +22,8 @@ use app\api\model\CfgItem;
 use app\api\model\UserItem;
 use GatewayWorker\Lib\Gateway;
 use app\api\model\UserExt;
+use app\api\model\Prop;
+use app\api\model\UserProp;
 
 class Page extends Base
 {
@@ -53,7 +55,6 @@ class Page extends Base
             if (!$userStar['qrcode']) {
                 // 获取二维码
                 $data = (new WxAPI())->getwxacode('/pages/index/index?starid=' . $userStar['star_id'] . '&referrer=' . $this->uid);
-
                 if (!isset($data['errcode'])) {
                     // 上传图片并保存
                     $filePath = ROOT_PATH . 'public/uploads/qrcode.jpg';
@@ -80,7 +81,7 @@ class Page extends Base
         $res['config'] = Cfg::getList();
         $res['config']['share_text'] = CfgShare::getOne();
 
-        $spriteUpgrade = UserSprite::getInfo($this->uid)['need_stone'];
+        $spriteUpgrade = UserSprite::getInfo($this->uid, $this->uid)['need_stone'];
         $stone = UserCurrency::where(['uid' => $this->uid])->value('stone');
 
         if ($stone >= $spriteUpgrade) {
@@ -105,7 +106,7 @@ class Page extends Base
         $res['starInfo']['star_rank']['week_hot_rank'] = $starService->getRank($res['starInfo']['star_rank']['week_hot'], 'week_hot');
 
         $res['userRank'] = UserStar::getRank($starid, 'thisweek_count', 1, 5);
-
+        $res['captain'] = UserStar::where('user_id', $this->uid)->value('captain');
         // 聊天内容
         $res['chartList'] = RecStarChart::getLeastChart($starid);
         // 加入聊天室
@@ -167,6 +168,18 @@ class Page extends Base
     {
         $this->getUser();
         $res = UserItem::where(['uid' => $this->uid])->sum('count');
+        Common::res(['data' => $res]);
+    }
+
+    public function prop()
+    {
+        Common::res(['data' => Prop::all()]);
+    }
+
+    public function myprop()
+    {
+        $this->getUser();
+        $res['list'] = UserProp::getList($this->uid);
         Common::res(['data' => $res]);
     }
 }

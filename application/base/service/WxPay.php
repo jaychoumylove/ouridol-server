@@ -1,5 +1,8 @@
 <?php
+
 namespace app\base\service;
+
+use think\Log;
 
 class WxPay
 {
@@ -14,12 +17,12 @@ class WxPay
      */
     public function returnFront($res)
     {
-        if ($res['result_code'] == 'SUCCESS') {
+        if (isset($res['result_code']) && $res['result_code'] == 'SUCCESS') {
             if ($res['trade_type'] == 'JSAPI') {
                 // JSAPI支付
                 $returnData = [
                     'appId' => $this->appinfo['appid'],
-                    'timeStamp' => (string)time(),
+                    'timeStamp' => (string) time(),
                     'nonceStr' => $res['nonce_str'],
                     'package' => 'prepay_id=' . $res['prepay_id'],
                     'signType' => 'MD5',

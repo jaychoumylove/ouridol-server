@@ -20,7 +20,7 @@ class UserSprite extends Base
     }
 
     /**获取该用户宠物信息 */
-    public static function getInfo($uid)
+    public static function getInfo($uid, $self)
     {
         $item = self::get(['user_id' => $uid]);
 
@@ -44,8 +44,13 @@ class UserSprite extends Base
         } else {
             $item['earn'] = 0;
         }
-        // 下一级所需灵丹
-        $item['need_stone'] = CfgSprite::where(['level' => $item['sprite_level'] + 1])->value('need_stone');
+        if ($uid == $self) {
+            // 下一级所需灵丹
+            $item['need_stone'] = CfgSprite::where(['level' => $item['sprite_level'] + 1])->value('need_stone');
+            // 
+            $item['isUseCard'] = UserProp::where(['user_id' => $uid, 'status' => 1])
+                ->where('use_time', '>=', time() - 2 * 3600)->value('id') == true;
+        }
 
         // if($uid == 1){
         //     // GM 收益始终显示为100
@@ -58,7 +63,7 @@ class UserSprite extends Base
     /**结算该用户宠物收益 */
     public static function settle($uid, $self)
     {
-        $userSprite = self::getInfo($uid);
+        $userSprite = self::getInfo($uid, $self);
         if ($userSprite['earn'] > 0) {
             Db::startTrans();
             try {
@@ -96,7 +101,7 @@ class UserSprite extends Base
 
     public static function upgrade($uid, $type)
     {
-        $userSprite = self::getInfo($uid);
+        $userSprite = self::getInfo($uid, $uid);
         switch ($type) {
             case 0:
                 // 精灵升级

@@ -7,8 +7,17 @@ use app\base\model\Appinfo;
 /**服务端wx接口 */
 class WxAPI
 {
+
     public function __construct($w = null)
     {
+        if (input('platform') == 'MP-WEIXIN') {
+            $this->apiHost = 'api.weixin.qq.com';
+            $type = 'miniapp';
+        } else if (input('platform') == 'MP-QQ') {
+            $this->apiHost = 'api.q.qq.com';
+            $type = 'qq';
+        }
+        if (!$w) $w = $type;
         $this->appinfo = Common::getAppinfo($w);
     }
 
@@ -17,7 +26,7 @@ class WxAPI
      */
     public function code2session($js_code)
     {
-        $url = 'https://api.weixin.qq.com/sns/jscode2session?appid=APPID&secret=SECRET&js_code=JSCODE&grant_type=authorization_code';
+        $url = 'https://' . $this->apiHost . '/sns/jscode2session?appid=APPID&secret=SECRET&js_code=JSCODE&grant_type=authorization_code';
         $url = str_replace('APPID', $this->appinfo['appid'], $url);
         $url = str_replace('SECRET', $this->appinfo['appsecret'], $url);
         $url = str_replace('JSCODE', $js_code, $url);
@@ -32,7 +41,7 @@ class WxAPI
      */
     public function getAuth($code)
     {
-        $url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=APPID&secret=SECRET&code=CODE&grant_type=authorization_code';
+        $url = 'https://' . $this->apiHost . '/sns/oauth2/access_token?appid=APPID&secret=SECRET&code=CODE&grant_type=authorization_code';
 
         $url = str_replace('APPID', $this->appinfo['appid'], $url);
         $url = str_replace('SECRET', $this->appinfo['appsecret'], $url);
@@ -49,7 +58,7 @@ class WxAPI
      */
     public function getUserInfo($accessToken, $openid)
     {
-        $url = 'https://api.weixin.qq.com/sns/userinfo?access_token=ACCESS_TOKEN&openid=OPENID&lang=zh_CN';
+        $url = 'https://' . $this->apiHost . '/sns/userinfo?access_token=ACCESS_TOKEN&openid=OPENID&lang=zh_CN';
 
         $url = str_replace('ACCESS_TOKEN', $accessToken, $url);
         $url = str_replace('OPENID', $openid, $url);
@@ -92,7 +101,7 @@ class WxAPI
     {
         if (strtotime($this->appinfo['access_token_expire']) - 600 < time()) {
             // 更新accessToken
-            $url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET';
+            $url = 'https://' . $this->apiHost . '/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET';
             $url = str_replace('APPID', $this->appinfo['appid'], $url);
             $url = str_replace('APPSECRET', $this->appinfo['appsecret'], $url);
 
@@ -119,7 +128,7 @@ class WxAPI
      */
     public function sendCustomerMsg($openid, $msgType, $msgBody)
     {
-        $url = 'https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=ACCESS_TOKEN';
+        $url = 'https://' . $this->apiHost . '/cgi-bin/message/custom/send?access_token=ACCESS_TOKEN';
 
         $accessToken = $this->getAccessToken();
         if (!$accessToken) return false;
@@ -139,7 +148,7 @@ class WxAPI
      */
     public function uploadMedia($filePath)
     {
-        $url = 'https://api.weixin.qq.com/cgi-bin/media/upload?access_token=ACCESS_TOKEN&type=TYPE';
+        $url = 'https://' . $this->apiHost . '/cgi-bin/media/upload?access_token=ACCESS_TOKEN&type=TYPE';
         $accessToken = $this->getAccessToken();
         if (!$accessToken) return false;
         $url = str_replace('ACCESS_TOKEN', $accessToken, $url);
@@ -156,7 +165,7 @@ class WxAPI
      */
     public function getMedia($mediaId)
     {
-        $url = 'https://api.weixin.qq.com/cgi-bin/media/get?access_token=ACCESS_TOKEN&media_id=MEDIA_ID';
+        $url = 'https://' . $this->apiHost . '/cgi-bin/media/get?access_token=ACCESS_TOKEN&media_id=MEDIA_ID';
 
         $accessToken = $this->getAccessToken();
         if (!$accessToken) return false;
@@ -172,7 +181,7 @@ class WxAPI
      */
     public function addMaterial($filePath)
     {
-        $url = 'https://api.weixin.qq.com/cgi-bin/material/add_material?access_token=ACCESS_TOKEN&type=TYPE';
+        $url = 'https://' . $this->apiHost . '/cgi-bin/material/add_material?access_token=ACCESS_TOKEN&type=TYPE';
 
         $accessToken = $this->getAccessToken();
         if (!$accessToken) return false;
@@ -189,7 +198,7 @@ class WxAPI
      */
     public function getwxacode($path = '/pages/index/index')
     {
-        $url = 'https://api.weixin.qq.com/wxa/getwxacode?access_token=ACCESS_TOKEN';
+        $url = 'https://' . $this->apiHost . '/wxa/getwxacode?access_token=ACCESS_TOKEN';
 
         $accessToken = $this->getAccessToken();
         if (!$accessToken) return false;
@@ -205,7 +214,7 @@ class WxAPI
      */
     public function sendTemplate($datas)
     {
-        $url = 'https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=ACCESS_TOKEN';
+        $url = 'https://' . $this->apiHost . '/cgi-bin/message/wxopen/template/send?access_token=ACCESS_TOKEN';
 
         $accessToken = $this->getAccessToken();
         if (!$accessToken) return false;
@@ -224,7 +233,7 @@ class WxAPI
      */
     public function sendTemplateSync()
     {
-        $url = 'https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=ACCESS_TOKEN';
+        $url = 'https://' . $this->apiHost . '/cgi-bin/message/wxopen/template/send?access_token=ACCESS_TOKEN';
 
         $accessToken = $this->getAccessToken();
         if (!$accessToken) return false;
@@ -252,10 +261,13 @@ class WxAPI
         return Common::request($url, json_encode($data, JSON_UNESCAPED_UNICODE));
     }
 
-
+    /**
+     * 检查一段文本是否含有违法违规内容。
+     * 若接口errcode返回87014(内容含有违法违规内容)
+     */
     public function msgCheck($content)
     {
-        $url = 'https://api.weixin.qq.com/wxa/msg_sec_check?access_token=ACCESS_TOKEN';
+        $url = 'https://' . $this->apiHost . '/wxa/msg_sec_check?access_token=ACCESS_TOKEN';
 
         $accessToken = $this->getAccessToken();
         if (!$accessToken) return false;
