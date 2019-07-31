@@ -47,8 +47,9 @@ class UserSprite extends Base
         if ($uid == $self) {
             // 下一级所需灵丹
             $item['need_stone'] = CfgSprite::where(['level' => $item['sprite_level'] + 1])->value('need_stone');
-            // 
-            $item['isUseCard'] = UserProp::where(['user_id' => $uid, 'status' => 1])
+            // 精灵生产加速卡
+            $prop_id = 2;
+            $item['isUseCard'] = UserProp::where(['user_id' => $uid, 'status' => 1,'prop_id' => $prop_id])
                 ->where('use_time', '>=', time() - 2 * 3600)->value('id') == true;
         }
 
