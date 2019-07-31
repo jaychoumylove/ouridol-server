@@ -10,12 +10,12 @@ class WxAPI
 
     public function __construct($w = null)
     {
-        if (input('platform') == 'MP-WEIXIN') {
-            $this->apiHost = 'api.weixin.qq.com';
-            $type = 'miniapp';
-        } else if (input('platform') == 'MP-QQ') {
+        if (input('platform') == 'MP-QQ') {
             $this->apiHost = 'api.q.qq.com';
             $type = 'qq';
+        } else {
+            $this->apiHost = 'api.weixin.qq.com';
+            $type = 'miniapp';
         }
         if (!$w) $w = $type;
         $this->appinfo = Common::getAppinfo($w);
