@@ -182,6 +182,7 @@ class UserStar extends Base
         } else {
             $res['remainPeople'] = 0;
         }
+        if ($res['remainPeople'] < 0) $res['remainPeople'] = 0;
 
         $active_card = self::where(['user_id' => $uid, 'star_id' => $starid])->field('active_card_days,active_card_time,active_subscribe,active_newbie_cards')->find();
         // 今日是否已打卡
