@@ -43,20 +43,24 @@ class UserRelation extends Base
         $relation = self::where(['ral_user_id' => $uid, 'status' => ['in',  [0, 1, 2]]])->find();
 
         if ($relation) {
+            // 更新状态为1，上级可以领取奖励
             self::where(['ral_user_id' => $uid])->update(['status' => 1]);
-            // 新用户打卡活动解锁10次
             $rerType = User::where('id', $relation['rer_user_id'])->value('type');
-
+            // 上级需为普通用户0 
             if ($rerType == 0) {
-                // 解锁活动
-                $count = 10;
-                // 推送解锁进度
-                // UserStar::push($starid, $count);
+                // 新用户打卡活动助力解锁10次
+                $activeEnd = Cfg::getCfg('active_date')[1];
+                if ($activeEnd > time()) {// 活动是否已结束
+                    // 推送解锁进度
+                    // UserStar::push($starid, $count);
+                    $count = 10;
 
-                UserStar::where('user_id', $relation['rer_user_id'])->update([
-                    'active_card_days' => Db::raw('active_card_days+' . $count),
-                    'active_newbie_cards' => Db::raw('active_newbie_cards+' . $count),
-                ]);
+                    UserStar::where('user_id', $relation['rer_user_id'])->update([
+                        'active_card_days' => Db::raw('active_card_days+' . $count),
+                        'active_newbie_cards' => Db::raw('active_newbie_cards+' . $count),
+                    ]);
+                }
+
                 // 判断是否结成师徒关系
                 UserFather::join($relation['rer_user_id'], $uid);
             }

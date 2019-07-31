@@ -33,7 +33,7 @@ class Rec extends Base
         $logList = json_decode(json_encode($logList, JSON_UNESCAPED_UNICODE), true);
 
         foreach ($logList as &$value) {
-            // 转译$0
+            // 转译$0 占位符
             $list = json_decode($value['content'], true);
             if ($list) {
                 for ($i = 0; $i < count($list); $i++) {

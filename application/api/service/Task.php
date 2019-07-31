@@ -209,6 +209,16 @@ class Task
                         }
                     }
                     break;
+                case 16:
+                    if (in_array($task['id'], $recTask)) {
+                        $task['status'] = 2;
+                    } else {
+                        $isDone = Rec::where(['type' => 25, 'user_id' => $uid])->whereTime('create_time', 'd')->count('id');
+                        if ($isDone) {
+                            $task['status'] = 1;
+                        }
+                    }
+                    break;
                 default:
                     # code...
                     break;
