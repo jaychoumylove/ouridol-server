@@ -217,7 +217,7 @@ class Request
         $server['REQUEST_METHOD'] = strtoupper($method);
         $info                     = parse_url($uri);
         if (isset($info['host'])) {
-            $server['HTTP_HOST'] = $info['host'];
+            $server['SERVER_NAME'] = $info['host'];
             $server['HTTP_HOST']   = $info['host'];
         }
         if (isset($info['scheme'])) {
