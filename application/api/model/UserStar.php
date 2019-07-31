@@ -178,7 +178,7 @@ class UserStar extends Base
             $res['remainPeople'] = 10; // 初步预计每天10人
             $gapCount = $res['nextCount'] - $res['complete_people'];
             $avgSpriteLv = UserSprite::where('user_id', 'in', self::where('star_id', $starid)->where('active_card_days', '>', 0)->column('user_id'))->avg('sprite_level') * 3;
-            if ($avgSpriteLv) $res['remainPeople'] = ceil($gapCount / $avgSpriteLv / ($res['active_end'] / 3600 / 24));
+            if ($avgSpriteLv && $res['active_end']) $res['remainPeople'] = ceil($gapCount / $avgSpriteLv / ($res['active_end'] / 3600 / 24));
         } else {
             $res['remainPeople'] = 0;
         }
@@ -200,7 +200,7 @@ class UserStar extends Base
     public static function setCard($uid)
     {
         $activeEnd = Cfg::getCfg('active_date')[1];
-        if ($activeEnd - time() < 0) Common::res(['code' => 1, 'msg' => '活动已结束']);
+        if ($activeEnd - time() < 0) Common::res(['code' => 1, 'msg' => '本次活动已结束']);
 
         $active_card = self::where(['user_id' => $uid])->field('star_id,active_card_time,active_subscribe')->find();
         if (date('ymd', time()) == date('ymd', $active_card['active_card_time'])) {
