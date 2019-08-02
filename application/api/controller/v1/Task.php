@@ -73,7 +73,9 @@ class Task extends Base
         //     不离不弃。爱STARNAME的伙伴们，一起来支持STARNAME吧？微信小程序搜索：APPNAME，夺取冠军福利，就等
         //     你了。现在STARNAME排名第STARRANK，获得了STARSCORE票。@APPNAME";
 
+        $text = str_replace('STARNAME[超话]', $user['user_star']['star']['chaohua'] . '[超话]', $text);
         $text = str_replace('STARNAME', $user['user_star']['star']['name'], $text);
+
         $text = str_replace('STARSCORE', $user['user_star']['star']['star_rank']['week_hot'], $text);
         $text = str_replace('STARRANK', $rank, $text);
         $text = str_replace('APPNAME', Cfg::getCfg('appname'), $text);
