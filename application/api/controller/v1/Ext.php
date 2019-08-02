@@ -34,7 +34,15 @@ class Ext extends Base
     public function config()
     {
         $key = input('key');
-        if ($key) Common::res(['data' => Cfg::getCfg($key)]);
+        if ($key) {
+            if ($key == 'open_img') {
+                $open_img = GuideCron::where('start_time', '<', time())->where('end_time', '>', time())->value('open_img');
+                if (!$open_img) $open_img = Cfg::getCfg($key);
+                Common::res(['data' => $open_img]);
+            } else {
+                Common::res(['data' => Cfg::getCfg($key)]);
+            }
+        }
 
         $res = Cfg::getList();
         // 顺便获取分享信息
