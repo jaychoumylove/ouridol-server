@@ -14,6 +14,7 @@ use app\api\model\Fanclub;
 use app\api\model\Rec;
 use app\api\model\UserSprite;
 use app\api\model\RecActive;
+use app\api\model\GuideCron;
 
 class Ext extends Base
 {
