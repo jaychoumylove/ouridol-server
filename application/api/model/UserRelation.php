@@ -49,8 +49,8 @@ class UserRelation extends Base
             // 上级需为普通用户0 
             if ($rerType == 0) {
                 // 新用户打卡活动助力解锁10次
-                $activeEnd = Cfg::getCfg('active_date')[1];
-                if ($activeEnd > time()) {// 活动是否已结束
+                $time = Cfg::getCfg('active_date');
+                if (time() > $time[0] && time() < $time[1]) { // 是否在活动时间内
                     // 推送解锁进度
                     // UserStar::push($starid, $count);
                     $count = 10;

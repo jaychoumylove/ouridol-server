@@ -18,6 +18,7 @@ use app\api\model\RecPayOrder;
 use app\api\model\Cfg;
 use app\api\model\CfgLottery;
 use app\api\model\RecStarChart;
+use app\api\model\UserFather;
 
 class Test extends Base
 {
@@ -40,13 +41,14 @@ class Test extends Base
     }
 
     public function __disconstruct()
-    {
-        
-    }
+    { }
 
     public function index()
     {
-        
+        $res = UserFather::with('f')->field('father,sum(cur_contribute) as sum')
+            ->group('father')->having('sum <> 0')->order('sum desc')->limit(20)->select();
+
+        Common::res(['data' => $res]);
         // echo $_SERVER['HTTP_HOST'];
         // echo $_SERVER['HTTP_HOST'];
         // Log::record(11);

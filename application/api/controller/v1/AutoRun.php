@@ -15,6 +15,7 @@ use app\api\model\Star;
 use app\base\service\WxAPI;
 use think\Log;
 use app\api\model\Lock;
+use app\api\model\Prop;
 
 class AutoRun extends Base
 {
@@ -24,11 +25,22 @@ class AutoRun extends Base
     /**每日执行 */
     public function dayHandle()
     {
+        $lock = Lock::getVal('day_end');
+        if (date('md', time()) == date('md', strtotime($lock['time']))) {
+            die('本日已执行过');
+        }
+        // lock
+        Lock::setVal('day_end', 1);
+
         Db::startTrans();
         try {
             // 用户日贡献清零
             UserStar::where('1=1')->update([
                 'thisday_count' => 0,
+            ]);
+            // 道具重置100库存
+            Prop::where('1=1')->update([
+                'remain' => 100
             ]);
 
             Db::commit();
@@ -36,6 +48,9 @@ class AutoRun extends Base
             Db::rollBack();
             die('rollBack:' . $e->getMessage());
         }
+
+        // lock
+        Lock::setVal('day_end', 0);
 
         die('done');
     }
