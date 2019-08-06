@@ -81,7 +81,7 @@ class Star
 
                 // 推送
                 $userInfo = UserModel::where(['id' => $uid])->field('nickname,avatarurl')->find();
-                Gateway::sendToAll(json_encode([
+                Gateway::sendToGroup('star_' . $starid, json_encode([
                     'type' => 'sendItem',
                     'data' => [
                         'itemicon' => $itemInfo['icon'],
