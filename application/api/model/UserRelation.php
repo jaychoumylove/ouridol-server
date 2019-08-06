@@ -55,10 +55,10 @@ class UserRelation extends Base
                     // UserStar::push($starid, $count);
                     $count = 10;
 
-                    UserStar::where('user_id', $relation['rer_user_id'])->update([
-                        'active_card_days' => Db::raw('active_card_days+' . $count),
-                        'active_newbie_cards' => Db::raw('active_newbie_cards+' . $count),
-                    ]);
+                    // UserStar::where('user_id', $relation['rer_user_id'])->update([
+                    //     'active_card_days' => Db::raw('active_card_days+' . $count),
+                    //     'active_newbie_cards' => Db::raw('active_newbie_cards+' . $count),
+                    // ]);
                 }
 
                 // 判断是否结成师徒关系

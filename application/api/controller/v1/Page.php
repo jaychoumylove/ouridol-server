@@ -126,21 +126,23 @@ class Page extends Base
         // $cur_contribute = UserFather::where(['father' => $this->uid])->max('cur_contribute');
         // $res['fatherEarn'] = floor($cur_contribute * Cfg::getCfg('father_earn_per'));
 
-        $res['active_info'] = Cfg::getCfg('active_info');
-        $res['activeInfo']['complete_people'] = UserStar::where(['star_id' => $starid])->sum('active_card_days');
-        $res['activeInfo']['nextCount'] = '完成解锁';
-        foreach ($res['active_info'] as $value) {
-            if ($res['activeInfo']['complete_people'] < $value['count']) {
-                // 下一目标次数与金额
-                $res['activeInfo']['nextCount'] = $value['count'];
-                $res['activeInfo']['nextFee'] = $value['fee'];
-                break;
-            } else {
-                // 已达成次数与金额
-                $res['activeInfo']['finishedCount'] = $value['count'];
-                $res['activeInfo']['finishedFee'] = $value['fee'];
-            }
-        }
+        // 应援解锁
+        $res['activeInfo'] = UserStar::getActiveInfo($this->uid, $starid);
+        // $res['active_info'] = Cfg::getCfg('active_info');
+        // $res['activeInfo']['complete_people'] = UserStar::where(['star_id' => $starid])->sum('active_card_days');
+        // $res['activeInfo']['nextCount'] = '完成解锁';
+        // foreach ($res['active_info'] as $value) {
+        //     if ($res['activeInfo']['complete_people'] < $value['count']) {
+        //         // 下一目标次数与金额
+        //         $res['activeInfo']['nextCount'] = $value['count'];
+        //         $res['activeInfo']['nextFee'] = $value['fee'];
+        //         break;
+        //     } else {
+        //         // 已达成次数与金额
+        //         $res['activeInfo']['finishedCount'] = $value['count'];
+        //         $res['activeInfo']['finishedFee'] = $value['fee'];
+        //     }
+        // }
 
         // 礼物
         $res['itemList'] = CfgItem::where('1=1')->order('count asc')->select();

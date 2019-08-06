@@ -22,6 +22,7 @@ use app\api\model\RecItem;
 use app\api\model\Fanclub;
 use app\api\model\Lock;
 use app\api\model\UserProp;
+use app\api\model\Star as  StarModel;
 
 class Star
 {
@@ -40,7 +41,7 @@ class Star
 
         Db::startTrans();
         try {
-            $moreInfo = '';
+            $moreInfo = ''; // 日志记录的更多信息
             if ($type == 1) {
                 // 送礼物
                 $item_id = $hot;
@@ -80,13 +81,14 @@ class Star
 
                 // 推送
                 $userInfo = UserModel::where(['id' => $uid])->field('nickname,avatarurl')->find();
-                Gateway::sendToGroup('star_' . $starid, json_encode([
+                Gateway::sendToAll(json_encode([
                     'type' => 'sendItem',
                     'data' => [
                         'itemicon' => $itemInfo['icon'],
                         'itemname' => $itemInfo['name'],
                         'username' => $userInfo['nickname'],
-                        'avatar' => $userInfo['avatarurl']
+                        'avatar' => $userInfo['avatarurl'],
+                        'starname' => StarModel::where('id', $starid)->value('name')
                     ]
                 ], JSON_UNESCAPED_UNICODE));
 

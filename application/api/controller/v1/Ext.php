@@ -67,7 +67,7 @@ class Ext extends Base
     public function setCard()
     {
         $this->getUser();
-
+        
         $res = UserStar::setCard($this->uid);
         Common::res(['data' => $res]);
     }
