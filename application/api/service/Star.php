@@ -92,6 +92,16 @@ class Star
                     ]
                 ], JSON_UNESCAPED_UNICODE));
 
+                // 全服推送
+                Gateway::sendToAll(json_encode([
+                    'type' => 'sayworld',
+                    'data' => [
+                        'avatarurl' => $userInfo['avatarurl'],
+                        'starname' => StarModel::where('id', $starid)->value('name'),
+                        'icon' => $itemInfo['icon'],
+                        'nickname' => $userInfo['nickname'],
+                    ],
+                ], JSON_UNESCAPED_UNICODE));
                 // 日志
                 Rec::create([
                     'user_id' => $uid,
