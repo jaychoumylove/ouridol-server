@@ -21,18 +21,6 @@ class StarRank extends Base
 
         $list = self::with('star')->where($w)->order($rankField . ' desc,id asc')
             ->page($page, $size)->select();
-
-        // 韩星榜
-        if ($sign !== 0) {
-            $return = [];
-            foreach ($list as $value) {
-                if ($value['star']['sign'] == $sign) {
-                    $return[] = $value;
-                }
-            }
-            return $return;
-        } else {
-            return $list;
-        }
+        return $list;
     }
 }
