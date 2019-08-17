@@ -5,6 +5,7 @@ namespace app\base\controller;
 use think\Controller;
 use app\base\service\Common;
 use app\api\model\User;
+use think\Validate;
 
 class Base extends Controller
 {
@@ -28,5 +29,18 @@ class Base extends Controller
     {
         $this->uid = User::where('unionid', input('unionid'))->value('id');
         if (!$this->uid) Common::res(['code' => 1, 'msg' => '不存在的用户']);
+    }
+
+    /**
+     * 获取并校验请求参数
+     */
+    protected function req($field, $validate = '', $default = null)
+    {
+        $value = input($field, $default);
+        if ($validate && !Validate::checkRule($value, $validate)) {
+            Common::res(['code' => 100, 'msg' => '参数错误！' . $field . '，错误值：' . $value]);
+        }
+
+        return $value;
     }
 }

@@ -45,20 +45,23 @@ class Test extends Base
 
     public function index()
     {
-        Db::execute("UPDATE `f_cfg` SET `value`='' WHERE (`key`='recharge_title');");
-
-        Db::execute("UPDATE `f_pay_goods` SET `fee`='2', `off_fee`='0' WHERE (`id`='1')");
-        Db::execute("UPDATE `f_pay_goods` SET `fee`='5', `off_fee`='0' WHERE (`id`='2')");
-        Db::execute("UPDATE `f_pay_goods` SET `fee`='10', `off_fee`='0' WHERE (`id`='3')");
-        Db::execute("UPDATE `f_pay_goods` SET `fee`='30', `off_fee`='0' WHERE (`id`='4')");
-        Db::execute("UPDATE `f_pay_goods` SET `fee`='60', `off_fee`='0' WHERE (`id`='5')");
-        Db::execute("UPDATE `f_pay_goods` SET `fee`='100', `off_fee`='0' WHERE (`id`='6')");
-        Db::execute("UPDATE `f_pay_goods` SET `fee`='200', `off_fee`='0' WHERE (`id`='7')");
-        Db::execute("UPDATE `f_pay_goods` SET `fee`='500', `off_fee`='0' WHERE (`id`='8')");
-        Db::execute("UPDATE `f_pay_goods` SET `fee`='880', `off_fee`='0' WHERE (`id`='9')");
+        // echo $this->req('a','integer',1);
+        echo (int) 'eeeeeeee';
+        // echo strtotime(date('Y-m-d', strtotime('this week') + 7 * 3600 * 24));
 
 
-        
+        // Db::execute("UPDATE `f_cfg` SET `value`='' WHERE (`key`='recharge_title');");
+
+        // Db::execute("UPDATE `f_pay_goods` SET `fee`='2', `off_fee`='0' WHERE (`id`='1')");
+        // Db::execute("UPDATE `f_pay_goods` SET `fee`='5', `off_fee`='0' WHERE (`id`='2')");
+        // Db::execute("UPDATE `f_pay_goods` SET `fee`='10', `off_fee`='0' WHERE (`id`='3')");
+        // Db::execute("UPDATE `f_pay_goods` SET `fee`='30', `off_fee`='0' WHERE (`id`='4')");
+        // Db::execute("UPDATE `f_pay_goods` SET `fee`='60', `off_fee`='0' WHERE (`id`='5')");
+        // Db::execute("UPDATE `f_pay_goods` SET `fee`='100', `off_fee`='0' WHERE (`id`='6')");
+        // Db::execute("UPDATE `f_pay_goods` SET `fee`='200', `off_fee`='0' WHERE (`id`='7')");
+        // Db::execute("UPDATE `f_pay_goods` SET `fee`='500', `off_fee`='0' WHERE (`id`='8')");
+        // Db::execute("UPDATE `f_pay_goods` SET `fee`='880', `off_fee`='0' WHERE (`id`='9')");
+
 
         // dump( $_GET);
         // echo gettype([1,2]); // integer string boolean double array

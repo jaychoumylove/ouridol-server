@@ -22,8 +22,7 @@ class Star extends Base
 {
     public function getInfo()
     {
-        $starid =  input('starid');
-        if (!$starid) Common::res(['code' => 100]);
+        $starid =  $this->req('starid', 'integer');
 
         $star = StarModel::with('StarRank')->where(['id' => $starid])->find();
 
@@ -36,8 +35,7 @@ class Star extends Base
 
     public function getChart()
     {
-        $starid = input('starid');
-        if (!$starid) Common::res(['code' => 100]);
+        $starid = $this->req('starid', 'integer');
 
         $res = RecStarChart::getLeastChart($starid);
         Common::res(['data' => $res]);
@@ -46,7 +44,7 @@ class Star extends Base
     /**加入聊天室 */
     public function joinChart()
     {
-        $star_id = input('star_id');
+        $star_id = $this->req('star_id', 'integer');
         $client_id = input('client_id');
         if (!$client_id || !$star_id) Common::res(['code' => 100]);
 
@@ -55,7 +53,7 @@ class Star extends Base
     }
     public function leaveChart()
     {
-        $star_id = input('star_id');
+        $star_id = $this->req('star_id', 'integer');
         $client_id = input('client_id');
         if (!$client_id || !$star_id) Common::res(['code' => 100]);
 
@@ -65,7 +63,7 @@ class Star extends Base
 
     public function sendMsg()
     {
-        $starid = input('starid');
+        $starid = $this->req('starid', 'integer');
         $content = input('content');
         if (!$starid || !$content) Common::res(['code' => 100]);
 
@@ -78,7 +76,7 @@ class Star extends Base
     /**贡献人气 */
     public function sendHot()
     {
-        $starid = input('starid');
+        $starid = $this->req('starid', 'integer');
         $hot = input('hot'); // type=1 为礼物id
         $type = input('type', 0);
         if (!$starid || !$hot) Common::res(['code' => 100]);
@@ -91,7 +89,7 @@ class Star extends Base
     /**加入圈子 */
     public function follow()
     {
-        $starid = input('starid');
+        $starid = $this->req('starid', 'integer');
         if (!$starid) Common::res(['code' => 100]);
         $this->getUser();
 
@@ -104,7 +102,7 @@ class Star extends Base
     /**偷花 */
     public function steal()
     {
-        $starid = input('starid');
+        $starid = $this->req('starid', 'integer');
         $index = input('index');
         if (!$starid) Common::res(['code' => 100]);
         $this->getUser();
@@ -120,7 +118,7 @@ class Star extends Base
     /**明星动态 */
     public function dynamic()
     {
-        $starid = input('starid');
+        $starid = $this->req('starid', 'integer');
         if (!$starid) Common::res(['code' => 100]);
         $res = Rec::with(['User ' => ['UserStar ' => ['Star']]])->where('target_star_id', $starid)->limit(10)->order('id desc')->select();
 
