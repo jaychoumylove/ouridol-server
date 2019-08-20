@@ -91,9 +91,10 @@ class Ext extends Base
         if ($file) {
             $info = $file->move(ROOT_PATH . 'public' . DS . 'uploads');
             if ($info) {
-                
-                $realPath = ROOT_PATH . 'public' . DS . 'uploads' . DS . $info->getSaveName();
-                $res = (new WxAPI('gzh'))->addMaterial($realPath);
+
+                $res['url'] = 'http://' . $_SERVER['HTTP_HOST'] . '/uploads/' . $info->getSaveName();
+
+                // $res = (new WxAPI('gzh'))->addMaterial($realPath);
                 // unlink($realPath);
                 Common::res(['data' => $res]);
             } else {
