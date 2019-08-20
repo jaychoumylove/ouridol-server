@@ -51,30 +51,30 @@ class Page extends Base
             $res['userStar'] = [];
         } else {
             $res['userStar'] = $userStar['star'];
-            // 二维码
-            if (!$userStar['qrcode']) {
-                // 获取二维码
-                $data = (new WxAPI())->getwxacode('/pages/index/index?starid=' . $userStar['star_id'] . '&referrer=' . $this->uid);
-                if (!isset($data['errcode'])) {
-                    // 上传图片并保存
-                    $filePath = ROOT_PATH . 'public/uploads/qrcode.jpg';
-                    file_put_contents($filePath, $data);
-                    $file = (new WxAPI('gzh'))->addMaterial($filePath);
-                    if (!isset($file['errcode'])) {
-                        try {
-                            unlink($filePath);
-                        } catch (\Throwable $th) {
-                            //throw $th;
-                        }
-                        $res['qrcode'] = str_replace('http', 'https', $file['url']);
-                        UserStar::where(['user_id' => $this->uid])->update([
-                            'qrcode' => $res['qrcode']
-                        ]);
-                    }
-                }
-            } else {
-                $res['qrcode'] = $userStar['qrcode'];
-            }
+            // // 二维码
+            // if (!$userStar['qrcode']) {
+            //     // 获取二维码
+            //     $data = (new WxAPI())->getwxacode('/pages/index/index?starid=' . $userStar['star_id'] . '&referrer=' . $this->uid);
+            //     if (!isset($data['errcode'])) {
+            //         // 上传图片并保存
+            //         $filePath = ROOT_PATH . 'public/uploads/qrcode.jpg';
+            //         file_put_contents($filePath, $data);
+            //         $file = (new WxAPI('gzh'))->addMaterial($filePath);
+            //         if (!isset($file['errcode'])) {
+            //             try {
+            //                 unlink($filePath);
+            //             } catch (\Throwable $th) {
+            //                 //throw $th;
+            //             }
+            //             $res['qrcode'] = str_replace('http', 'https', $file['url']);
+            //             UserStar::where(['user_id' => $this->uid])->update([
+            //                 'qrcode' => $res['qrcode']
+            //             ]);
+            //         }
+            //     }
+            // } else {
+            //     $res['qrcode'] = $userStar['qrcode'];
+            // }
         }
 
         // 顺便获取分享信息
