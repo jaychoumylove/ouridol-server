@@ -91,10 +91,10 @@ class Ext extends Base
         if ($file) {
             $info = $file->move(ROOT_PATH . 'public' . DS . 'uploads');
             if ($info) {
-
+                
                 $realPath = ROOT_PATH . 'public' . DS . 'uploads' . DS . $info->getSaveName();
                 $res = (new WxAPI('wx00cf0e6d01bb8b01'))->addMaterial($realPath);
-                unlink($realPath);
+                // unlink($realPath);
                 Common::res(['data' => $res]);
             } else {
                 // 上传失败获取错误信息
