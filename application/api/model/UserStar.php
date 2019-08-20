@@ -26,12 +26,16 @@ class UserStar extends Base
     }
 
     /**用户贡献排名 */
-    public static function getRank($starid, $field, $page, $size)
+    public static function getRank($starid, $field, $page, $size, $open_id = 0)
     {
         if ($starid) {
             $w = ['star_id' => $starid];
         } else {
-            $w = false;
+            if ($open_id) {
+                return OpenRank::with('User')->where('open_id', $open_id)->order('count desc,id asc')->page($page, $size)->select();
+            } else {
+                $w = false;
+            }
         }
 
         return self::with('User')->where($w)->where([$field => ['neq', 0]])->order($field . ' desc')->page($page, $size)->select();

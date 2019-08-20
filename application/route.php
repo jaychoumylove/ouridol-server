@@ -145,3 +145,8 @@ Route::rule('api/:version/subscribe', 'api/v1.Subscribe/index');// 订阅消息
 // Prop
 Route::rule('api/:version/prop/use', 'api/v1.Prop/use');// 使用道具
 
+// Open 
+Route::rule('api/:version/open/upload', 'api/v1.Open/upload');// 上传开屏
+Route::rule('api/:version/open/select', 'api/v1.Open/select');// 开屏图列表
+Route::rule('api/:version/open/settle', 'api/v1.Open/settle');// 开屏图数据结算
+Route::rule('api/:version/open/today', 'api/v1.Open/today');// 今日当前开屏

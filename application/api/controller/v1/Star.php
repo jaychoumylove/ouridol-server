@@ -77,12 +77,13 @@ class Star extends Base
     public function sendHot()
     {
         $starid = $this->req('starid', 'integer');
+        $openId = $this->req('open_id', 'number', 0); // 开屏图id
         $hot = input('hot'); // type=1 为礼物id
         $type = input('type', 0);
         if (!$starid || !$hot) Common::res(['code' => 100]);
         $this->getUser();
 
-        (new StarService())->sendHot($starid, $hot, $this->uid, $type);
+        (new StarService())->sendHot($starid, $hot, $this->uid, $type, $openId);
         Common::res();
     }
 

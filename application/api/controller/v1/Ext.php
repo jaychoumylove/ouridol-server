@@ -67,7 +67,7 @@ class Ext extends Base
     public function setCard()
     {
         $this->getUser();
-        
+
         $res = UserStar::setCard($this->uid);
         Common::res(['data' => $res]);
     }
@@ -88,17 +88,12 @@ class Ext extends Base
     {
         $file = request()->file('file');
 
-        // $dir = iconv("UTF-8", "GBK", ROOT_PATH . 'public/upload');
-        // if (!file_exists($dir)) {
-        //     mkdir($dir, 0777, true);
-        // } 
-
         if ($file) {
             $info = $file->move(ROOT_PATH . 'public' . DS . 'uploads');
             if ($info) {
 
                 $realPath = ROOT_PATH . 'public' . DS . 'uploads' . DS . $info->getSaveName();
-                $res = (new WxAPI('gzh'))->addMaterial($realPath);
+                $res = (new WxAPI('wx00cf0e6d01bb8b01'))->addMaterial($realPath);
                 unlink($realPath);
                 Common::res(['data' => $res]);
             } else {

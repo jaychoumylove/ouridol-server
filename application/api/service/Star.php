@@ -21,6 +21,7 @@ use GatewayWorker\Lib\Gateway;
 use app\api\model\RecItem;
 use app\api\model\Fanclub;
 use app\api\model\Lock;
+use app\api\model\Open;
 use app\api\model\UserProp;
 use app\api\model\Star as  StarModel;
 
@@ -33,7 +34,7 @@ class Star
     }
 
     /**打榜 */
-    public function sendHot($starid, $hot, $uid, $type)
+    public function sendHot($starid, $hot, $uid, $type, $openId)
     {
         if (Lock::getVal('week_end')['value'] == 1) {
             Common::res(['code' => 1, 'msg' => '榜单结算中，请稍后再试！']);
@@ -47,6 +48,8 @@ class Star
                 $item_id = $hot;
                 // $hot 贡献度
                 $hot = CfgItem::where(['id' => $item_id])->value('count');
+                // 开屏图增加人气
+                if ($openId) Open::addHot($openId, $uid, $hot);
 
                 // 使用道具卡
                 $prop_id = 3;
