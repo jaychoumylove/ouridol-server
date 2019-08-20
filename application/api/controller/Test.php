@@ -46,7 +46,9 @@ class Test extends Base
     public function index()
     {
         // echo $this->req('a','integer',1);
-        echo (int) 'eeeeeeee';
+
+
+        // echo (int) 'eeeeeeee';
         // echo strtotime(date('Y-m-d', strtotime('this week') + 7 * 3600 * 24));
 
 

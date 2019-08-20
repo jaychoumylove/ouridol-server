@@ -89,10 +89,10 @@ class Ext extends Base
         $file = request()->file('file');
 
         if ($file) {
-            $info = $file->move(ROOT_PATH . 'public' . DS . 'uploads');
+            $rootPath = '/home/logs/default';
+            $info = $file->move($rootPath . '/static');
             if ($info) {
-
-                $res['url'] = 'http://' . $_SERVER['HTTP_HOST'] . '/uploads/' . $info->getSaveName();
+                $res['url'] = 'http://' . get_onlineip() . '/static/' . $info->getSaveName();
 
                 // $res = (new WxAPI('gzh'))->addMaterial($realPath);
                 // unlink($realPath);
