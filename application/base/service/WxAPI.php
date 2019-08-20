@@ -113,6 +113,8 @@ class WxAPI
                     'access_token_expire' => date('Y-m-d H:i:s', time() + $res['expires_in']),
                 ]);
                 return $res['access_token'];
+            } else {
+                Common::res(['code' => 1, 'data' => $res]);
             }
         } else {
             return $this->appinfo['access_token'];
