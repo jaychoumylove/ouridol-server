@@ -21,6 +21,10 @@ class Open extends Base
         $imgUrl = $this->req('img_url', 'require');
         $this->getUser();
         $starId = UserStar::getStarId($this->uid);
+        if (!$starId) Common::res(['code' => 1, 'msg' => '请先加入一个圈子']);
+
+        $todayDone = OpenModel::where('user_id', $this->uid)->whereTime('create_time', 'd')->value('id');
+        if ($todayDone) Common::res(['code' => 1, 'msg' => '每日只可上传一张']);
 
         OpenModel::create(['user_id' => $this->uid, 'star_id' => $starId, 'img_url' => $imgUrl]);
 

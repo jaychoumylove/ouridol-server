@@ -194,6 +194,7 @@ class WxAPI
         return Common::request($url, $data);
     }
 
+    /**使用公众号接口上传图片 */
     public function uploadimg($filePath)
     {
         $url = 'https://' . $this->apiHost . '/cgi-bin/media/uploadimg?access_token=ACCESS_TOKEN';
