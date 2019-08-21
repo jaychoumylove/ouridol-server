@@ -3,6 +3,7 @@
 namespace app\api\model;
 
 use app\base\model\Base;
+use app\base\service\Common;
 use think\Db;
 use think\Model;
 
@@ -35,5 +36,27 @@ class Open extends Base
                 'count' => $hot
             ]);
         }
+    }
+
+    public static function settle()
+    {
+        // 获取榜首数据
+        $topOpen = self::where('1=1')->order('hot desc,id desc')->find();
+        $starname = Star::where('id', $topOpen['star_id'])->value('name');
+        $userRank = OpenRank::with('User')->where('open_id', $topOpen['id'])->limit(3)->order('count desc,id asc')->select();
+
+        $res = OpenTop::create([
+            'open_id' => $topOpen['id'],
+            'open_img' => $topOpen['img_url'],
+            'starname' => $starname,
+            'user_rank' => json_encode($userRank),
+            'date' => date("Ymd", strtotime("-1 day"))
+        ]);
+
+        // 清空
+        self::where('1=1')->update(['hot' => 0]);
+        OpenRank::where('1=1')->update(['count' => 0]);
+
+        // if ($res) Common::res();
     }
 }

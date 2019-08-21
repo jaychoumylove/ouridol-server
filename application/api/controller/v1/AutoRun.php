@@ -15,6 +15,7 @@ use app\api\model\Star;
 use app\base\service\WxAPI;
 use think\Log;
 use app\api\model\Lock;
+use app\api\model\Open;
 use app\api\model\Prop;
 
 class AutoRun extends Base
@@ -42,6 +43,8 @@ class AutoRun extends Base
             Prop::where('1=1')->update([
                 'remain' => 100
             ]);
+            // 开屏结算
+            Open::settle();
 
             Db::commit();
         } catch (\Exception $e) {

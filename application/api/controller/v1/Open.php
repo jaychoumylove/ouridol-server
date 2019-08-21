@@ -56,36 +56,19 @@ class Open extends Base
 
     public function settle()
     {
-        // 获取榜首数据
-        $topOpen = OpenModel::where('1=1')->order('hot desc,id desc')->find();
-        $starname = Star::where('id', $topOpen['star_id'])->value('name');
-        $userRank = OpenRank::with('User')->where('open_id', $topOpen['id'])->limit(3)->order('count desc,id asc')->select();
-
-        $res = OpenTop::create([
-            'open_id' => $topOpen['id'],
-            'open_img' => $topOpen['img_url'],
-            'starname' => $starname,
-            'user_rank' => json_encode($userRank),
-            'date' => date("Ymd", strtotime("-1 day"))
-        ]);
-
-        // 清空
-        OpenModel::where('1=1')->update(['hot' => 0]);
-        OpenRank::where('1=1')->update(['count' => 0]);
-
-        if ($res) Common::res();
+        OpenModel::settle();
     }
 
     public function today()
     {
-        $res['img'] = Cfg::getCfg('open_img');
-
-        if (!$res['img']) {
+        $topInfo = OpenTop::where('date', date("Ymd", strtotime("-1 day")))->find();
+        if ($topInfo) {
             // 助力开屏
-            $topInfo = OpenTop::where('date', date("Ymd", strtotime("-1 day")))->find();
             $res['img'] = $topInfo['open_img'];
             $res['starname'] = $topInfo['starname'];
             $res['user'] = $topInfo['user_rank'][0];
+        } else {
+            $res['img'] = Cfg::getCfg('open_img');
         }
 
         Common::res(['data' => $res]);
