@@ -33,6 +33,7 @@ class Base extends Controller
 
     /**
      * 获取并校验请求参数
+     * https://www.kancloud.cn/manual/thinkphp5_1/354107
      */
     protected function req($field, $validate = '', $default = null)
     {

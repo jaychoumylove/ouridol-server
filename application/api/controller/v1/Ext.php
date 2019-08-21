@@ -89,13 +89,12 @@ class Ext extends Base
         $file = request()->file('file');
 
         if ($file) {
-            $rootPath = '/home/logs/default';
-            $info = $file->move($rootPath . '/static');
+            $info = $file->move(ROOT_PATH . 'public' . DS . 'uploads');
             if ($info) {
-                $res['url'] = 'http://' . get_onlineip() . '/static/' . $info->getSaveName();
-
-                // $res = (new WxAPI('gzh'))->addMaterial($realPath);
-                // unlink($realPath);
+                
+                $realPath = ROOT_PATH . 'public' . DS . 'uploads' . DS . $info->getSaveName();
+                $res = (new WxAPI('wx00cf0e6d01bb8b01'))->addMaterial($realPath);
+                unlink($realPath);
                 Common::res(['data' => $res]);
             } else {
                 // 上传失败获取错误信息
