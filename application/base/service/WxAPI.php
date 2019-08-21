@@ -194,6 +194,18 @@ class WxAPI
         return Common::request($url, $data);
     }
 
+    public function uploadimg($filePath)
+    {
+        $url = 'https://' . $this->apiHost . '/cgi-bin/media/uploadimg?access_token=ACCESS_TOKEN';
+
+        $accessToken = $this->getAccessToken();
+        if (!$accessToken) return false;
+        $url = str_replace('ACCESS_TOKEN', $accessToken, $url);
+
+        $data = ['media' => new \CURLFile($filePath, false, false)];
+        return Common::request($url, $data);
+    }
+
     /**
      * 获取小程序码，适用于需要的码数量较少的业务场景。
      * @param string $path 扫码进入的小程序页面路径

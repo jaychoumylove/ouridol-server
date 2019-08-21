@@ -93,7 +93,7 @@ class Ext extends Base
             if ($info) {
                 
                 $realPath = ROOT_PATH . 'public' . DS . 'uploads' . DS . $info->getSaveName();
-                $res = (new WxAPI('wx00cf0e6d01bb8b01'))->addMaterial($realPath);
+                $res = (new WxAPI('gzh'))->uploadimg($realPath);
                 unlink($realPath);
                 Common::res(['data' => $res]);
             } else {
