@@ -28,6 +28,8 @@ Route::rule('api/:version/page/app', 'api/v1.Page/app');
 Route::rule('api/:version/page/group', 'api/v1.Page/group');
 Route::rule('api/:version/page/prop', 'api/v1.Page/prop');
 Route::rule('api/:version/page/myprop', 'api/v1.Page/myprop');
+Route::rule('api/:version/page/game', 'api/v1.Page/game');
+
 
 // Remote
 Route::rule('api/:version/remote/zuimei', 'api/v1.Remote/zuimei');

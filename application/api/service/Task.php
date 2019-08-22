@@ -23,7 +23,7 @@ class Task
     {
         // 已领取记录
         $recTask = RecTask::where(['user_id' => $uid])->whereTime('create_time', 'd')->column('task_id');
-        foreach ($taskList as &$task) {
+        foreach ($taskList as $key => &$task) {
             $task['status'] = 0;
 
             // 检查完成状态
@@ -216,6 +216,20 @@ class Task
                         $isDone = Rec::where(['type' => 25, 'user_id' => $uid])->whereTime('create_time', 'd')->count('id');
                         if ($isDone) {
                             $task['status'] = 1;
+                        }
+                    }
+                    break;
+                case 17:
+                    // 游戏试玩
+                    // 用户贡献度大于100才显示游戏试玩
+                    $userCount = UserStar::where('user_id', $uid)->order('total_count desc')->value('total_count');
+                    if ($userCount < 101) {
+                        unset($taskList[$key]);
+                    } else {
+                        $task['doneTimes'] = RecTask::where('user_id', $uid)->where('task_id', $task['id'])->whereTime('create_time', 'd')->count('id');
+                        
+                        if ($task['doneTimes'] > $task['times']) {
+                            $task['status'] = 2;
                         }
                     }
                     break;

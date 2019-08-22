@@ -16,6 +16,7 @@ use app\api\service\Star;
 use app\api\model\Star as AppStar;
 use app\api\model\RecStarChart;
 use app\api\model\Article;
+use app\api\model\CfgAds;
 use app\api\model\UserSprite;
 use app\base\service\WxAPI;
 use app\api\model\CfgItem;
@@ -183,5 +184,17 @@ class Page extends Base
         $this->getUser();
         $res['list'] = UserProp::getList($this->uid);
         Common::res(['data' => $res]);
+    }
+
+    /**游戏试玩 */
+    public function game()
+    {
+        $type = $this->req('type', 'integer', 0);
+        if ($type == 1) {
+            $w = ['show' => 1];
+        } else {
+            $w = '1=1';
+        }
+        Common::res(['data' => CfgAds::where($w)->order('sort asc')->select()]);
     }
 }
