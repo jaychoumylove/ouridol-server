@@ -17,6 +17,8 @@ use think\Log;
 use app\api\model\Lock;
 use app\api\model\Open;
 use app\api\model\Prop;
+use app\api\model\Rec;
+use app\api\model\RecTask;
 
 class AutoRun extends Base
 {
@@ -204,5 +206,12 @@ class AutoRun extends Base
 
         $wxApi = new WxAPI();
         $wxApi->sendTemplate($pushDatas);
+    }
+
+    public function clearDb()
+    {
+        Rec::clear(7, 100);
+        RecTask::clear(7, 100);
+        echo 'done';
     }
 }

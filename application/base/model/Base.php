@@ -31,7 +31,7 @@ class Base extends Model
     protected $update = ['delete_time'];
 
     /**
-     * 数据库清理
+     * 数据表清理
      * @param int $day   清除多少天之前的数据
      * @param int $count 条数
      */

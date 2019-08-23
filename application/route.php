@@ -17,6 +17,9 @@ Route::rule('api/:version/auto/d', 'api/v1.AutoRun/dayHandle');// 每日定期�
 Route::rule('api/:version/auto/w', 'api/v1.AutoRun/weekHandle');// 每周定期执行
 Route::rule('api/:version/auto/m', 'api/v1.AutoRun/monthHander');// 每月定期执行
 
+Route::rule('api/:version/auto/clear', 'api/v1.AutoRun/clearDb');// 清除数据表
+
+
 Route::rule('api/:version/auto/sendTmp', 'api/v1.AutoRun/sendTmp');// 打卡消息推送
 
 // Notify
@@ -29,7 +32,6 @@ Route::rule('api/:version/page/group', 'api/v1.Page/group');
 Route::rule('api/:version/page/prop', 'api/v1.Page/prop');
 Route::rule('api/:version/page/myprop', 'api/v1.Page/myprop');
 Route::rule('api/:version/page/game', 'api/v1.Page/game');
-
 
 // Remote
 Route::rule('api/:version/remote/zuimei', 'api/v1.Remote/zuimei');

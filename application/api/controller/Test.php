@@ -45,6 +45,8 @@ class Test extends Base
 
     public function index()
     {
+
+        echo strtotime('-10 day');
         // echo $this->req('a','integer',1);
 
 
