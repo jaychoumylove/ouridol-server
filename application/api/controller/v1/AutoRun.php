@@ -210,8 +210,11 @@ class AutoRun extends Base
 
     public function clearDb()
     {
-        Rec::clear(7, 100);
-        RecTask::clear(7, 100);
+        $day = input('day', 10);
+        $count = input('count', 100);
+
+        Rec::clear($day, $count);
+        RecTask::clear($day, $count);
         echo 'done';
     }
 }
