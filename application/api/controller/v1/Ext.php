@@ -105,6 +105,7 @@ class Ext extends Base
             }
         }
         if ($filename) {
+            // 上传到微信
             $realPath = ROOT_PATH . 'public' . DS . 'uploads' . DS . $filename;
             $res = (new WxAPI('wx00cf0e6d01bb8b01'))->uploadimg($realPath);
             unlink($realPath);
