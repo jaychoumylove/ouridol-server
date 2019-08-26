@@ -84,22 +84,31 @@ class Ext extends Base
         Common::res(['data' => $list]);
     }
 
+    /**文件上传 */
     public function upload()
     {
-        $file = request()->file('file');
-
-        if ($file) {
-            $info = $file->move(ROOT_PATH . 'public' . DS . 'uploads');
-            if ($info) {
-                
-                $realPath = ROOT_PATH . 'public' . DS . 'uploads' . DS . $info->getSaveName();
-                $res = (new WxAPI('gzh'))->uploadimg($realPath);
-                unlink($realPath);
-                Common::res(['data' => $res]);
+        $file_url = input('url', '');
+        if ($file_url) {
+            $content = file_get_contents($file_url);
+            $file_arr = explode('.', $file_url);
+            // 文件名及扩展名
+            $filename = time() . mt_rand(1000, 9999) . '.' . $file_arr[count($file_arr) - 1];
+            file_put_contents(ROOT_PATH . 'public' . DS . 'uploads' . DS . $filename, $content);
+        } else {
+            $file = request()->file('file');
+            if ($file) {
+                $info = $file->move(ROOT_PATH . 'public' . DS . 'uploads');
+                $filename = $info->getSaveName();
             } else {
                 // 上传失败获取错误信息
                 echo $file->getError();
             }
+        }
+        if ($filename) {
+            $realPath = ROOT_PATH . 'public' . DS . 'uploads' . DS . $filename;
+            $res = (new WxAPI('wx00cf0e6d01bb8b01'))->uploadimg($realPath);
+            unlink($realPath);
+            Common::res(['data' => $res]);
         }
     }
 
