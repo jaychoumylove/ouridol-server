@@ -64,10 +64,16 @@ class WxPay
         $sign = $data['sign'];
         unset($data['sign']); // 剔除sign再校验
         if ($sign == $this->makeSign($data) && $data['result_code'] == 'SUCCESS') {
-            echo '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+            // 校验成功，返回data
             return $data;
         } else {
             die();
         }
+    }
+
+    /**业务处理成功，告知给微信 */
+    public function returnSuccess()
+    {
+        echo '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
     }
 }

@@ -17,6 +17,7 @@ use app\api\model\PayOrder;
 use app\api\model\RecPayOrder;
 use app\api\model\Cfg;
 use app\api\model\CfgLottery;
+use app\api\model\RecCardHistory;
 use app\api\model\RecStarChart;
 use app\api\model\UserFather;
 
@@ -46,7 +47,20 @@ class Test extends Base
     public function index()
     {
 
-        echo strtotime('-10 day');
+        // RecCardHistory::settle();
+        // $res = Db::query("SELECT s.name,count(u.id) as count FROM `f_user_star` u join
+        // f_star s on s.id = u.star_id where u.active_card_days >= 7 and u.delete_time is null GROUP BY u.star_id ORDER BY count desc LIMIT 10;");
+
+
+        // Common::res(['data' => $res]);
+
+        // // $arr = [
+        // //     'fee' => '100'
+        // // ];
+        // $a = --self::$fee;
+        // echo $a;
+
+        // echo strtotime('-10 day');
         // echo $this->req('a','integer',1);
 
 

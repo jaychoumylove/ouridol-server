@@ -41,8 +41,8 @@ class Payment extends Base
     public function order()
     {
         $this->getUser();
-        $goodsId = input('goods_id');// 商品id
-        $goodsNum = input('goods_num', 1);// 商品数量
+        $goodsId = input('goods_id'); // 商品id
+        $goodsNum = input('goods_num', 1); // 商品数量
         $user_id = input('user_id', 0); // 代充值uid
         $type = input('type', 0); // 购买类型
         if ($user_id == $this->uid) $user_id = 0;
@@ -65,12 +65,12 @@ class Payment extends Base
         ]);
         // 预支付
         $res = (new WxAPI())->unifiedorder([
-            'body' => $goods['title'],
-            'orderId' => $order['id'],
-            'totalFee' => $totalFee,
-            'notifyUrl' => 'https://' . $_SERVER['HTTP_HOST'] . '/api/v1/pay/notify',
-            'tradeType' => 'JSAPI',
-            'openid' => User::where('id', $this->uid)->value('openid'),
+            'body' => $goods['title'], // 支付标题
+            'orderId' => $order['id'], // 订单ID
+            'totalFee' => $totalFee, // 支付金额
+            'notifyUrl' => 'https://' . $_SERVER['HTTP_HOST'] . '/api/v1/pay/notify', // 支付成功通知url
+            'tradeType' => 'JSAPI', // 支付类型
+            'openid' => User::where('id', $this->uid)->value('openid'), // 用户openid
         ]);
         // 处理预支付数据
         (new WxPayService())->returnFront($res);
@@ -87,16 +87,14 @@ class Payment extends Base
             Db::startTrans();
             try {
                 // 更改订单状态
-                $res = RecPayOrder::where(['id' => $data['out_trade_no']])->update(['pay_time' => $data['time_end']]);
-                if (!$res) {
-                    // 订单不存在或已完成支付
-                    Db::rollback();
-                    die();
-                }
-                // 支付成功 处理业务
-                RecPayOrder::paySuccess($order);
+                $isDone = RecPayOrder::where(['id' => $data['out_trade_no']])->update(['pay_time' => $data['time_end']]);
+                if ($isDone) {
+                    // 支付成功 处理业务
+                    RecPayOrder::paySuccess($order);
+                    Db::commit();
 
-                Db::commit();
+                    $wxPayService->returnSuccess();
+                }
             } catch (\Exception $e) {
                 Db::rollback();
             }

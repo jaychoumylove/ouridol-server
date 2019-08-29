@@ -5,6 +5,7 @@ namespace app\api\model;
 use think\Model;
 use app\base\model\Base;
 
+/**数据锁 */
 class Lock extends Base
 {
     //

@@ -18,6 +18,7 @@ use app\api\model\Lock;
 use app\api\model\Open;
 use app\api\model\Prop;
 use app\api\model\Rec;
+use app\api\model\RecCardHistory;
 use app\api\model\RecTask;
 
 class AutoRun extends Base
@@ -120,6 +121,7 @@ class AutoRun extends Base
         die('done');
     }
 
+    /**每月执行 */
     public function monthHander()
     {
         $lock = Lock::getVal('month_end');
@@ -150,6 +152,9 @@ class AutoRun extends Base
             StarRank::where('1=1')->update([
                 'month_hot' => 10000,
             ]);
+
+            // 应援结算
+            RecCardHistory::settle();
 
             // 后援会贡献重置
             Fanclub::where('1=1')->update(['month_count' => 0]);
