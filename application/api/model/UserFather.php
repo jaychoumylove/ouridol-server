@@ -124,4 +124,21 @@ class UserFather extends Base
         ], true);
         if (!$isDone) Common::res(['code' => 1]);
     }
+
+    /**增加徒弟贡献 */
+    public static function addContribute($son, $hot)
+    {
+        $opTime = self::where(['son' => $son])->value('update_time');
+        if ($opTime) {
+            if (date('Ymd', strtotime($opTime)) != date('Ymd')) {
+                self::where(['son' => $son])->update([
+                    'cur_contribute' => $hot,
+                ]);
+            } else {
+                self::where(['son' => $son])->update([
+                    'cur_contribute' => Db::raw('cur_contribute+' . $hot)
+                ]);
+            }
+        }
+    }
 }

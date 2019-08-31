@@ -47,6 +47,8 @@ class Test extends Base
     public function index()
     {
 
+        echo strtotime(date('Y-m-01') . ' +1 month');
+
         // RecCardHistory::settle();
         // $res = Db::query("SELECT s.name,count(u.id) as count FROM `f_user_star` u join
         // f_star s on s.id = u.star_id where u.active_card_days >= 7 and u.delete_time is null GROUP BY u.star_id ORDER BY count desc LIMIT 10;");

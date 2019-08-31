@@ -84,6 +84,7 @@ class Star
 
                 // 推送
                 $userInfo = UserModel::where(['id' => $uid])->field('nickname,avatarurl')->find();
+                // 圈内推送
                 Gateway::sendToGroup('star_' . $starid, json_encode([
                     'type' => 'sendItem',
                     'data' => [
@@ -128,21 +129,8 @@ class Star
             UserStar::change($uid, $starid, $hot);
             // 后援会贡献度增加
             Fanclub::change($uid, $hot);
-
-            // 徒弟贡献 
-            $opTime = UserFather::where(['son' => $uid])->value('update_time');
-            if ($opTime) {
-                if (date('Ymd', strtotime($opTime)) != date('Ymd', time())) {
-                    UserFather::where(['son' => $uid])->update([
-                        'cur_contribute' => $hot,
-                    ]);
-                } else {
-                    UserFather::where(['son' => $uid])->update([
-                        'cur_contribute' => Db::raw('cur_contribute+' . $hot)
-                    ]);
-                }
-            }
-
+            // 徒弟贡献度增加 
+            UserFather::addContribute($uid, $hot);
             // 明星增加人气
             StarRankModel::where(['star_id' => $starid])->update([
                 'week_hot' => Db::raw('week_hot+' . $hot),
