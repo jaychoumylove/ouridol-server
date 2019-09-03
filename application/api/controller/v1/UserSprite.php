@@ -6,6 +6,7 @@ use app\base\controller\Base;
 use app\api\model\UserSprite as UserSpriteModel;
 use app\base\service\Common;
 use app\api\service\User;
+use think\Db;
 
 class UserSprite extends Base
 {
@@ -44,6 +45,9 @@ class UserSprite extends Base
         if ($info['isUseCard']) {
             (new User())->change($this->uid, [
                 'coin' => $info['earnPer']
+            ]);
+            UserSpriteModel::where('user_id', $this->uid)->update([
+                'total_coin' => Db::raw('total_coin+' . $info['earnPer'])
             ]);
         }
 

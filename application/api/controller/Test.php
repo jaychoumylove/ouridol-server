@@ -17,6 +17,7 @@ use app\api\model\PayOrder;
 use app\api\model\RecPayOrder;
 use app\api\model\Cfg;
 use app\api\model\CfgLottery;
+use app\api\model\Lock;
 use app\api\model\RecCardHistory;
 use app\api\model\RecStarChart;
 use app\api\model\UserFather;
@@ -47,7 +48,14 @@ class Test extends Base
     public function index()
     {
 
-        echo strtotime(date('Y-m-01') . ' +1 month');
+        // echo strtotime(date('Y-m-01') . ' +1 month');
+        Db::startTrans();
+        Lock::where('1=1')->update([
+            'value' => 0
+        ]);
+
+
+
 
         // RecCardHistory::settle();
         // $res = Db::query("SELECT s.name,count(u.id) as count FROM `f_user_star` u join
