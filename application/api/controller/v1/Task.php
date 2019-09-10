@@ -9,17 +9,25 @@ use app\api\service\Task as TaskService;
 use app\api\model\User;
 use app\api\service\Star;
 use app\api\model\Cfg;
+use app\api\model\CfgBadge;
 use app\api\model\UserStar;
 
 class Task extends Base
 {
     public function index()
     {
+        $category = $this->req('category', 'integer');
         $this->getUser();
-        $taskList = TaskModel::with('TaskType')->order('sort asc')->select();
-        $taskList = (new TaskService())->checkTask($this->uid, $taskList);
 
-        Common::res(['data' => $taskList]);
+        if ($category == 2) {
+            // 徽章
+            $list = CfgBadge::getList($this->uid);
+        } else {
+            $list = TaskModel::with('TaskType')->order('sort asc')->select();
+            $list = (new TaskService())->checkTask($this->uid, $list);
+        }
+
+        Common::res(['data' => $list]);
     }
 
     public function settle()
@@ -95,5 +103,14 @@ class Task extends Base
             'share_text' => $text,
             'weibo_zhuanfa' => Cfg::getCfg('weibo_zhuanfa'),
         ]]);
+    }
+
+    public function badgeUse()
+    {
+        $badgeId = $this->req('badge_id', 'integer');
+
+        $this->getUser();
+        CfgBadge::badgeUse($badgeId, $this->uid);
+        Common::res();
     }
 }

@@ -112,6 +112,7 @@ class Page extends Base
         $res['chartList'] = RecStarChart::getLeastChart($starid);
         // 加入聊天室
         Gateway::joinGroup($client_id, 'star_' . $starid);
+        $res['disLeastCount'] = AppStar::disLeastCount($starid);
 
         $res['mass'] = ShareMass::getMass($this->uid);
 

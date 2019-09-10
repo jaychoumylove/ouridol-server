@@ -32,7 +32,7 @@ class UserStar extends Base
             $w = ['star_id' => $starid];
         } else {
             if ($open_id) {
-                return OpenRank::with('User')->where('open_id', $open_id)->order('count desc,id asc')->page($page, $size)->select();
+                return OpenRank::with('User')->where('open_id', $open_id)->where('count', '<>', 0)->order('count desc,id asc')->page($page, $size)->select();
             } else {
                 $w = false;
             }

@@ -112,7 +112,8 @@ Route::rule('api/:version/pay/goods', 'api/v1.Payment/goods');// 商品列表
 Route::rule('api/:version/task', 'api/v1.Task/index');// 任务
 Route::rule('api/:version/task/settle', 'api/v1.Task/settle');// 任务领取
 Route::rule('api/:version/task/weibo', 'api/v1.Task/weibo');// 提交微博链接
-Route::rule('api/:version/sharetext', 'api/v1.Task/sharetext');// 分享文字
+Route::rule('api/:version/sharetext', 'api/v1.Task/sharetext');// 分享文字 
+Route::rule('api/:version/badge/use', 'api/v1.Task/badgeUse');// 徽章使用
 
 // Ext
 Route::rule('api/:version/config', 'api/v1.Ext/config');// 配置信息
@@ -154,3 +155,8 @@ Route::rule('api/:version/open/upload', 'api/v1.Open/upload');// 上传开屏
 Route::rule('api/:version/open/select', 'api/v1.Open/select');// 开屏图列表
 Route::rule('api/:version/open/settle', 'api/v1.Open/settle');// 开屏图数据结算
 Route::rule('api/:version/open/today', 'api/v1.Open/today');// 今日当前开屏
+
+// Android
+Route::rule('api/:version/android/index', 'api/v1.Android/index'); // 
+Route::rule('api/:version/android/create', 'api/v1.Android/create');// 新建一个机器人用户
+Route::rule('api/:version/android/sendHot', 'api/v1.Android/sendHot');// 让一个机器人打榜

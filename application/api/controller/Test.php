@@ -48,11 +48,12 @@ class Test extends Base
     public function index()
     {
 
+        echo strtotime('00:09:00');
         // echo strtotime(date('Y-m-01') . ' +1 month');
-        Db::startTrans();
-        Lock::where('1=1')->update([
-            'value' => 0
-        ]);
+        // Db::startTrans();
+        // Lock::where('1=1')->update([
+        //     'value' => 0
+        // ]);
 
 
 
