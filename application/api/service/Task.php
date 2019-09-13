@@ -25,7 +25,7 @@ class Task
         $recTask = RecTask::where(['user_id' => $uid])->whereTime('create_time', 'd')->column('task_id');
         foreach ($taskList as $key => &$task) {
             $task['status'] = 0;
-            
+
             // 检查完成状态
             switch ($task['type']) {
                 case 1:
