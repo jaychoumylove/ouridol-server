@@ -94,6 +94,7 @@ Route::rule('api/:version/share/mass', 'api/v1.Share/mass');// 分享集结
 Route::rule('api/:version/share/start', 'api/v1.Share/massStart');// 分享集结开始
 Route::rule('api/:version/share/joinmass', 'api/v1.Share/massJoin');// 分享集结加入
 Route::rule('api/:version/share/settlemass', 'api/v1.Share/massSettle');// 集结结算
+Route::rule('api/:version/share/group_award', 'api/v1.Share/groupAward');// 群奖励
 
 
 // Sprite
@@ -125,6 +126,8 @@ Route::rule('api/:version/active/userrank', 'api/v1.Ext/userRank');// 用户打�
 Route::rule('api/:version/ext/log', 'api/v1.Ext/log');// 用户日志
 
 // 
+
+Route::rule('api/:version/uploadIndex', 'api/v1.Ext/uploadIndex');// 文件上传
 Route::rule('api/:version/upload', 'api/v1.Ext/upload');// 文件上传
 
 Route::rule('api/:version/Fanclub/join', 'api/v1.Ext/FanclubJoin');// 后援会

@@ -57,6 +57,7 @@ class UserSprite extends Base
         //     // GM 收益始终显示为100
         //     $item['earn'] = 100;
         // }
+        $item['sprite_img'] = CfgSprite::where(['level' => $item['sprite_level']])->value('image');
 
         return $item;
     }

@@ -46,6 +46,7 @@ class Page extends Base
 
         $res['userInfo'] = User::where(['id' => $this->uid])->field('id,nickname,avatarurl,type')->find();
         $res['userCurrency'] = UserCurrency::getCurrency($this->uid);
+        $res['userExt'] = UserExt::where('user_id', $this->uid)->field('is_join_wxgroup')->find();
 
         $userStar = UserStar::with('Star')->where(['user_id' => $this->uid])->order('id desc')->find();
         if (!$userStar) {

@@ -7,6 +7,7 @@ use app\api\model\ShareMass;
 use app\base\service\Common;
 use app\api\model\UserFather;
 use app\api\model\Cfg;
+use app\api\model\CfgSignin;
 use think\Db;
 use app\api\model\UserRelation;
 
@@ -87,5 +88,14 @@ class Share extends Base
         $this->getUser();
         UserFather::breakFather($this->uid);
         Common::res([]);
+    }
+
+    /**团长红包 */
+    public function groupAward()
+    {
+        $awardType = $this->req('award_type', 'integer');
+        
+        $this->getUser();
+        CfgSignin::hongBao($awardType, $this->uid);
     }
 }

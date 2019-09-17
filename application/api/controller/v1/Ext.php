@@ -84,6 +84,11 @@ class Ext extends Base
         Common::res(['data' => $list]);
     }
 
+    public function uploadIndex()
+    {
+        return view('upload');
+    }
+
     /**文件上传 */
     public function upload()
     {
