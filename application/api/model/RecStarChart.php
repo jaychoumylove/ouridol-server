@@ -87,7 +87,7 @@ class RecStarChart extends Base
             // 用户信息
             $res['user'] = User::with([
                 'UserStar' => function ($query) {
-                    $query->field('user_id,total_count');
+                    $query->field('user_id,total_count,captain');
                 },
                 'UserExt' => function ($query) {
                     $query->field('user_id,badge_id');
