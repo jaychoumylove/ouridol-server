@@ -1,5 +1,4 @@
 <?php
-
 namespace app\api\model;
 
 use app\base\model\Base;
@@ -11,10 +10,6 @@ class User extends Base
     public function UserStar()
     {
         return $this->hasOne('UserStar', 'user_id', 'id', [], 'LEFT');
-    }
-    public function UserExt()
-    {
-        return $this->hasOne('UserExt', 'user_id', 'id', [], 'LEFT');
     }
 
     public function Sprite()
@@ -51,10 +46,10 @@ class User extends Base
                 $currency = [
                     'uid' => $user['id'],
                 ];
-                if (isset($data['type']) && $data['type'] != 0) {
+                if (isset($data['type']) && $data['type'] == 1) {
                     $currency['coin'] =  100000;
                     $currency['stone'] =  300;
-                    $currency['trumpet'] = 100;
+                    $currency['trumpet'] =  100;
                 }
                 UserCurrency::create($currency);
 
@@ -97,30 +92,5 @@ class User extends Base
             'avatarurl' => $vrAvatar,
             'type' => 1 // 虚拟用户type
         ]);
-    }
-
-    /**创建机器人用户 */
-    public static function createAndroid($vrNickname, $vrAvatar)
-    {
-        $rdCode = Common::getRandCode(24);
-
-        return self::searchUser([
-            'openid' => $rdCode,
-            'unionid' => $rdCode,
-            'nickname' => $vrNickname,
-            'avatarurl' => $vrAvatar,
-            'type' => 5 // 机器人用户type
-        ]);
-    }
-
-    /**随机获取一个圈子内的机器人 */
-    public static function getOneAndroid($starid)
-    {
-        $uid = Db::name('user_star')->alias('s')->join('user u', 'u.id = s.user_id')
-            ->where('u.type', 5)->where('s.star_id', $starid)->orderRaw('rand()')->value('u.id');
-
-        if (!$uid) Common::res(['code' => 1, 'msg' => '该圈子未找到Android']);
-
-        return $uid;
     }
 }

@@ -214,10 +214,4 @@ class UserRelation extends Base
             Common::res(['code' => 1, 'msg' => '删除失败']);
         }
     }
-
-    /**用户一共拉了多少人 */
-    public static function invitCount($uid)
-    {
-        return self::where('rer_user_id', $uid)->where('status', 'in', [1, 2])->count('id');
-    }
 }

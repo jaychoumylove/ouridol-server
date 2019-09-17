@@ -84,11 +84,7 @@ class Star extends Base
         $this->getUser();
 
         (new StarService())->sendHot($starid, $hot, $this->uid, $type, $openId);
-        // 我的总贡献
-        $res['totalCount'] = UserStar::where('user_id', $this->uid)->value('total_count');
-        // 距离上一名
-        $res['disLeastCount'] = StarModel::disLeastCount($starid);
-        Common::res(['data' => $res]);
+        Common::res();
     }
 
     /**加入圈子 */
