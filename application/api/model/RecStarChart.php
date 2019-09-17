@@ -23,13 +23,21 @@ class RecStarChart extends Base
 
     public static function getLeastChart($starid)
     {
-        $list = self::with(['User' => ['UserStar']])->where(['star_id' => $starid])->order('id desc')->limit(10)->select();
-
+        $list = self::with(['User' => [
+            'UserStar' => function ($query) {
+                $query->field('user_id,total_count');
+            },
+            'UserExt' => function ($query) {
+                $query->field('user_id,badge_id');
+            }
+        ]])->where(['star_id' => $starid])->order('id desc')->limit(10)->select();
+        $list = json_decode(json_encode($list, JSON_UNESCAPED_UNICODE), true);
+        
         // 粉丝等级
-        // foreach ($list as &$value) {
-        //     $totalCount = $value['user']['user_star']['total_count'];
-        //     $value['level'] = CfgUserLevel::where('total', '<=', $totalCount)->max('level');
-        // }
+        foreach ($list as &$value) {
+            $totalCount = $value['user']['user_star']['total_count'];
+            $value['user']['level'] = CfgUserLevel::where('total', '<=', $totalCount)->max('level');
+        }
 
         return array_reverse($list);
     }
@@ -77,8 +85,17 @@ class RecStarChart extends Base
             ]);
 
             // 用户信息
-            $res['user'] = User::where(['id' => $uid])->field('nickname,avatarurl,type')->find();
-            $res['user']['user_star'] = UserStar::get(['user_id' => $uid, 'star_id' => $starid]);
+            $res['user'] = User::with([
+                'UserStar' => function ($query) {
+                    $query->field('user_id,total_count');
+                },
+                'UserExt' => function ($query) {
+                    $query->field('user_id,badge_id');
+                }
+            ])->where('id', $uid)->field('id,nickname,avatarurl,type')->find();
+
+            $totalCount = $res['user']['user_star']['total_count'];
+            $res['user']['level'] = CfgUserLevel::where('total', '<=', $totalCount)->max('level');
 
             if ($res['user']['type'] == 2) {
                 Db::rollback();

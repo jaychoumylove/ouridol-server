@@ -94,24 +94,27 @@ class Ext extends Base
     {
         $file_url = input('url', '');
         if ($file_url) {
+            // 上传的url
             $content = file_get_contents($file_url);
             $file_arr = explode('.', $file_url);
             // 文件名及扩展名
             $filename = time() . mt_rand(1000, 9999) . '.' . $file_arr[count($file_arr) - 1];
-            file_put_contents(ROOT_PATH . 'public' . DS . 'uploads' . DS . $filename, $content);
+            $realPath = ROOT_PATH . 'public' . DS . 'uploads' . DS . $filename;
+            file_put_contents($realPath, $content);
         } else {
+            // 上传的文件
             $file = request()->file('file');
             if ($file) {
                 $info = $file->move(ROOT_PATH . 'public' . DS . 'uploads');
                 $filename = $info->getSaveName();
+                $realPath = ROOT_PATH . 'public' . DS . 'uploads' . DS . $filename;
             } else {
                 // 上传失败获取错误信息
                 echo $file->getError();
             }
         }
-        if ($filename) {
+        if ($realPath) {
             // 上传到微信
-            $realPath = ROOT_PATH . 'public' . DS . 'uploads' . DS . $filename;
             $res = (new WxAPI('wx00cf0e6d01bb8b01'))->uploadimg($realPath);
             unlink($realPath);
             Common::res(['data' => $res]);
