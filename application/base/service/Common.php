@@ -163,4 +163,18 @@ class Common
 
         return $appinfo;
     }
+
+    /**微信数据解密算法 */
+    public static function wxDecrypt($appid, $sessionKey, $encryptedData, $iv)
+    {
+        require_once APP_PATH . 'wx/aes/wxBizDataCrypt.php';
+        $pc = new \WXBizDataCrypt($appid, $sessionKey);
+        $errcode = $pc->decryptData($encryptedData, $iv, $data);
+        $data = json_decode($data, true);
+
+        return [
+            'errcode' => $errcode,
+            'data' => $data
+        ];
+    }
 }

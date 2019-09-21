@@ -17,7 +17,7 @@ class CfgBadge extends Base
         $dataInvitCount = UserRelation::invitCount($uid);
 
         foreach ($list as $key => &$value) {
-            // 默认未达成
+            // status默认未达成
             $value['status'] = 0;
             switch ($value['type']) {
                 case 1:

@@ -21,4 +21,20 @@ class Lock extends Base
             'value' => $value
         ]);
     }
+
+    public static function lock($name)
+    {
+        $isDone = self::where('key', $name)->update(['value' => 1]);
+        if (!$isDone) {
+            self::create([
+                'key' => $name,
+                'value' => 1
+            ]);
+        }
+    }
+
+    public static function unlock($name)
+    {
+        self::where('key', $name)->update(['value' => 0]);
+    }
 }

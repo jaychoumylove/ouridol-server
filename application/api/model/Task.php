@@ -2,6 +2,7 @@
 
 namespace app\api\model;
 
+use app\api\service\Task as TaskService;
 use app\base\model\Base;
 
 class Task extends Base

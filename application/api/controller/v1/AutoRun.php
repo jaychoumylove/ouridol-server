@@ -20,6 +20,9 @@ use app\api\model\Prop;
 use app\api\model\Rec;
 use app\api\model\RecCardHistory;
 use app\api\model\RecTask;
+use app\api\model\UserExt;
+use app\api\model\UserWxgroup;
+use app\api\model\Wxgroup;
 
 class AutoRun extends Base
 {
@@ -46,6 +49,18 @@ class AutoRun extends Base
             Prop::where('1=1')->update([
                 'remain' => 100
             ]);
+            // 每日参与群集结次数重置
+            UserExt::where('1=1')->update([
+                'group_mass_times' => 0
+            ]);
+            // 群贡献
+            Wxgroup::where('1=1')->update([
+                'thisday_count' => 0,
+            ]);
+            UserWxgroup::where('1=1')->update([
+                'thisday_count' => 0,
+            ]);
+
             // 开屏结算
             Open::settle();
 

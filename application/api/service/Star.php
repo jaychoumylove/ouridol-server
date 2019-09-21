@@ -24,6 +24,7 @@ use app\api\model\Lock;
 use app\api\model\Open;
 use app\api\model\UserProp;
 use app\api\model\Star as  StarModel;
+use app\api\model\Wxgroup;
 
 class Star
 {
@@ -136,6 +137,8 @@ class Star
                 'week_hot' => Db::raw('week_hot+' . $hot),
                 'month_hot' => Db::raw('month_hot+' . $hot),
             ]);
+            // 微信群贡献度增加
+            Wxgroup::userSendHot($uid, $hot);
 
             Db::commit();
         } catch (\Exception $e) {

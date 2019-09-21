@@ -19,13 +19,19 @@ class Task
 {
 
     /**检查任务是否完成 */
-    public function checkTask($uid, $taskList)
+    public function checkTask($uid, $category)
     {
+        $taskList = TaskModel::with('TaskType')->where('category', $category)->order('sort asc')->select();
         // 已领取记录
-        $recTask = RecTask::where(['user_id' => $uid])->whereTime('create_time', 'd')->column('task_id');
+        if ($category == 0) {
+            // 新手任务只完成一次
+            $recTask = RecTask::where(['user_id' => $uid])->where('task_category', $category)->column('task_id');
+        } else if ($category == 1) {
+            // 每日任务每天都可完成
+            $recTask = RecTask::where(['user_id' => $uid])->where('task_category', $category)->whereTime('create_time', 'd')->column('task_id');
+        }
         foreach ($taskList as $key => &$task) {
             $task['status'] = 0;
-            
             // 检查完成状态
             switch ($task['type']) {
                 case 1:
@@ -227,7 +233,7 @@ class Task
                         unset($taskList[$key]);
                     } else {
                         $task['doneTimes'] = RecTask::where('user_id', $uid)->where('task_id', $task['id'])->whereTime('create_time', 'd')->count('id');
-                        
+
                         if ($task['doneTimes'] > $task['times']) {
                             $task['status'] = 2;
                         }
@@ -264,6 +270,7 @@ class Task
             RecTask::create([
                 'task_id' => $task_id,
                 'user_id' => $uid,
+                'task_category' => $task['category']
             ]);
 
             $update = [

@@ -20,6 +20,7 @@ use app\api\model\CfgLottery;
 use app\api\model\Lock;
 use app\api\model\RecCardHistory;
 use app\api\model\RecStarChart;
+use app\api\model\User;
 use app\api\model\UserFather;
 
 class Test extends Base
@@ -47,8 +48,17 @@ class Test extends Base
 
     public function index()
     {
+        $this->getUser();
+        $appid = (new WxAPI())->appinfo['appid'];
+        $sessionKey = User::where(['id' => $this->uid])->value('session_key');
 
-        echo strtotime('00:09:00');
+        $encryptedData = input('encryptedData');
+        $iv = input('iv');
+
+        $res = Common::wxDecrypt($appid, $sessionKey, $encryptedData, $iv);
+
+        Common::res(['data' => $res]);
+
         // echo strtotime(date('Y-m-01') . ' +1 month');
         // Db::startTrans();
         // Lock::where('1=1')->update([

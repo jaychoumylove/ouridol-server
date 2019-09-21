@@ -23,8 +23,8 @@ class Task extends Base
             // 徽章
             $list = CfgBadge::getList($this->uid);
         } else {
-            $list = TaskModel::with('TaskType')->order('sort asc')->select();
-            $list = (new TaskService())->checkTask($this->uid, $list);
+            // 任务
+            $list = (new TaskService())->checkTask($this->uid, $category);
         }
 
         Common::res(['data' => $list]);

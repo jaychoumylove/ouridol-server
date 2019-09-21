@@ -8,8 +8,13 @@ use app\base\service\Common;
 use app\api\model\UserFather;
 use app\api\model\Cfg;
 use app\api\model\CfgSignin;
+use app\api\model\User;
 use think\Db;
 use app\api\model\UserRelation;
+use app\api\model\UserWxgroup;
+use app\api\model\Wxgroup;
+use app\api\model\WxgroupMass;
+use app\base\service\WxAPI;
 
 class Share extends Base
 {
@@ -94,8 +99,46 @@ class Share extends Base
     public function groupAward()
     {
         $awardType = $this->req('award_type', 'integer');
-        
+
         $this->getUser();
         CfgSignin::hongBao($awardType, $this->uid);
+    }
+
+    public function groupAdd()
+    {
+        $this->getUser();
+        $appid = (new WxAPI())->appinfo['appid'];
+        $sessionKey = User::where(['id' => $this->uid])->value('session_key');
+
+        $encryptedData = input('encryptedData');
+        $iv = input('iv');
+
+        $res = Common::wxDecrypt($appid, $sessionKey, $encryptedData, $iv);
+        if ($res['errcode'] !== 0) Common::res(['code' => 1, 'data' => $res]);
+
+        $star_id = $this->req('star_id', 'integer');
+        // 新增群
+        $gid = Wxgroup::groupAdd($res['data']['openGId'], $star_id);
+        // 新增群用户
+        UserWxgroup::groupAddUser($gid, $this->uid);
+
+        Common::res(['data' => [
+            'gid' => $gid,
+            'open_gid' => $res['data']['openGId']
+        ]]);
+    }
+
+    public function groupMassJoin()
+    {
+        $gid = $this->req('gid', 'integer');
+        $force = $this->req('force', 'integer');
+        $this->getUser();
+        UserWxgroup::massJoin($gid, $force, $this->uid);
+        Common::res();
+    }
+
+    public function groupMassSettle()
+    {
+        UserWxgroup::massSettle();
     }
 }

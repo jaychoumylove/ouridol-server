@@ -32,6 +32,8 @@ Route::rule('api/:version/page/group', 'api/v1.Page/group');
 Route::rule('api/:version/page/prop', 'api/v1.Page/prop');
 Route::rule('api/:version/page/myprop', 'api/v1.Page/myprop');
 Route::rule('api/:version/page/game', 'api/v1.Page/game');
+Route::rule('api/:version/page/groupMass', 'api/v1.Page/groupMass');
+Route::rule('api/:version/page/wxgroup', 'api/v1.Page/wxgroup');// 
 
 // Remote
 Route::rule('api/:version/remote/zuimei', 'api/v1.Remote/zuimei');
@@ -95,6 +97,10 @@ Route::rule('api/:version/share/start', 'api/v1.Share/massStart');// 分享集�
 Route::rule('api/:version/share/joinmass', 'api/v1.Share/massJoin');// 分享集结加入
 Route::rule('api/:version/share/settlemass', 'api/v1.Share/massSettle');// 集结结算
 Route::rule('api/:version/share/group_award', 'api/v1.Share/groupAward');// 群奖励
+Route::rule('api/:version/share/group/add', 'api/v1.Share/groupAdd');// 新增群信息
+Route::rule('api/:version/share/group/join', 'api/v1.Share/groupMassJoin');// 加入群集结
+Route::rule('api/:version/share/group/settle', 'api/v1.Share/groupMassSettle');// 群集结结算
+
 
 
 // Sprite

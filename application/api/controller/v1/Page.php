@@ -25,6 +25,10 @@ use GatewayWorker\Lib\Gateway;
 use app\api\model\UserExt;
 use app\api\model\Prop;
 use app\api\model\UserProp;
+use app\api\model\UserWxgroup;
+use app\api\model\Wxgroup;
+use app\api\model\WxgroupDynamic;
+use app\api\model\WxgroupMass;
 
 class Page extends Base
 {
@@ -198,5 +202,40 @@ class Page extends Base
             $w = '1=1';
         }
         Common::res(['data' => CfgAds::where($w)->order('sort asc')->select()]);
+    }
+
+    /**群集结信息 */
+    public function groupMass()
+    {
+        $gid = $this->req('gid', 'integer');
+        $star_id = $this->req('star_id', 'integer');
+
+        UserWxgroup::massSettle();
+
+        $res = UserWxgroup::massStatus($gid);
+        // 集结成员
+        if ($res['status'] != 0) {
+            $res['list'] = UserWxgroup::with('User')->where('wxgroup_id', $gid)
+                ->whereTime('mass_join_at', 'between', [$res['massStartTime'], $res['massEndTime']])->order('mass_join_at asc')->select();
+        } else {
+            $res['list'] = [];
+        }
+        // star信息
+        $res['star'] = AppStar::where('id', $star_id)->field('name,head_img_s')->find();
+        Common::res(['data' => $res]);
+    }
+
+    public function wxgroup()
+    {
+        // 集结动态
+        $res['dynamic'] = array_reverse(WxgroupDynamic::where('1=1')->order('id desc')->limit(30)->select());
+
+        // 群日贡献排名
+        $res['groupList'] = Wxgroup::with('star')->order('thisday_count desc')->limit(10)->select();
+        foreach ($res['groupList'] as &$group) {
+            $group['userRank'] = UserWxgroup::with('user')->where('wxgroup_id', $group['id'])->order('thisday_count desc')->field('user_id,thisday_count')->limit(5)->select();
+        }
+
+        Common::res(['data' => $res]);
     }
 }
