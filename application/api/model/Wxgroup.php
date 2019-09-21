@@ -30,19 +30,17 @@ class Wxgroup extends Base
     /**增加贡献度 */
     public static function userSendHot($uid, $hot)
     {
+        // 打一次榜只给参与集结次数最多的群加贡献
+        $gid = UserWxgroup::where('user_id', $uid)->order('mass_times desc,mass_join_at desc')->value('wxgroup_id');
         // 个人贡献
-        UserWxgroup::where('user_id', $uid)->update([
+        UserWxgroup::where('user_id', $uid)->where('wxgroup_id', $gid)->update([
             'thisday_count' => Db::raw('thisday_count+' . $hot),
         ]);
 
         // 群贡献
-        $groupIds = UserWxgroup::where('user_id', $uid)->column('wxgroup_id');
-
-        foreach ($groupIds as $gid) {
-            self::where('id', $gid)->update([
-                'total_count' => Db::raw('total_count+' . $hot),
-                'thisday_count' => Db::raw('thisday_count+' . $hot),
-            ]);
-        }
+        self::where('id', $gid)->update([
+            'total_count' => Db::raw('total_count+' . $hot),
+            'thisday_count' => Db::raw('thisday_count+' . $hot),
+        ]);
     }
 }

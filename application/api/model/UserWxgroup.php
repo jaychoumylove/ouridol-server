@@ -83,7 +83,8 @@ class UserWxgroup extends Base
             $startTime = time();
             self::where('user_id', $uid)->where('wxgroup_id', $gid)->update([
                 'mass_join_at' => $startTime,
-                'mass_point' => $force
+                'mass_point' => $force,
+                'mass_times' => Db::raw('mass_times+1')
             ]);
 
             if ($res['status'] == 0) {
@@ -113,8 +114,6 @@ class UserWxgroup extends Base
                 // 参加了本次群集结的用户
                 $massList = self::where('wxgroup_id', $group['id'])
                     ->whereTime('mass_join_at', 'between', [$status['massStartTime'], $status['massEndTime']])->select();
-                // 参与人数需至少3人
-                if (count($massList) < 3) continue;
 
                 Db::startTrans();
                 try {
@@ -124,13 +123,17 @@ class UserWxgroup extends Base
                         Db::rollback();
                         continue;
                     }
-                    // 集结奖励分发到每个参与用户
-                    $userService = new UserService();
-                    foreach ($massList as $user) {
-                        $userService->change($user['user_id'], [
-                            'coin' => $user['mass_point']
-                        ], ['type' => 28]);
-                    }
+                    // 参与人数需至少3人
+                    if (count($massList) >= 3) {
+                        // 集结奖励分发到每个参与用户
+                        $userService = new UserService();
+                        foreach ($massList as $user) {
+                            $userService->change($user['user_id'], [
+                                'coin' => $user['mass_point']
+                            ], ['type' => 28]);
+                        }
+                    };
+
                     Db::commit();
                 } catch (\Exception $e) {
                     Db::rollback();

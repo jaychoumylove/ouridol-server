@@ -127,11 +127,13 @@ class UserStar extends Base
                 UserExt::where(['user_id' => $uid])->update(['exit_group_time' => time()]);
                 // 清除师徒关系
                 UserFather::where(['father' => $uid])->whereOr(['son' => $uid])->delete(true);
+                // 清除微信群关系
+                UserWxgroup::where('user_id', $uid)->delete();
 
                 Db::commit();
             } catch (\Exception $e) {
                 Db::rollBack();
-                Common::res(['code' => 400, 'data' => $e->getMessage()]);
+                Common::res(['code' => 400, 'msg' => $e->getMessage()]);
             }
         } else {
             Common::res(['code' => 1, 'msg' => '退出偶像圈失败，上次退出偶像圈时间为' . date('Y-m-d', $ext['exit_group_time'])]);
