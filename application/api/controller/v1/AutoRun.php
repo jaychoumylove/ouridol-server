@@ -54,12 +54,7 @@ class AutoRun extends Base
                 'group_mass_times' => 0
             ]);
             // 群贡献
-            Wxgroup::where('1=1')->update([
-                'thisday_count' => 0,
-            ]);
-            UserWxgroup::where('1=1')->update([
-                'thisday_count' => 0,
-            ]);
+            Wxgroup::dayInit();
 
             // 开屏结算
             Open::settle();

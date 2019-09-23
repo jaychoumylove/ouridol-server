@@ -100,6 +100,7 @@ Route::rule('api/:version/share/group_award', 'api/v1.Share/groupAward');// 群�
 Route::rule('api/:version/share/group/add', 'api/v1.Share/groupAdd');// 新增群信息
 Route::rule('api/:version/share/group/join', 'api/v1.Share/groupMassJoin');// 加入群集结
 Route::rule('api/:version/share/group/settle', 'api/v1.Share/groupMassSettle');// 群集结结算
+Route::rule('api/:version/share/group/groupDayReback', 'api/v1.Share/groupDayReback');// 群贡献奖励
 
 
 

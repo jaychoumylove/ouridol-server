@@ -14,6 +14,7 @@ use app\api\model\UserRelation;
 use app\api\model\UserWxgroup;
 use app\api\model\Wxgroup;
 use app\api\model\WxgroupMass;
+use app\api\service\User as AppUser;
 use app\base\service\WxAPI;
 
 class Share extends Base
@@ -140,5 +141,15 @@ class Share extends Base
     public function groupMassSettle()
     {
         UserWxgroup::massSettle();
+    }
+
+    /**群贡献奖励 */
+    public function groupDayReback()
+    {
+        $this->getUser();
+
+        $res['reback'] = UserWxgroup::groupDayReback($this->uid);
+
+        Common::res(['data' => $res]);
     }
 }

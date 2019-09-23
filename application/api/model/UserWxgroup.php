@@ -142,4 +142,26 @@ class UserWxgroup extends Base
             }
         }
     }
+
+    /**群贡献奖励 */
+    public static function groupDayReback($uid)
+    {
+        $reback = self::where('user_id', $uid)->sum('daycount_reback');
+
+        Db::startTrans();
+        try {
+            (new UserService)->change($uid, [
+                'coin' => $reback
+            ], ['type' => 29]);
+
+            self::where('user_id', $uid)->update(['daycount_reback' => 0]);
+
+            Db::commit();
+        } catch (\Exception $e) {
+            Db::rollback();
+            Common::res(['code' => 400, 'msg' => $e->getMessage()]);
+        }
+
+        return $reback;
+    }
 }

@@ -227,6 +227,7 @@ class Page extends Base
 
     public function wxgroup()
     {
+        $this->getUser();
         // 集结动态
         $res['dynamic'] = array_reverse(WxgroupDynamic::where('1=1')->order('id desc')->limit(30)->select());
 
@@ -235,6 +236,9 @@ class Page extends Base
         foreach ($res['groupList'] as &$group) {
             $group['userRank'] = UserWxgroup::with('user')->where('wxgroup_id', $group['id'])->order('thisday_count desc')->field('user_id,thisday_count')->limit(5)->select();
         }
+
+        // 贡献奖励
+        $res['reback'] = UserWxgroup::where('user_id', $this->uid)->sum('daycount_reback');
 
         Common::res(['data' => $res]);
     }

@@ -2,6 +2,7 @@
 
 namespace app\api\model;
 
+use app\api\service\User;
 use app\base\model\Base;
 use think\Db;
 use think\Model;
@@ -41,6 +42,28 @@ class Wxgroup extends Base
         self::where('id', $gid)->update([
             'total_count' => Db::raw('total_count+' . $hot),
             'thisday_count' => Db::raw('thisday_count+' . $hot),
+        ]);
+    }
+
+    // 每日重置数据
+    public static function dayInit()
+    {
+        // 群贡献奖励
+        $groupIds = self::where('1=1')->order('thisday_count desc')->limit(10)->column('id');
+        $rebackCfg = Cfg::getCfg('groupmass')['reback'];
+
+        foreach ($groupIds as $rank => $gid) {
+            UserWxgroup::where('wxgroup_id', $gid)->update([
+                'daycount_reback' => Db::raw('thisday_count*' . $rebackCfg[$rank])
+            ]);
+        }
+
+        // 重置
+        self::where('1=1')->update([
+            'thisday_count' => 0,
+        ]);
+        UserWxgroup::where('1=1')->update([
+            'thisday_count' => 0,
         ]);
     }
 }

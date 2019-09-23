@@ -22,6 +22,7 @@ use app\api\model\RecCardHistory;
 use app\api\model\RecStarChart;
 use app\api\model\User;
 use app\api\model\UserFather;
+use app\api\model\Wxgroup;
 
 class Test extends Base
 {
@@ -48,16 +49,18 @@ class Test extends Base
 
     public function index()
     {
-        $this->getUser();
-        $appid = (new WxAPI())->appinfo['appid'];
-        $sessionKey = User::where(['id' => $this->uid])->value('session_key');
+        Wxgroup::dayInit();
 
-        $encryptedData = input('encryptedData');
-        $iv = input('iv');
+        // $this->getUser();
+        // $appid = (new WxAPI())->appinfo['appid'];
+        // $sessionKey = User::where(['id' => $this->uid])->value('session_key');
 
-        $res = Common::wxDecrypt($appid, $sessionKey, $encryptedData, $iv);
+        // $encryptedData = input('encryptedData');
+        // $iv = input('iv');
 
-        Common::res(['data' => $res]);
+        // $res = Common::wxDecrypt($appid, $sessionKey, $encryptedData, $iv);
+
+        // Common::res(['data' => $res]);
 
         // echo strtotime(date('Y-m-01') . ' +1 month');
         // Db::startTrans();
