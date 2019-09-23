@@ -132,7 +132,7 @@ class AutoRun extends Base
     }
 
     /**每月执行 */
-    public function monthHander()
+    public function monthHandle()
     {
         $lock = Lock::getVal('month_end');
         if (date('Ym', time()) == date('Ym', strtotime($lock['time']))) {
