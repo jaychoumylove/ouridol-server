@@ -68,10 +68,11 @@ class UserWxgroup extends Base
 
         if ($res['status'] == 2) {
             // 正在集结，避免同一用户重复参与
-            $isJoin = self::where('user_id', $uid)
+            $isJoin = self::where('user_id', $uid)->where('wxgroup_id', $gid)
                 ->whereTime('mass_join_at', 'between', [$res['massStartTime'], $res['massEndTime']])->find();
             if ($isJoin) Common::res(['code' => 1, 'msg' => '你已参加本次群集结']);
         } else if ($res['status'] == 1) {
+            // 正在冷却中
             Common::res(['code' => 1, 'msg' => '正在冷却中']);
         }
         // 每天最多参加20次群集结
