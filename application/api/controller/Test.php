@@ -27,9 +27,6 @@ use app\api\model\Wxgroup;
 class Test extends Base
 {
 
-    public function fanclub()
-    { }
-
     public function getToken()
     {
         echo Common::setSession(input('uid') / 1234);
@@ -39,17 +36,14 @@ class Test extends Base
     {
         echo Common::getSession(input('token'));
     }
-    private function test()
-    {
-        return 1;
-    }
-
-    public function __disconstruct()
-    { }
 
     public function index()
     {
-        Wxgroup::dayInit();
+
+        return response('test');
+        // Wxgroup::dayInit();
+
+        // die('Hello World!');
 
         // $this->getUser();
         // $appid = (new WxAPI())->appinfo['appid'];
