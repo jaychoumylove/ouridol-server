@@ -24,7 +24,7 @@ class User extends Base
 
     /**
      * 检索用户
-     * @return mixed uid 用户id
+     * @return integer uid 用户id
      */
     public static function searchUser($data)
     {
@@ -52,6 +52,7 @@ class User extends Base
                     'uid' => $user['id'],
                 ];
                 if (isset($data['type']) && $data['type'] != 0) {
+                    // 0 普通用户
                     $currency['coin'] =  100000;
                     $currency['stone'] =  300;
                     $currency['trumpet'] = 100;

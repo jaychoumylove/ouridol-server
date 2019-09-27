@@ -34,8 +34,15 @@ class Star
         return StarRankModel::where($field, 'GT', $score)->count() + 1;
     }
 
-    /**打榜 */
-    public function sendHot($starid, $hot, $uid, $type, $openId)
+    /**
+     * 打榜
+     * @param integer $starid 
+     * @param integer $hot 人气 
+     * @param integer $uid 
+     * @param integer $type 打榜类型：0送能量 1送礼物
+     * @param integer $openId 开屏图ID
+     */
+    public function sendHot($starid, $hot, $uid, $type, $openId = null)
     {
         if (Lock::getVal('week_end')['value'] == 1) {
             Common::res(['code' => 1, 'msg' => '榜单结算中，请稍后再试！']);
