@@ -115,10 +115,11 @@ class User extends Base
     }
 
     /**随机获取一个圈子内的机器人 */
-    public static function getOneAndroid($starid)
+    public static function getOneAndroid($starid, $limit_hot)
     {
         $uid = Db::name('user_star')->alias('s')->join('user u', 'u.id = s.user_id')
-            ->where('u.type', 5)->where('s.star_id', $starid)->orderRaw('rand()')->value('u.id');
+            ->where('u.type', 5)->where('s.star_id', $starid)->where('s.thisweek_count', '<', $limit_hot)
+            ->orderRaw('rand()')->value('u.id');
 
         if (!$uid) Common::res(['code' => 1, 'msg' => '该圈子未找到Android']);
 

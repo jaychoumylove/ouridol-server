@@ -49,8 +49,8 @@
             $('#new').val('')
 
             var formData = new FormData();
-            formData.append("file", $("#file")[0].files[0]);
-            formData.append("url", $('#url').val())
+            formData.append("file", $("#file")[0].files[0] || '');
+            formData.append("url", $('#url').val() || '')
 
             $.ajax({
                 url: '/api/v1/upload',

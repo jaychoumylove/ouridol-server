@@ -167,6 +167,8 @@ Route::rule('api/:version/open/settle', 'api/v1.Open/settle');// 开屏图数据
 Route::rule('api/:version/open/today', 'api/v1.Open/today');// 今日当前开屏
 
 // Android
-Route::rule('api/:version/android/index', 'api/v1.Android/index'); // 
+Route::rule('api/:version/android/createView', 'api/v1.Android/createView'); // 
 Route::rule('api/:version/android/create', 'api/v1.Android/create');// 新建一个机器人用户
+Route::rule('api/:version/android/sendHotView', 'api/v1.Android/sendHotView'); // 
 Route::rule('api/:version/android/sendHot', 'api/v1.Android/sendHot');// 让一个机器人打榜
+Route::rule('api/:version/android/infoView', 'api/v1.Android/infoView'); // 
