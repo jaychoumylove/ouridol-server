@@ -58,14 +58,25 @@ class Android extends Base
     public function infoView()
     {
         $starid = $this->req('starid');
+        $page = $this->req('page', 'integer', 1);
+        $list = [];
+        $totalCount = 0;
         if ($starid) {
-            $query = Db::query("SELECT u.nickname,u.avatarurl,s.thisweek_count FROM `f_user` u join f_user_star s on s.user_id = u.id where u.type = 5 and s.star_id = {$starid} ORDER BY thisweek_count desc;");
-        } else {
-            $query = [];
+            $list = Db::name('user_star')->alias('s')
+                ->join('user u', 'u.id = s.user_id')
+                ->where('s.star_id', $starid)->where('u.type', 5)
+                ->field('u.avatarurl,u.nickname,s.thisweek_count')->page($page, 10)->order('s.thisweek_count desc,s.id desc')
+                ->select();
+            $totalCount = Db::name('user_star')->alias('s')
+                ->join('user u', 'u.id = s.user_id')
+                ->where('s.star_id', $starid)->where('u.type', 5)
+                ->count('s.id');
         }
-        return view('info',[
+        return view('info', [
             'active' => 'info',
-            'list' => $query
+            'list' => $list,
+            'totalCount' => $totalCount,
+            'page' => $page,
         ]);
     }
 }
