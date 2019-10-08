@@ -59,8 +59,10 @@ class Android extends Base
     {
         $starid = $this->req('starid');
         $page = $this->req('page', 'integer', 1);
+
         $list = [];
         $totalCount = 0;
+        $totalSendCount = 0;
         if ($starid) {
             $list = Db::name('user_star')->alias('s')
                 ->join('user u', 'u.id = s.user_id')
@@ -71,11 +73,16 @@ class Android extends Base
                 ->join('user u', 'u.id = s.user_id')
                 ->where('s.star_id', $starid)->where('u.type', 5)
                 ->count('s.id');
+            $totalSendCount = Db::name('user_star')->alias('s')
+                ->join('user u', 'u.id = s.user_id')
+                ->where('s.star_id', $starid)->where('u.type', 5)
+                ->sum('s.thisweek_count');
         }
         return view('info', [
             'active' => 'info',
             'list' => $list,
             'totalCount' => $totalCount,
+            'totalSendCount' => $totalSendCount,
             'page' => $page,
         ]);
     }
