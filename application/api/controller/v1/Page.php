@@ -86,11 +86,11 @@ class Page extends Base
         // 顺便获取分享信息
         $res['config'] = Cfg::getList();
         $res['config']['share_text'] = CfgShare::getOne();
-
-        $spriteUpgrade = UserSprite::getInfo($this->uid, $this->uid)['need_stone'];
+        $res['spriteInfo'] = UserSprite::getInfo($this->uid, $this->uid);
+        $spriteUpgrade = $res['spriteInfo']['need_stone'];
         $stone = UserCurrency::where(['uid' => $this->uid])->value('stone');
 
-        if ($stone >= $spriteUpgrade) {
+        if ($stone >= $spriteUpgrade && $res['spriteInfo']['sprite_level'] < 30) {
             $res['upSprite'] = true;
         }
 
