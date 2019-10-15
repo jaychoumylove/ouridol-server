@@ -115,7 +115,8 @@ class Ext extends Base
         }
         if ($realPath) {
             // 上传到微信
-            $res = (new WxAPI('wx00cf0e6d01bb8b01'))->uploadimg($realPath);
+            // 我们的偶向公众号
+            $res = (new WxAPI('wx3120fe6dc469ae29'))->uploadimg($realPath);
             $res['https_url'] = str_replace('http', 'https', $res['url']);
             unlink($realPath);
             Common::res(['data' => $res]);
