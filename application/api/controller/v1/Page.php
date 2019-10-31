@@ -134,7 +134,7 @@ class Page extends Base
         // $res['fatherEarn'] = floor($cur_contribute * Cfg::getCfg('father_earn_per'));
 
         // 应援解锁
-        $res['activeInfo'] = UserStar::getActiveInfo($this->uid, $starid);
+        // $res['activeInfo'] = UserStar::getActiveInfo($this->uid, $starid);
         // $res['active_info'] = Cfg::getCfg('active_info');
         // $res['activeInfo']['complete_people'] = UserStar::where(['star_id' => $starid])->sum('active_card_days');
         // $res['activeInfo']['nextCount'] = '完成解锁';

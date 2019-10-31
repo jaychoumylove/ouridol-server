@@ -128,6 +128,7 @@ Route::rule('api/:version/config', 'api/v1.Ext/config');// 配置信息
 
 Route::rule('api/:version/active/info', 'api/v1.Ext/getActiveInfo');// 活动信息
 Route::rule('api/:version/active/card', 'api/v1.Ext/setCard');// 打卡
+Route::rule('api/:version/active/list', 'api/v1.Ext/activeList');// 活动列表
 Route::rule('api/:version/active/userrank', 'api/v1.Ext/userRank');// 用户打卡排名
 
 Route::rule('api/:version/ext/log', 'api/v1.Ext/log');// 用户日志
@@ -172,3 +173,4 @@ Route::rule('api/:version/android/create', 'api/v1.Android/create');// 新建一
 Route::rule('api/:version/android/sendHotView', 'api/v1.Android/sendHotView'); // 
 Route::rule('api/:version/android/sendHot', 'api/v1.Android/sendHot');// 让一个机器人打榜
 Route::rule('api/:version/android/infoView', 'api/v1.Android/infoView'); // 
+Route::rule('api/:version/android/addHot', 'api/v1.Android/addHot'); // 

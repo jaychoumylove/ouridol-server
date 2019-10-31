@@ -7,6 +7,7 @@ use app\api\model\RecUserFormid;
 use app\base\service\Common;
 use app\api\model\CfgShare;
 use app\api\model\Cfg;
+use app\api\model\CfgActive;
 use app\api\model\UserStar;
 use think\Db;
 use app\base\service\WxAPI;
@@ -15,6 +16,7 @@ use app\api\model\Rec;
 use app\api\model\UserSprite;
 use app\api\model\RecActive;
 use app\api\model\GuideCron;
+use app\api\model\UserActive;
 
 class Ext extends Base
 {
@@ -52,13 +54,28 @@ class Ext extends Base
         Common::res(['data' => $res]);
     }
 
+    public function activeList()
+    {
+        $list = CfgActive::all();
+        $starid = $this->req('starid', 'integer');
+
+        foreach ($list as &$value) {
+            // 离活动结束还剩
+            $value['active_end'] = strtotime(json_decode($value['active_date'], true)[1]) - time();
+            $value['progress'] = UserActive::getProgress($starid, $value['id'], $value['target_people']);
+        }
+
+        Common::res(['data' => $list]);
+    }
+
     /**活动信息 */
     public function getActiveInfo()
     {
         $starid = input('starid');
+        $active_id = $this->req('id', 'integer');
         $this->getUser();
 
-        $res = UserStar::getActiveInfo($this->uid, $starid);
+        $res = UserStar::getActiveInfo($this->uid, $starid, $active_id);
 
         Common::res(['data' => $res]);
     }
@@ -67,9 +84,11 @@ class Ext extends Base
     public function setCard()
     {
         $this->getUser();
+        $starid = $this->req('starid', 'integer');
+        $active_id = $this->req('active_id', 'integer');
 
-        $res = UserStar::setCard($this->uid);
-        Common::res(['data' => $res]);
+        UserStar::setCard($this->uid, $starid, $active_id);
+        Common::res();
     }
 
     public function userRank()
@@ -77,9 +96,10 @@ class Ext extends Base
         $starid =  input('starid');
         $page =  input('page', 1);
         $size =  input('size', 10);
+        $active_id = $this->req('active_id', 'integer');
 
-        $list = UserStar::with(['user'])->where(['star_id' => $starid])->where('active_card_days', '>', 0)
-            ->order('active_card_days desc')->page($page, $size)->select();
+        $list = UserActive::with(['user'])->where('star_id', $starid)->where('total_clocks', '>', 0)->where('active_id', $active_id)
+            ->order('total_clocks desc')->page($page, $size)->select();
 
         Common::res(['data' => $list]);
     }
@@ -93,6 +113,7 @@ class Ext extends Base
     public function upload()
     {
         $file_url = input('url', '');
+        
         if ($file_url) {
             // 上传的url
             $content = file_get_contents($file_url);

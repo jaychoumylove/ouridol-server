@@ -157,122 +157,36 @@ class UserStar extends Base
      * 活动信息
      * @param int $type 0：阶段解锁 1：7日解锁
      */
-    public static function getActiveInfo($uid, $starid)
+    public static function getActiveInfo($uid, $starid, $active_id)
     {
         // 活动信息
-        $res['active_info'] = Cfg::getCfg('active_info');
-        // 活动时间
-        $activeTime = Cfg::getCfg('active_date');
-        $res['active_end'] = $activeTime[1] - time();
-        if ($res['active_end'] < 0) $res['active_end'] = 0;
+        $res = CfgActive::get($active_id);
+        // 离活动结束还剩
+        $res['active_end'] = strtotime(json_decode($res['active_date'], true)[1]) - time();
+        // 活动说明
+        $res['notice'] = json_decode($res['notice'], true);
+        // 完成进度
+        $res['progress'] = UserActive::getProgress($starid, $res['id'], $res['target_people']);
+        // 我的打卡信息
+        $res['self'] = UserActive::getOneInfo($uid, $starid, $active_id);
 
-        // 参与人数
-        $res['join_people'] = self::where(['star_id' => $starid])->where('active_card_days', '>', 0)->count();
-        // 完成人数
-        $res['complete_people'] = self::where(['star_id' => $starid])->where('active_card_days', '>=', 7)->count();
-
-        $active_card = self::where(['user_id' => $uid, 'star_id' => $starid])->field('active_card_days,active_card_time')->find();
-        // 今日是否已打卡
-        $res['can_card'] = date('ymd', time()) != date('ymd', $active_card['active_card_time']);
-        // 我的累计打卡
-        $res['my_card_days'] = $active_card['active_card_days'] ? $active_card['active_card_days'] : 0;
         // canvas活动标题
-        $res['canvas_title'] = Cfg::getCfg('canvas_title_active');
-
-        // 阶段解锁
-        // // 活动信息
-        // $res['active_info'] = Cfg::getCfg('active_info');
-        // // 活动时间
-        // $activeTime = Cfg::getCfg('active_date');
-        // $res['active_end'] = $activeTime[1] - time();
-        // if ($res['active_end'] < 0) $res['active_end'] = 0;
-        // // 参与人数
-        // // $res['join_people'] = self::where(['star_id' => $starid])->where('active_card_days', '>', 0)->count();
-        // // 累计打卡次数
-        // $res['complete_people'] = self::where(['star_id' => $starid])->sum('active_card_days');
-        // $res['nextCount'] = '已完成解锁！';
-        // foreach ($res['active_info'] as $value) {
-        //     if ($res['complete_people'] < $value['count']) {
-        //         // 下一目标次数与金额
-        //         $res['nextCount'] = $value['count'];
-        //         $res['nextFee'] = $value['fee'];
-        //         break;
-        //     } else {
-        //         // 已达成次数与金额
-        //         $res['finishedCount'] = $value['count'];
-        //         $res['finishedFee'] = $value['fee'];
-        //     }
-        // }
-        // // 预计每天需要多少人次打卡才能达成下一目标
-        // if (isset($res['nextCount']) && gettype($res['nextCount']) == 'integer') {
-        //     $res['remainPeople'] = 10; // 初步预计每天10人
-        //     $gapCount = $res['nextCount'] - $res['complete_people'];
-        //     $avgSpriteLv = UserSprite::where('user_id', 'in', self::where('star_id', $starid)->where('active_card_days', '>', 0)->column('user_id'))->avg('sprite_level') * 3;
-        //     if ($avgSpriteLv && $res['active_end']) $res['remainPeople'] = ceil($gapCount / $avgSpriteLv / ($res['active_end'] / 3600 / 24));
-        // } else {
-        //     $res['remainPeople'] = 0;
-        // }
-        // if ($res['remainPeople'] < 0) $res['remainPeople'] = 0;
-
-        // $active_card = self::where(['user_id' => $uid, 'star_id' => $starid])->field('active_card_days,active_card_time,active_subscribe,active_newbie_cards')->find();
-        // // 今日是否已打卡
-        // $res['can_card'] = date('ymd', time()) != date('ymd', $active_card['active_card_time']) ? UserSprite::where('user_id', $uid)->value('sprite_level') * 1 : false;
-        // // 我的累计打卡
-        // $res['my_card_days'] = $active_card['active_card_days'] ? $active_card['active_card_days'] : 0;
-        // $res['my_newbie_cards'] = $active_card['active_newbie_cards'] ? $active_card['active_newbie_cards'] : 0;
-        // // 是否订阅
-        // $res['active_subscribe'] = $active_card['active_subscribe'];
-        // // canvas活动标题
         // $res['canvas_title'] = Cfg::getCfg('canvas_title_active');
+
         return $res;
     }
 
     /**活动 打卡 */
-    public static function setCard($uid)
+    public static function setCard($uid, $starid, $active_id)
     {
-        $activeEnd = Cfg::getCfg('active_date')[1];
-        if ($activeEnd < time()) Common::res(['code' => 1, 'msg' => '本次活动已结束']);
+        CfgActive::checkInDate($active_id);
 
-        $active_card = self::where(['user_id' => $uid])->field('star_id,active_card_time,active_subscribe')->find();
-        if (date('ymd', time()) == date('ymd', $active_card['active_card_time'])) {
-            Common::res(['code' => 1, 'msg' => '你今天已经打卡了哦']);
-        }
+        // 我的打卡信息
+        $myCardInfo = UserActive::getOneInfo($uid, $starid, $active_id);
+        if ($myCardInfo['is_card_today']) Common::res(['code' => 1, 'msg' => '你今天已经打卡了哦']);
 
-        Db::startTrans();
-        try {
-            $res = [];
-
-            // 打卡数额由用户精灵等级决定
-            // $count = UserSprite::where('user_id', $uid)->value('sprite_level') * 1;
-            $count = 1;
-
-            // 推送解锁进度
-            // self::push($active_card['star_id'], $count);
-
-            // 是否订阅
-            $active_subscribe = $active_card['active_subscribe'];
-            if ($active_subscribe == 0) {
-                $active_subscribe = 2;
-                $res['subscribe'] = true;
-            }
-
-            self::where(['user_id' => $uid])->update([
-                'active_card_days' => Db::raw('active_card_days+' . $count),
-                'active_card_time' => time(),
-                'active_subscribe' => $active_subscribe
-            ]);
-
-            // 记录
-            RecActive::create(['user_id' => $uid, 'card_count' => $count, 'card_time' => (int) date('Ymd')]);
-
-            Db::commit();
-        } catch (\Exception $e) {
-            Db::rollback();
-            Common::res(['code' => 400, 'data' => $e->getMessage()]);
-        }
-
-
-        return $res;
+        // 打卡数+1
+        UserActive::addClock($uid, $starid, $active_id);
     }
 
     /**推送解锁 */

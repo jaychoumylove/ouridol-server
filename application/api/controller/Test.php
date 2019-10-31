@@ -40,7 +40,8 @@ class Test extends Base
     public function index()
     {
 
-        return response('test');
+        echo strtotime('2019-11-01');
+        // return response('test');
         // Wxgroup::dayInit();
 
         // die('Hello World!');
