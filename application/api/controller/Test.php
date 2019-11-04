@@ -39,8 +39,33 @@ class Test extends Base
 
     public function index()
     {
+        $text = "
+        title = this is a title;
+        content = this is a content;
+        content = this is a content;
+        content = this is a content;
+        image = https://mmbiz.qpic.cn/mmbiz_png/w5pLFvdua9G9p0qicKzuicwqfrKLg0UeviaEtVDRhsnDz0JTv4EvibM0QPUQWw6fiaZPicOZLcCNaria0hRtrw6Lob7fg/0;";
 
-        echo strtotime('2019-11-01');
+        $result = [];
+        $text = explode(';', $text);
+        foreach ($text as $row) {
+            if (strpos($row, '=') !== false) {
+                $split = explode('=', $row);
+
+                $left = trim($split[0]);
+                $right = trim($split[1]);
+
+                $result[] = [
+                    'type' => $left,
+                    'content' => $right,
+                ];
+            }
+        }
+
+        Common::res(['data' => $result]);
+
+
+        // echo strtotime('2019-11-01');
         // return response('test');
         // Wxgroup::dayInit();
 
