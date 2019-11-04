@@ -57,7 +57,7 @@ class WxAPI
         $url = str_replace('SECRET', $this->appinfo['appsecret'], $url);
         $url = str_replace('CODE', $code, $url);
 
-        return $this->request($url);
+        return Common::request($url);
     }
 
     /**
@@ -109,7 +109,7 @@ class WxAPI
      */
     public function getAccessToken()
     {
-        if (strtotime($this->appinfo['access_token_expire']) - 1800 < time()) {
+        if (strtotime($this->appinfo['access_token_expire']) - 600 < time()) {
             // 更新accessToken
             $url = 'https://' . $this->apiHost . '/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET';
             $url = str_replace('APPID', $this->appinfo['appid'], $url);
