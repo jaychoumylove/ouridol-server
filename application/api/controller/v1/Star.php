@@ -64,9 +64,7 @@ class Star extends Base
     public function sendMsg()
     {
         $starid = $this->req('starid', 'integer');
-        $content = input('content');
-        if (!$starid || !$content) Common::res(['code' => 100]);
-
+        $content = $this->req('content', 'require');
         $this->getUser();
 
         RecStarChart::sendMsg($this->uid, $starid, $content);

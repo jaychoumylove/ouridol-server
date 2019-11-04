@@ -55,6 +55,14 @@ class Android extends Base
         Common::res();
     }
 
+    public function addHot()
+    {
+        $starid = $this->req('starid', 'integer');
+
+        Db::execute("update `f_user_currency` set coin = 100000 where uid in (SELECT u.id FROM `f_user_star` s join f_user u on u.id = s.user_id where u.type = 5 and s.star_id = {$starid});");
+        Common::res();
+    }
+
     public function infoView()
     {
         $starid = $this->req('starid');

@@ -23,12 +23,38 @@
         <button type="button" id="send-btn" class="btn btn-primary">送出</button>
     </div>
 </form>
+
+<form id="add-hot-form" class="form">
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text">明星ID</span>
+        </div>
+        <input type="text" name="starid" class="form-control" placeholder="">
+        <div class="input-group-append">
+            <button type="button" id="add-btn" class="btn btn-primary">加能量</button>
+        </div>
+    </div>
+</form>
+
+
 <script>
     $('#send-btn').on('click', e => {
         $.ajax({
             url: '/api/v1/android/sendHot',
             type: 'post',
             data: $('#form-send').serialize(),
+
+            success: (res) => {
+                alert(res.msg)
+            }
+        });
+    })
+
+    $('#add-btn').on('click', e => {
+        $.ajax({
+            url: '/api/v1/android/addHot',
+            type: 'post',
+            data: $('#add-hot-form').serialize(),
 
             success: (res) => {
                 alert(res.msg)

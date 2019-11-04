@@ -164,7 +164,7 @@ class AutoRun extends Base
             ]);
 
             // 应援结算
-            RecCardHistory::settle();
+            // RecCardHistory::settle();
 
             // 后援会贡献重置
             Fanclub::where('1=1')->update(['month_count' => 0]);

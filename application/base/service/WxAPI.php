@@ -21,6 +21,16 @@ class WxAPI
         $this->appinfo = Common::getAppinfo($w);
     }
 
+    public function request($url, $data = null)
+    {
+        $res = Common::request($url, $data);
+        if (isset($res['errcode']) && $res['errcode'] != 0) {
+            Common::res(['code' => $res['errcode'], 'msg' => $res['errmsg']]);
+        } else {
+            return $res;
+        }
+    }
+
     /**
      * 小程序登录
      */
@@ -31,7 +41,7 @@ class WxAPI
         $url = str_replace('SECRET', $this->appinfo['appsecret'], $url);
         $url = str_replace('JSCODE', $js_code, $url);
 
-        return Common::request($url, false);
+        return $this->request($url);
     }
 
     /**
@@ -47,7 +57,7 @@ class WxAPI
         $url = str_replace('SECRET', $this->appinfo['appsecret'], $url);
         $url = str_replace('CODE', $code, $url);
 
-        return Common::request($url, false);
+        return $this->request($url);
     }
 
     /**
@@ -63,7 +73,7 @@ class WxAPI
         $url = str_replace('ACCESS_TOKEN', $accessToken, $url);
         $url = str_replace('OPENID', $openid, $url);
 
-        return Common::request($url, false);
+        return $this->request($url);
     }
 
     /**统一下单API */
@@ -89,7 +99,7 @@ class WxAPI
         $params['sign'] = (new WxPay($this->appinfo['appid']))->makeSign($params);
         // 发送请求
         $xml = Common::toXml($params);
-        $res = Common::request($url, $xml);
+        $res = $this->request($url, $xml);
         return Common::fromXml($res);
     }
 
@@ -99,13 +109,13 @@ class WxAPI
      */
     public function getAccessToken()
     {
-        if (strtotime($this->appinfo['access_token_expire']) - 600 < time()) {
+        if (strtotime($this->appinfo['access_token_expire']) - 1800 < time()) {
             // 更新accessToken
             $url = 'https://' . $this->apiHost . '/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET';
             $url = str_replace('APPID', $this->appinfo['appid'], $url);
             $url = str_replace('APPSECRET', $this->appinfo['appsecret'], $url);
 
-            $res = Common::request($url, false);
+            $res = $this->request($url);
             if (isset($res['access_token'])) {
                 // 将新的token保存到数据库
                 Appinfo::where(['id' => $this->appinfo['id']])->update([
@@ -142,7 +152,7 @@ class WxAPI
             $msgType => $msgBody
         ];
 
-        return Common::request($url, json_encode($data, JSON_UNESCAPED_UNICODE));
+        return $this->request($url, json_encode($data, JSON_UNESCAPED_UNICODE));
     }
 
     /**
@@ -158,7 +168,7 @@ class WxAPI
 
         $data = ['media' => new \CURLFile($filePath, false, false)];
 
-        return Common::request($url, $data);
+        return $this->request($url, $data);
     }
 
     /**
@@ -174,7 +184,7 @@ class WxAPI
         $url = str_replace('ACCESS_TOKEN', $accessToken, $url);
         $url = str_replace('MEDIA_ID', $mediaId, $url);
 
-        return Common::request($url, false);
+        return $this->request($url);
     }
 
 
@@ -191,7 +201,7 @@ class WxAPI
         $url = str_replace('TYPE', 'image', $url);
 
         $data = ['media' => new \CURLFile($filePath, false, false)];
-        return Common::request($url, $data);
+        return $this->request($url, $data);
     }
 
     /**使用公众号接口上传图片 */
@@ -200,11 +210,10 @@ class WxAPI
         $url = 'https://' . $this->apiHost . '/cgi-bin/media/uploadimg?access_token=ACCESS_TOKEN';
 
         $accessToken = $this->getAccessToken();
-        if (!$accessToken) return false;
         $url = str_replace('ACCESS_TOKEN', $accessToken, $url);
 
         $data = ['media' => new \CURLFile($filePath, false, false)];
-        return Common::request($url, $data);
+        return $this->request($url, $data);
     }
 
     /**
@@ -220,7 +229,7 @@ class WxAPI
         $url = str_replace('ACCESS_TOKEN', $accessToken, $url);
 
         $data = ['path' => $path];
-        return Common::request($url, json_encode($data, JSON_UNESCAPED_UNICODE));
+        return $this->request($url, json_encode($data, JSON_UNESCAPED_UNICODE));
     }
 
     /**
@@ -236,10 +245,10 @@ class WxAPI
         $url = str_replace('ACCESS_TOKEN', $accessToken, $url);
 
         foreach ($datas as $data) {
-            Common::requestAsync($url, json_encode($data, JSON_UNESCAPED_UNICODE));
+            $this->requestAsync($url, json_encode($data, JSON_UNESCAPED_UNICODE));
         }
 
-        // return Common::request($url, json_encode($data, JSON_UNESCAPED_UNICODE));
+        // return $this->request($url, json_encode($data, JSON_UNESCAPED_UNICODE));
     }
 
     /**
@@ -271,9 +280,9 @@ class WxAPI
             "emphasis_keyword" => "keyword1.DATA"
         ];
 
-        // Common::requestAsync($url, json_encode($data, JSON_UNESCAPED_UNICODE));
+        // $this->requestAsync($url, json_encode($data, JSON_UNESCAPED_UNICODE));
 
-        return Common::request($url, json_encode($data, JSON_UNESCAPED_UNICODE));
+        return $this->request($url, json_encode($data, JSON_UNESCAPED_UNICODE));
     }
 
     /**
@@ -291,6 +300,19 @@ class WxAPI
         $data = [
             'content' => $content
         ];
-        return Common::request($url, json_encode($data, JSON_UNESCAPED_UNICODE));
+        return $this->request($url, json_encode($data, JSON_UNESCAPED_UNICODE));
+    }
+
+    /**校验一张图片是否含有违法违规内容 */
+    public function imgCheck($filePath)
+    {
+        $url = 'https://' . $this->apiHost . '/wxa/img_sec_check?access_token=ACCESS_TOKEN';
+
+        $accessToken = $this->getAccessToken();
+        $url = str_replace('ACCESS_TOKEN', $accessToken, $url);
+
+        $data = ['media' => new \CURLFile($filePath, false, false)];
+
+        return $this->request($url, $data);
     }
 }
