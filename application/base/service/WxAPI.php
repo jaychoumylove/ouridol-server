@@ -24,11 +24,14 @@ class WxAPI
     public function request($url, $data = null)
     {
         $res = Common::request($url, $data);
-        if (isset($res['errcode']) && $res['errcode'] != 0) {
-            Common::res(['code' => $res['errcode'], 'msg' => $res['errmsg']]);
-        } else {
-            return $res;
+        if (isset($res['errmsg']) && strpos($res['errmsg'], 'access_token') !== false) {
+            // 更新access_token
+            $oldAccessToken = $this->appinfo['access_token'];
+            $this->getAccessToken();
+            $url = str_replace($oldAccessToken, $this->appinfo['access_token'], $url);
+            $res = Common::request($url, $data);
         }
+        return $res;
     }
 
     /**
@@ -57,7 +60,7 @@ class WxAPI
         $url = str_replace('SECRET', $this->appinfo['appsecret'], $url);
         $url = str_replace('CODE', $code, $url);
 
-        return Common::request($url);
+        return $this->request($url);
     }
 
     /**
@@ -68,9 +71,8 @@ class WxAPI
      */
     public function getUserInfo($accessToken, $openid)
     {
-        $url = 'https://' . $this->apiHost . '/sns/userinfo?access_token=ACCESS_TOKEN&openid=OPENID&lang=zh_CN';
+        $url = 'https://' . $this->apiHost . '/sns/userinfo?access_token=' . $this->appinfo['access_token'] . '&openid=OPENID&lang=zh_CN';
 
-        $url = str_replace('ACCESS_TOKEN', $accessToken, $url);
         $url = str_replace('OPENID', $openid, $url);
 
         return $this->request($url);
@@ -109,26 +111,18 @@ class WxAPI
      */
     public function getAccessToken()
     {
-        if (strtotime($this->appinfo['access_token_expire']) - 600 < time()) {
-            // 更新accessToken
-            $url = 'https://' . $this->apiHost . '/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET';
-            $url = str_replace('APPID', $this->appinfo['appid'], $url);
-            $url = str_replace('APPSECRET', $this->appinfo['appsecret'], $url);
+        // 更新accessToken
+        $url = 'https://' . $this->apiHost . '/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET';
+        $url = str_replace('APPID', $this->appinfo['appid'], $url);
+        $url = str_replace('APPSECRET', $this->appinfo['appsecret'], $url);
 
-            $res = $this->request($url);
-            if (isset($res['access_token'])) {
-                // 将新的token保存到数据库
-                Appinfo::where(['id' => $this->appinfo['id']])->update([
-                    'access_token' => $res['access_token'],
-                    'access_token_expire' => date('Y-m-d H:i:s', time() + $res['expires_in']),
-                ]);
-                return $res['access_token'];
-            } else {
-                Common::res(['code' => 1, 'data' => $res]);
-            }
-        } else {
-            return $this->appinfo['access_token'];
-        }
+        $res = $this->request($url);
+        $this->appinfo['access_token'] = $res['access_token'];
+        // 将新的token保存到数据库
+        Appinfo::where(['id' => $this->appinfo['id']])->update([
+            'access_token' => $res['access_token'],
+            'access_token_expire' => date('Y-m-d H:i:s', time() + $res['expires_in']),
+        ]);
     }
 
     /**
@@ -140,11 +134,7 @@ class WxAPI
      */
     public function sendCustomerMsg($openid, $msgType, $msgBody)
     {
-        $url = 'https://' . $this->apiHost . '/cgi-bin/message/custom/send?access_token=ACCESS_TOKEN';
-
-        $accessToken = $this->getAccessToken();
-        if (!$accessToken) return false;
-        $url = str_replace('ACCESS_TOKEN', $accessToken, $url);
+        $url = 'https://' . $this->apiHost . '/cgi-bin/message/custom/send?access_token=' . $this->appinfo['access_token'];
 
         $data = [
             'touser' => $openid,
@@ -160,10 +150,7 @@ class WxAPI
      */
     public function uploadMedia($filePath)
     {
-        $url = 'https://' . $this->apiHost . '/cgi-bin/media/upload?access_token=ACCESS_TOKEN&type=TYPE';
-        $accessToken = $this->getAccessToken();
-        if (!$accessToken) return false;
-        $url = str_replace('ACCESS_TOKEN', $accessToken, $url);
+        $url = 'https://' . $this->apiHost . '/cgi-bin/media/upload?access_token=' . $this->appinfo['access_token'] . '&type=TYPE';
         $url = str_replace('TYPE', 'image', $url);
 
         $data = ['media' => new \CURLFile($filePath, false, false)];
@@ -177,11 +164,8 @@ class WxAPI
      */
     public function getMedia($mediaId)
     {
-        $url = 'https://' . $this->apiHost . '/cgi-bin/media/get?access_token=ACCESS_TOKEN&media_id=MEDIA_ID';
+        $url = 'https://' . $this->apiHost . '/cgi-bin/media/get?access_token=' . $this->appinfo['access_token'] . '&media_id=MEDIA_ID';
 
-        $accessToken = $this->getAccessToken();
-        if (!$accessToken) return false;
-        $url = str_replace('ACCESS_TOKEN', $accessToken, $url);
         $url = str_replace('MEDIA_ID', $mediaId, $url);
 
         return $this->request($url);
@@ -193,11 +177,8 @@ class WxAPI
      */
     public function addMaterial($filePath)
     {
-        $url = 'https://' . $this->apiHost . '/cgi-bin/material/add_material?access_token=ACCESS_TOKEN&type=TYPE';
+        $url = 'https://' . $this->apiHost . '/cgi-bin/material/add_material?access_token=' . $this->appinfo['access_token'] . '&type=TYPE';
 
-        $accessToken = $this->getAccessToken();
-        if (!$accessToken) return false;
-        $url = str_replace('ACCESS_TOKEN', $accessToken, $url);
         $url = str_replace('TYPE', 'image', $url);
 
         $data = ['media' => new \CURLFile($filePath, false, false)];
@@ -207,10 +188,7 @@ class WxAPI
     /**使用公众号接口上传图片 */
     public function uploadimg($filePath)
     {
-        $url = 'https://' . $this->apiHost . '/cgi-bin/media/uploadimg?access_token=ACCESS_TOKEN';
-
-        $accessToken = $this->getAccessToken();
-        $url = str_replace('ACCESS_TOKEN', $accessToken, $url);
+        $url = 'https://' . $this->apiHost . '/cgi-bin/media/uploadimg?access_token=' . $this->appinfo['access_token'];
 
         $data = ['media' => new \CURLFile($filePath, false, false)];
         return $this->request($url, $data);
@@ -222,11 +200,7 @@ class WxAPI
      */
     public function getwxacode($path = '/pages/index/index')
     {
-        $url = 'https://' . $this->apiHost . '/wxa/getwxacode?access_token=ACCESS_TOKEN';
-
-        $accessToken = $this->getAccessToken();
-        if (!$accessToken) return false;
-        $url = str_replace('ACCESS_TOKEN', $accessToken, $url);
+        $url = 'https://' . $this->apiHost . '/wxa/getwxacode?access_token=' . $this->appinfo['access_token'];
 
         $data = ['path' => $path];
         return $this->request($url, json_encode($data, JSON_UNESCAPED_UNICODE));
@@ -238,11 +212,7 @@ class WxAPI
      */
     public function sendTemplate($datas)
     {
-        $url = 'https://' . $this->apiHost . '/cgi-bin/message/wxopen/template/send?access_token=ACCESS_TOKEN';
-
-        $accessToken = $this->getAccessToken();
-        if (!$accessToken) return false;
-        $url = str_replace('ACCESS_TOKEN', $accessToken, $url);
+        $url = 'https://' . $this->apiHost . '/cgi-bin/message/wxopen/template/send?access_token=' . $this->appinfo['access_token'];
 
         foreach ($datas as $data) {
             $this->requestAsync($url, json_encode($data, JSON_UNESCAPED_UNICODE));
@@ -257,12 +227,7 @@ class WxAPI
      */
     public function sendTemplateSync()
     {
-        $url = 'https://' . $this->apiHost . '/cgi-bin/message/wxopen/template/send?access_token=ACCESS_TOKEN';
-
-        $accessToken = $this->getAccessToken();
-        if (!$accessToken) return false;
-        $url = str_replace('ACCESS_TOKEN', $accessToken, $url);
-
+        $url = 'https://' . $this->apiHost . '/cgi-bin/message/wxopen/template/send?access_token=' . $this->appinfo['access_token'];
 
         $data = [
             "touser" => 'oj77y5LIpHuIWUU2kW8BHVP4goPc',
@@ -291,11 +256,7 @@ class WxAPI
      */
     public function msgCheck($content)
     {
-        $url = 'https://' . $this->apiHost . '/wxa/msg_sec_check?access_token=ACCESS_TOKEN';
-
-        $accessToken = $this->getAccessToken();
-        if (!$accessToken) return false;
-        $url = str_replace('ACCESS_TOKEN', $accessToken, $url);
+        $url = 'https://' . $this->apiHost . '/wxa/msg_sec_check?access_token=' . $this->appinfo['access_token'];
 
         $data = [
             'content' => $content
@@ -306,10 +267,7 @@ class WxAPI
     /**校验一张图片是否含有违法违规内容 */
     public function imgCheck($filePath)
     {
-        $url = 'https://' . $this->apiHost . '/wxa/img_sec_check?access_token=ACCESS_TOKEN';
-
-        $accessToken = $this->getAccessToken();
-        $url = str_replace('ACCESS_TOKEN', $accessToken, $url);
+        $url = 'https://' . $this->apiHost . '/wxa/img_sec_check?access_token=' . $this->appinfo['access_token'];
 
         $data = ['media' => new \CURLFile($filePath, false, false)];
 
