@@ -52,11 +52,30 @@ class RecPayOrder extends Base
             ];
         }
 
-        // 货币增加
-        (new UserService())->change($order['user_id'], [
-            'coin' => $goodsInfo['coin'],
-            'stone' => $goodsInfo['stone'],
-        ], $log);
+        if ($goodsInfo['coin'] != 0) { 
+            // 货币增加
+            (new UserService())->change($order['user_id'], [
+                'coin' => $goodsInfo['coin'],
+                'stone' => $goodsInfo['stone'],
+            ]);
+            Rec::addRec([
+                'user_id' => $order['user_id'],
+                'type' => $log['type'],
+                'content' => $log['content'],
+                'stone' => $goodsInfo['stone'],
+            ]);
+            Rec::addRec([
+                'user_id' => $order['user_id'],
+                'type' => 30,
+                'coin' => $goodsInfo['coin'],
+            ]);
+        } else {
+            // 货币增加
+            (new UserService())->change($order['user_id'], [
+                'coin' => $goodsInfo['coin'],
+                'stone' => $goodsInfo['stone'],
+            ], $log);
+        }
 
         // 礼物增加
         UserItem::addItem($order['user_id'], $goodsInfo['item_id'], $goodsInfo['item_num']);
