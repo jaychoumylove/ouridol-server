@@ -66,7 +66,7 @@ class RecPayOrder extends Base
             ]);
             Rec::addRec([
                 'user_id' => $order['user_id'],
-                'type' => 30,
+                'type' => 31,
                 'coin' => $goodsInfo['coin'],
             ]);
         } else {
