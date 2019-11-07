@@ -44,7 +44,7 @@ class User
                 Common::res(['code' => 202, 'msg' => '未获取到用户信息，缺少unionid']);
             }
         }
-
+        
         if (!isset($res['openid'])) {
             Common::res(['code' => 202, 'data' => $res]);
         } else {

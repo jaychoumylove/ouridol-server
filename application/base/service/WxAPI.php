@@ -35,6 +35,26 @@ class WxAPI
     }
 
     /**
+     * 检查更新accessToken
+     * @return string access_token
+     */
+    public function getAccessToken()
+    {
+        // 更新accessToken
+        $url = 'https://' . $this->apiHost . '/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET';
+        $url = str_replace('APPID', $this->appinfo['appid'], $url);
+        $url = str_replace('APPSECRET', $this->appinfo['appsecret'], $url);
+
+        $res = $this->request($url);
+        $this->appinfo['access_token'] = $res['access_token'];
+        // 将新的token保存到数据库
+        Appinfo::where(['id' => $this->appinfo['id']])->update([
+            'access_token' => $res['access_token'],
+            'access_token_expire' => date('Y-m-d H:i:s', time() + $res['expires_in']),
+        ]);
+    }
+
+    /**
      * 小程序登录
      */
     public function code2session($js_code)
@@ -103,26 +123,6 @@ class WxAPI
         $xml = Common::toXml($params);
         $res = $this->request($url, $xml);
         return Common::fromXml($res);
-    }
-
-    /**
-     * 检查更新accessToken
-     * @return string access_token
-     */
-    public function getAccessToken()
-    {
-        // 更新accessToken
-        $url = 'https://' . $this->apiHost . '/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET';
-        $url = str_replace('APPID', $this->appinfo['appid'], $url);
-        $url = str_replace('APPSECRET', $this->appinfo['appsecret'], $url);
-
-        $res = $this->request($url);
-        $this->appinfo['access_token'] = $res['access_token'];
-        // 将新的token保存到数据库
-        Appinfo::where(['id' => $this->appinfo['id']])->update([
-            'access_token' => $res['access_token'],
-            'access_token_expire' => date('Y-m-d H:i:s', time() + $res['expires_in']),
-        ]);
     }
 
     /**

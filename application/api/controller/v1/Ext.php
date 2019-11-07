@@ -62,7 +62,7 @@ class Ext extends Base
         foreach ($list as &$value) {
             // 离活动结束还剩
             $value['active_end'] = strtotime(json_decode($value['active_date'], true)[1]) - time();
-            $value['progress'] = UserActive::getProgress($starid, $value['id'], $value['target_people']);
+            $value['progress'] = UserActive::getProgress($starid, $value['id'], $value['min_days']);
         }
 
         Common::res(['data' => $list]);
@@ -135,9 +135,11 @@ class Ext extends Base
             }
         }
         if ($realPath) {
+            $res = (new WxAPI)->imgCheck($realPath);
+            if ($res['errcode'] == 87014) Common::res(['code' => 87014, 'msg' => '含有违法违规内容']);
             // 上传到微信 我们的偶向公众号
-            (new WxAPI)->imgCheck($realPath);
             $res = (new WxAPI('wx3120fe6dc469ae29'))->uploadimg($realPath);
+            if (isset($res['errcode']) && $res['errcode'] != 0) Common::res(['code' => $res['errcode'], 'msg' => $res['errmsg']]);
             $res['https_url'] = str_replace('http', 'https', $res['url']);
             unlink($realPath);
             Common::res(['data' => $res]);
