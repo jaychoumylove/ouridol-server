@@ -135,8 +135,10 @@ class Ext extends Base
             }
         }
         if ($realPath) {
-            $res = (new WxAPI)->imgCheck($realPath);
-            if ($res['errcode'] == 87014) Common::res(['code' => 87014, 'msg' => '含有违法违规内容']);
+            if (input('platform') == 'MP-WEIXIN') {
+                $res = (new WxAPI)->imgCheck($realPath);
+                if ($res['errcode'] == 87014) Common::res(['code' => 87014, 'msg' => '含有违法违规内容']);
+            }
             // 上传到微信 我们的偶向公众号
             $res = (new WxAPI('wx3120fe6dc469ae29'))->uploadimg($realPath);
             if (isset($res['errcode']) && $res['errcode'] != 0) Common::res(['code' => $res['errcode'], 'msg' => $res['errmsg']]);
