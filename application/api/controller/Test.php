@@ -39,12 +39,7 @@ class Test extends Base
 
     public function index()
     {
-        $text = "
-        title = this is a title;
-        content = this is a content;
-        content = this is a content;
-        content = this is a content;
-        image = https://mmbiz.qpic.cn/mmbiz_png/w5pLFvdua9G9p0qicKzuicwqfrKLg0UeviaEtVDRhsnDz0JTv4EvibM0QPUQWw6fiaZPicOZLcCNaria0hRtrw6Lob7fg/0;";
+        $text = input('text');
 
         $result = [];
         $text = explode(';', $text);
@@ -62,7 +57,7 @@ class Test extends Base
             }
         }
 
-        Common::res(['data' => $result]);
+        return json($result);
 
 
         // echo strtotime('2019-11-01');

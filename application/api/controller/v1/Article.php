@@ -31,4 +31,30 @@ class Article extends Base
         $res = ArticleModel::where('1=1')->order('is_top desc,create_time desc')->page($page, $size)->select();
         Common::res(['data' => $res]);
     }
+
+    public function formart()
+    {
+        $text = input('text');
+
+        $result = [];
+        $text = explode(';', $text);
+        foreach ($text as $row) {
+            if (strpos($row, '=') !== false) {
+                $split = explode('=', $row);
+
+                $left = trim($split[0]);
+                $right = trim($split[1]);
+
+                if ($left == '标题') $left = 'title';
+                if ($left == '内容') $left = 'content';
+                if ($left == '图片') $left = 'image';
+
+                $result[] = [
+                    'type' => $left,
+                    'content' => $right,
+                ];
+            }
+        }
+        return view('formart', ['text' => json_encode($result, JSON_UNESCAPED_UNICODE)]);
+    }
 }

@@ -168,11 +168,11 @@ return [
 
     'log'                    => [
         // 日志记录方式，内置 file socket 支持扩展
-        'type'  => 'test',
+        'type'  => 'File',
         // 日志保存目录
         'path'  => LOG_PATH,
         // 日志记录级别
-        'level' => [],
+        'level' => ['error'],
         // 日志文件最多只会保留30个，超过会自动清理较早的日志文件，避免日志文件长期写入占满磁盘空间
         'max_files' => 30
     ],
