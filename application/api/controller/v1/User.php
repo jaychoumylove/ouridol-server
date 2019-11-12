@@ -169,11 +169,12 @@ class User extends Base
 
     public function sayworld()
     {
-        $content = input('content');
-        if (!$content) Common::res(['code' => 100]);
+        $content = $this->req('content', 'require');
         $this->getUser();
-        // 格式化发言内容
-        RecStarChart::verifyWord($content);
+        // 发言内容校验
+        if (input('platform') == 'MP-WEIXIN') {
+            RecStarChart::verifyWord($content);
+        }
         // 扣除喇叭
         (new UserService())->change($this->uid, [
             'trumpet' => -1
