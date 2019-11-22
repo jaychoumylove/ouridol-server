@@ -31,6 +31,10 @@ class Notify extends Base
                 } else if ($msg['Content'] == '2') {
                     // 打卡
                     $media_id = $wxMsg->getMediaId(ROOT_PATH . 'public/uploads/cust-2.jpg');
+                
+                }else if ($msg['Content'] == '3') {
+                    // 加群
+                    $media_id = $wxMsg->getMediaId(ROOT_PATH . 'public/uploads/cust-3.jpg');
                 }
             }
 
