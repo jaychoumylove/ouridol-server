@@ -114,7 +114,7 @@ class Page extends Base
         $res['userRank'] = UserStar::getRank($starid, 'thisweek_count', 1, 5);
         $res['captain'] = UserStar::where('user_id', $this->uid)->value('captain');
         // 聊天内容
-        $res['chartList'] = RecStarChart::getLeastChart($starid);
+        $res['chartList'] = RecStarChart::getLeastChart($starid, $this->uid);
         // 加入聊天室
         Gateway::joinGroup($client_id, 'star_' . $starid);
         $res['disLeastCount'] = AppStar::disLeastCount($starid);

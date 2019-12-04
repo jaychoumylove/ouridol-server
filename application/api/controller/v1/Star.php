@@ -1,5 +1,4 @@
 <?php
-
 namespace app\api\controller\v1;
 
 use app\base\controller\Base;
@@ -20,43 +19,59 @@ use GatewayWorker\Lib\Gateway;
 
 class Star extends Base
 {
+
     public function getInfo()
     {
-        $starid =  $this->req('starid', 'integer');
-
-        $star = StarModel::with('StarRank')->where(['id' => $starid])->find();
-
+        $starid = $this->req('starid', 'integer');
+        
+        $star = StarModel::with('StarRank')->where([
+            'id' => $starid
+        ])->find();
+        
         $starService = new StarService();
         $star['star_rank']['week_hot_rank'] = $starService->getRank($star['star_rank']['week_hot'], 'week_hot');
         // $star['star_rank']['month_hot_rank'] = $starService->getRank($star['star_rank']['month_hot'], 'month_hot');
-
-        Common::res(['data' => $star]);
+        
+        Common::res([
+            'data' => $star
+        ]);
     }
 
     public function getChart()
     {
         $starid = $this->req('starid', 'integer');
-
+        
         $res = RecStarChart::getLeastChart($starid);
-        Common::res(['data' => $res]);
+        Common::res([
+            'data' => $res
+        ]);
     }
 
-    /**加入聊天室 */
+    /**
+     * 加入聊天室
+     */
     public function joinChart()
     {
         $star_id = $this->req('star_id', 'integer');
         $client_id = input('client_id');
-        if (!$client_id || !$star_id) Common::res(['code' => 100]);
-
+        if (! $client_id || ! $star_id)
+            Common::res([
+                'code' => 100
+            ]);
+        
         Gateway::joinGroup($client_id, 'star_' . $star_id);
         Common::res([]);
     }
+
     public function leaveChart()
     {
         $star_id = $this->req('star_id', 'integer');
         $client_id = input('client_id');
-        if (!$client_id || !$star_id) Common::res(['code' => 100]);
-
+        if (! $client_id || ! $star_id)
+            Common::res([
+                'code' => 100
+            ]);
+        
         Gateway::leaveGroup($client_id, 'star_' . $star_id);
         Common::res([]);
     }
@@ -65,66 +80,106 @@ class Star extends Base
     {
         $starid = $this->req('starid', 'integer');
         $content = $this->req('content', 'require');
+        $client_id = input('client_id', NULL);
         $this->getUser();
-
-        RecStarChart::sendMsg($this->uid, $starid, $content);
+        
+        RecStarChart::sendMsg($this->uid, $starid, $content, $client_id);
         Common::res();
     }
 
-    /**贡献人气 */
+    /**
+     * 贡献人气
+     */
     public function sendHot()
     {
         $starid = $this->req('starid', 'integer');
         $openId = $this->req('open_id', 'number', 0); // 开屏图id
         $hot = input('hot'); // type=1 为礼物id
         $type = input('type', 0);
-        if (!$starid || !$hot) Common::res(['code' => 100]);
+        if (! $starid || ! $hot)
+            Common::res([
+                'code' => 100
+            ]);
         $this->getUser();
-
+        
         (new StarService())->sendHot($starid, $hot, $this->uid, $type, $openId);
         // 我的总贡献
         $res['totalCount'] = UserStar::where('user_id', $this->uid)->value('total_count');
         // 距离上一名
         $res['disLeastCount'] = StarModel::disLeastCount($starid);
-        Common::res(['data' => $res]);
+        Common::res([
+            'data' => $res
+        ]);
     }
 
-    /**加入圈子 */
+    /**
+     * 加入圈子
+     */
     public function follow()
     {
         $starid = $this->req('starid', 'integer');
-        if (!$starid) Common::res(['code' => 100]);
+        if (! $starid)
+            Common::res([
+                'code' => 100
+            ]);
         $this->getUser();
-
+        
         $uid = UserStar::joinNew($starid, $this->uid);
         UserRelation::join($starid, $uid);
-
+        
         Common::res([]);
     }
 
-    /**偷花 */
+    /**
+     * 偷花
+     */
     public function steal()
     {
         $starid = $this->req('starid', 'integer');
         $index = input('index');
-        if (!$starid) Common::res(['code' => 100]);
+        if (! $starid)
+            Common::res([
+                'code' => 100
+            ]);
         $this->getUser();
-
-        $spriteLevel = UserSprite::where(['user_id' => $this->uid])->value('sprite_level');
+        
+        $spriteLevel = UserSprite::where([
+            'user_id' => $this->uid
+        ])->value('sprite_level');
         $stealCount = Cfg::getCfg('stealCount') * $spriteLevel;
         (new StarService())->steal($starid, $this->uid, $stealCount);
-
+        
         UserExt::setTime($this->uid, $index);
-        Common::res(['data' => ['count' => $stealCount]]);
+        Common::res([
+            'data' => [
+                'count' => $stealCount
+            ]
+        ]);
     }
 
-    /**明星动态 */
+    /**
+     * 明星动态
+     */
     public function dynamic()
     {
         $starid = $this->req('starid', 'integer');
-        if (!$starid) Common::res(['code' => 100]);
-        $res = Rec::with(['User ' => ['UserStar ' => ['Star']]])->where('target_star_id', $starid)->limit(10)->order('id desc')->select();
-
-        Common::res(['data' => $res]);
+        if (! $starid)
+            Common::res([
+                'code' => 100
+            ]);
+        $res = Rec::with([
+            'User ' => [
+                'UserStar ' => [
+                    'Star'
+                ]
+            ]
+        ])->where('target_star_id', $starid)
+            ->limit(10)
+            ->order('id desc')
+            ->select();
+        
+        Common::res([
+            'data' => $res
+        ]);
     }
 }
