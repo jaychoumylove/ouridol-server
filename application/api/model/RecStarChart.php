@@ -22,7 +22,7 @@ class RecStarChart extends Base
     }
 
     public static function getLeastChart($starid, $to_user_id = NULL)
-    {   
+    {
         $where = $to_user_id ? 'star_id=' . $starid . ' or to_user_id=' . $to_user_id : 'star_id=' . $starid;
         $list = self::with([
             'User' => [
@@ -106,10 +106,7 @@ class RecStarChart extends Base
                     'msg' => '你已被禁言'
                 ]);
             }
-
-            // 如果是新用户,群主默认回复一段话
-            if ($client_id)  self::GrouperSayHello($starid,$uid);
-            
+                
             // 推送socket消息
             Gateway::sendToGroup('star_' . $starid, json_encode([
                 'type' => 'chartMsg',
@@ -126,24 +123,4 @@ class RecStarChart extends Base
         }
     }
     
-    // 根据用户id获取机器人回复用户
-    private static function GrouperSayHello($starid,$uid)
-    {
-        // 保存聊天记录
-        $data = CfgGrouper::where('star_id', $starid)->field('star_id,user_id,content')
-            ->orderRaw('rand()')
-            ->find();
-        if (! $data) {
-            $data = CfgGrouper::where('id', 1)->field('star_id,user_id,content')->find();
-        }
-        
-        $res = self::create([
-            'user_id' => $data['user_id'],
-            'star_id' => 0,
-            'to_user_id' => $uid,
-            'content' => $data['content'],
-            'create_time' => time()
-        ]);
-        
-    }
 }
