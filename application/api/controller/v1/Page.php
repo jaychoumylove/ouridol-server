@@ -55,8 +55,10 @@ class Page extends Base
         $userStar = UserStar::with('Star')->where(['user_id' => $this->uid])->order('id desc')->find();
         if (!$userStar) {
             $res['userStar'] = [];
+            $res['userStar']['captain'] = 0;            
         } else {
             $res['userStar'] = $userStar['star'];
+            $res['userStar']['captain'] = $userStar['captain'];            
             // // 二维码
             // if (!$userStar['qrcode']) {
             //     // 获取二维码

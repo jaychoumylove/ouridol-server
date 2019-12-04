@@ -78,8 +78,8 @@ class User extends Base
         $res = UserModel::where(['id' => $uid])->field('id,nickname,avatarurl,type')->find();
         $res['userStar'] = UserStar::where('user_id', $uid)->field('total_count,thismonth_count,thisweek_count')->find();
         $res['level'] = UserSprite::where('user_id', $uid)->value('sprite_level');
-        Common::res(['data' => $res]);
-    }
+        Common::res(['data' => $res]);        
+    }    
 
     /**
      * 获取用户所有货币数量

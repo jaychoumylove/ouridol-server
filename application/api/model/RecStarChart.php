@@ -106,8 +106,11 @@ class RecStarChart extends Base
                     'msg' => '你已被禁言'
                 ]);
             }
+            
+            // 如果是新用户,群主默认回复一段话
+            //if ($client_id) self::GrouperSayHello($starid, $uid);
                 
-            // 推送socket消息
+                // 推送socket消息
             Gateway::sendToGroup('star_' . $starid, json_encode([
                 'type' => 'chartMsg',
                 'data' => $res
@@ -123,4 +126,31 @@ class RecStarChart extends Base
         }
     }
     
+    // 根据用户id获取机器人回复用户
+    private static function GrouperSayHello($starid, $uid)
+    {
+        // 保存聊天记录
+        $exist = self::where([
+            'to_user_id' => $uid
+        ])->value('count(1)');
+        
+        if ($exist)
+            return;
+        
+        $data = CfgGrouper::where('star_id', $starid)->field('star_id,user_id,content')
+            ->orderRaw('rand()')
+            ->find();
+        
+        if (! $data) {
+            $data = CfgGrouper::where('id', 1)->field('star_id,user_id,content')->find();
+        }
+        
+        $res = self::create([
+            'user_id' => $data['user_id'],
+            'star_id' => 0,
+            'to_user_id' => $uid,
+            'content' => $data['content'],
+            'create_time' => time()
+        ]);
+    }
 }
