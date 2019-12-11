@@ -14,6 +14,7 @@ use app\api\model\RecWeibo;
 use app\api\model\UserRelation;
 use app\api\model\UserExt;
 use app\api\model\RecItem;
+use app\api\model\UserSprite;
 
 class Task
 {
@@ -30,7 +31,8 @@ class Task
             // 每日任务每天都可完成
             $recTask = RecTask::where(['user_id' => $uid])->where('task_category', $category)->whereTime('create_time', 'd')->column('task_id');
         }
-        foreach ($taskList as $key => &$task) {
+
+        foreach ($taskList as $key => &$task) {            
             $task['status'] = 0;
             // 检查完成状态
             switch ($task['type']) {
@@ -227,9 +229,9 @@ class Task
                     break;
                 case 17:
                     // 游戏试玩
-                    // 用户贡献度大于100才显示游戏试玩
+                    // 用户贡献度大于200才显示游戏试玩
                     $userCount = UserStar::where('user_id', $uid)->order('total_count desc')->value('total_count');
-                    if ($userCount < 101) {
+                    if ($userCount < 201) {
                         unset($taskList[$key]);
                     } else {
                         $task['doneTimes'] = RecTask::where('user_id', $uid)->where('task_id', $task['id'])->whereTime('create_time', 'd')->count('id');
