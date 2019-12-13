@@ -115,7 +115,7 @@ class Share extends Base
         $iv = input('iv');
 
         $res = Common::wxDecrypt($appid, $sessionKey, $encryptedData, $iv);
-        if ($res['errcode'] !== 0) Common::res(['code' => 1, 'data' => $res]);
+        if ($res['errcode'] !== 0) $res['data']['openGId'] = 0;//Common::res(['code' => 1, 'data' => $res]);
 
         $star_id = $this->req('star_id', 'integer');
         // 新增群

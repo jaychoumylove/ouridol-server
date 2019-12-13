@@ -2,10 +2,10 @@
 
 namespace app\api\model;
 
-use app\api\service\User;
 use app\base\model\Base;
 use think\Db;
 use think\Model;
+
 
 class Wxgroup extends Base
 {

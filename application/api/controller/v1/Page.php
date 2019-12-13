@@ -28,7 +28,6 @@ use app\api\model\UserProp;
 use app\api\model\UserWxgroup;
 use app\api\model\Wxgroup;
 use app\api\model\WxgroupDynamic;
-use app\api\model\WxgroupMass;
 
 class Page extends Base
 {
