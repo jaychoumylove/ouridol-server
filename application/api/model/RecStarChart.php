@@ -108,7 +108,7 @@ class RecStarChart extends Base
             }
             
             // 如果是新用户,群主默认回复一段话
-            //if ($client_id) self::GrouperSayHello($starid, $uid);
+            if ($client_id) self::GrouperSayHello($starid, $uid);
                 
                 // 推送socket消息
             Gateway::sendToGroup('star_' . $starid, json_encode([
@@ -129,6 +129,8 @@ class RecStarChart extends Base
     // 根据用户id获取机器人回复用户
     private static function GrouperSayHello($starid, $uid)
     {
+        if($starid==1) return;//罗不含
+        
         // 保存聊天记录
         $exist = self::where([
             'to_user_id' => $uid

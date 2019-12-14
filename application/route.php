@@ -134,7 +134,6 @@ Route::rule('api/:version/active/userrank', 'api/v1.Ext/userRank');// 用户打�
 Route::rule('api/:version/ext/log', 'api/v1.Ext/log');// 用户日志
 
 // 
-
 Route::rule('api/:version/uploadIndex', 'api/v1.Ext/uploadIndex');// 文件上传
 Route::rule('api/:version/upload', 'api/v1.Ext/upload');// 文件上传
 
@@ -149,6 +148,7 @@ Route::rule('api/:version/treasure', 'api/v1.Treasure/index');//
 Route::rule('api/:version/lottery/start', 'api/v1.Treasure/start');// 
 
 // Article
+Route::rule('api/:version/article/formart', 'api/v1.Article/formart');// 文章格式化
 Route::rule('api/:version/article', 'api/v1.Article/getArticle');// 获取文章
 Route::rule('api/:version/article/list', 'api/v1.Article/getList');// 获取文章列表
 
