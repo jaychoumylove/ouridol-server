@@ -108,7 +108,7 @@ class RecStarChart extends Base
             }
             
             // 如果是新用户,群主默认回复一段话
-            if ($client_id) self::GrouperSayHello($starid, $uid);
+            //if ($client_id) self::GrouperSayHello($starid, $uid);
                 
                 // 推送socket消息
             Gateway::sendToGroup('star_' . $starid, json_encode([
