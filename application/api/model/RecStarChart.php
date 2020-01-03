@@ -23,7 +23,8 @@ class RecStarChart extends Base
 
     public static function getLeastChart($starid, $to_user_id = NULL)
     {
-        $where = $to_user_id ? 'star_id=' . $starid . ' or to_user_id=' . $to_user_id : 'star_id=' . $starid;
+        $where = 'star_id=' . $starid;
+        // $where = $to_user_id ? 'star_id=' . $starid . ' or to_user_id=' . $to_user_id : 'star_id=' . $starid;
         $list = self::with([
             'User' => [
                 'UserStar' => function ($query) {
