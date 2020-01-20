@@ -34,6 +34,10 @@ Route::rule('api/:version/page/myprop', 'api/v1.Page/myprop');
 Route::rule('api/:version/page/game', 'api/v1.Page/game');
 Route::rule('api/:version/page/groupMass', 'api/v1.Page/groupMass');
 Route::rule('api/:version/page/wxgroup', 'api/v1.Page/wxgroup');// 
+Route::rule('api/:version/page/hongbao', 'api/v1.Page/hongbao');// 新春红包
+Route::rule('api/:version/page/sendHongbao', 'api/v1.Page/sendHongbao');// 新春红包发
+Route::rule('api/:version/page/getBox', 'api/v1.Page/getBox');// 新春红包发
+Route::rule('api/:version/page/getHongbaoDouble', 'api/v1.Page/getHongbaoDouble');// 新春红包双倍
 
 // Remote
 Route::rule('api/:version/remote/zuimei', 'api/v1.Remote/zuimei');

@@ -21,50 +21,74 @@ use app\api\model\RecStarChart;
 
 class User extends Base
 {
-    /**用户登录 */
+    /**
+     * 用户登录
+     * 获取到用户的openid
+     */
     public function login()
     {
-        $code = input('code'); // 登录code
-        $platform = input('platform', 'MP-WEIXIN'); // 平台
-        if (!$code) Common::res(['code' => 100]);
+        // 登录code 小程序 公众号H5
+        $code = $this->req('code');
 
-        $res = (new UserService())->wxGetAuth($code, $platform);
+        $res['platform'] = $this->req('platform', 'require', 'MP-WEIXIN'); // 平台
+        $res['model'] = $this->req('model'); // 手机型号
 
-        $res['platform'] = $platform;
-        $res['model'] = input('model', null); // 手机型号
-
+        if ($code) {
+            // 以code形式获取openid
+            $res = array_merge($res, (new UserService())->wxGetAuth($code, $res['platform']));
+        } else {
+            $res['openid'] = $this->req('openid');
+        }
+        
         $uid = UserModel::searchUser($res);
         $token = Common::setSession($uid);
 
-        Common::res(['msg' => '登录成功', 'data' => ['token' => $token]]);
+        Common::res(['msg' => '登录成功', 'data' => ['token' => $token, 'package' => $res]]);
     }
 
-    /**保存用户信息 */
+    /**授权&保存用户信息 */
     public function saveInfo()
     {
-        $this->getUser();
+        $type = $this->req('type', 'require', 0);
 
-        // 解密encryptedData
-        $appid = (new WxAPI())->appinfo['appid'];
-        $sessionKey = UserModel::where(['id' => $this->uid])->value('session_key');
+        if ($type == 0) {
+            // 小程序授权
+            // 解密形式
+            $encryptedData = $this->req('encryptedData', 'require');
+            $iv = $this->req('iv', 'require');
 
-        $encryptedData = input('encryptedData');
-        $iv = input('iv');
+            $this->getUser();
 
-        require_once APP_PATH . 'wx/aes/wxBizDataCrypt.php';
-        $pc = new \WXBizDataCrypt($appid, $sessionKey);
-        $errcode = $pc->decryptData($encryptedData, $iv, $data);
-        $data = json_decode($data, true);
+            $appid = (new WxAPI())->appinfo['appid'];
+            $sessionKey = UserModel::where('id', $this->uid)->value('session_key');
 
-        if ($errcode) Common::res(['code' => 201, 'data' => $data]);
-        // 保存
-        foreach ($data as $key => $value) {
-            $saveData[strtolower($key)] = $value;
+            // 解密encryptedData
+            $res = Common::wxDecrypt($appid, $sessionKey, $encryptedData, $iv);
+            if ($res['errcode']) Common::res(['code' => 1, 'msg' => $res['data']]);
+
+            // 保存
+            foreach ($res['data'] as $key => $value) {
+                $saveData[strtolower($key)] = $value;
+            }
+        } else {
+            // 公众号和app授权
+            // 通过openid和access_token
+            $openid = $this->req('openid', 'require');
+            $access_token = $this->req('access_token', 'require');
+            $res = (new WxAPI())->getUserInfo($openid, $access_token);
+            if (isset($res['errcode'])) Common::res(['code' => 1, 'msg' => $res]);
+
+            $saveData = $res;
+            $saveData['avatarurl'] = $res['headimgurl'];
+            $saveData['gender'] = $res['sex'];
         }
-        unset($saveData['watermark']);
 
-        UserModel::where(['id' => $this->uid])->update($saveData);
-        Common::res();
+        $saveData['platform'] = $this->req('platform', 'require', 'MP-WEIXIN'); // 平台
+
+        // 包含用户信息和unionid的数据集合
+        $data = UserModel::saveUserInfo($saveData);
+        $token = Common::setSession($data['id']);
+        Common::res(['data' => ['userInfo' => $data, 'token' => $token]]);
     }
 
     public function getInfo()
@@ -78,8 +102,8 @@ class User extends Base
         $res = UserModel::where(['id' => $uid])->field('id,nickname,avatarurl,type')->find();
         $res['userStar'] = UserStar::where('user_id', $uid)->field('total_count,thismonth_count,thisweek_count')->find();
         $res['level'] = UserSprite::where('user_id', $uid)->value('sprite_level');
-        Common::res(['data' => $res]);        
-    }    
+        Common::res(['data' => $res]);
+    }
 
     /**
      * 获取用户所有货币数量

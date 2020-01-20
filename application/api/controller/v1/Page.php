@@ -20,6 +20,8 @@ use app\api\model\CfgAds;
 use app\api\model\UserSprite;
 use app\base\service\WxAPI;
 use app\api\model\CfgItem;
+use app\api\model\Hongbao;
+use app\api\model\HongbaoUser;
 use app\api\model\UserItem;
 use GatewayWorker\Lib\Gateway;
 use app\api\model\UserExt;
@@ -28,6 +30,8 @@ use app\api\model\UserProp;
 use app\api\model\UserWxgroup;
 use app\api\model\Wxgroup;
 use app\api\model\WxgroupDynamic;
+use app\api\service\User as ServiceUser;
+use think\Db;
 
 class Page extends Base
 {
@@ -54,10 +58,10 @@ class Page extends Base
         $userStar = UserStar::with('Star')->where(['user_id' => $this->uid])->order('id desc')->find();
         if (!$userStar) {
             $res['userStar'] = [];
-            $res['userStar']['captain'] = 0;            
+            $res['userStar']['captain'] = 0;
         } else {
             $res['userStar'] = $userStar['star'];
-            $res['userStar']['captain'] = $userStar['captain'];            
+            $res['userStar']['captain'] = $userStar['captain'];
             // // 二维码
             // if (!$userStar['qrcode']) {
             //     // 获取二维码
@@ -197,12 +201,13 @@ class Page extends Base
     public function game()
     {
         $type = $this->req('type', 'integer', 0);
+        $w = ['platform' => input('platform')];
         if ($type == 1) {
-            $w = ['show' => 1];
-        } else {
-            $w = '1=1';
+            $w['show'] = 1;
         }
-        Common::res(['data' => CfgAds::where($w)->order('sort asc')->select()]);
+        Common::res([
+            'data' => CfgAds::where($w)->order('sort asc')->select()
+        ]);
     }
 
     /**群集结信息 */
@@ -242,5 +247,56 @@ class Page extends Base
         $res['reback'] = UserWxgroup::where('user_id', $this->uid)->sum('daycount_reback');
 
         Common::res(['data' => $res]);
+    }
+
+    public function hongbao()
+    {
+        $this->getUser();
+
+        $latest = Hongbao::where('user_id', $this->uid)->order('id desc')->find();
+        $res['send'] = 1800 - (time() - strtotime($latest['create_time']));
+        Common::res(['data' => $res]);
+    }
+
+    /**发红包 */
+    public function sendHongbao()
+    {
+        $this->getUser();
+
+        $hongbaoId = Hongbao::sendbox($this->uid);
+        Common::res(['data' => $hongbaoId]);
+    }
+
+    public function getBox()
+    {
+        $referrer = $this->req('referrer', 'integer');
+        $box_id = Hongbao::where('user_id', $referrer)->max('id');
+
+        $this->getUser();
+
+        $res['open'] = HongbaoUser::openBox($this->uid, $box_id);
+
+        $res['info'] = Hongbao::with('user')->where('id', $box_id)->find();
+
+        $res['self'] = HongbaoUser::with('user')->where('box_id', $box_id)->where('user_id', $this->uid)->find();
+        if (!$res['self']) $res['self'] = ['count' => 0];
+
+        $res['list'] = HongbaoUser::with('user')->where('box_id', $box_id)->order('id desc')->select();
+        // 已领取
+        $res['info']['isEarn'] = HongbaoUser::where('box_id', $box_id)->sum('count');
+        // 手气最佳
+        $res['lucky'] = HongbaoUser::where('box_id', $box_id)->order('count desc')->value('user_id');
+        // // 奖品type 1coin
+        // $res['award_type'] = RecLottery::with(['lottery'])->where('id', $box_id)->find()['lottery']['type'];
+
+        Common::res(['data' => $res]);
+    }
+
+    public function getHongbaoDouble()
+    {
+        $this->getUser();
+        HongbaoUser::getDouble($this->uid);
+
+        Common::res();
     }
 }

@@ -3,18 +3,21 @@
 namespace app\base\service;
 
 use app\base\model\Appinfo;
+use think\Log;
 
 /**服务端wx接口 */
 class WxAPI
 {
-
+    private $apiHost;
     public function __construct($w = null)
     {
+        $this->apiHost = 'api.weixin.qq.com';
         if (input('platform') == 'MP-QQ') {
             $this->apiHost = 'api.q.qq.com';
             $type = 'qq';
+        } else if (input('platform') == 'APP') {
+            $type = 'app';
         } else {
-            $this->apiHost = 'api.weixin.qq.com';
             $type = 'miniapp';
         }
         if (!$w) $w = $type;
@@ -24,7 +27,10 @@ class WxAPI
     public function request($url, $data = null)
     {
         $res = Common::request($url, $data);
-        if (isset($res['errmsg']) && strpos($res['errmsg'], 'access_token') !== false) {
+        if (isset($res['errmsg'])) $errMsg = $res['errmsg'];
+        else if (isset($res['errMsg'])) $errMsg = $res['errMsg'];
+
+        if (isset($errMsg) && strpos($errMsg, 'access_token') !== false) {
             // 更新access_token
             $oldAccessToken = $this->appinfo['access_token'];
             $this->getAccessToken();
@@ -41,7 +47,11 @@ class WxAPI
     public function getAccessToken()
     {
         // 更新accessToken
-        $url = 'https://' . $this->apiHost . '/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET';
+        if (input('platform') == 'MP-QQ') {
+            $url = 'https://' . $this->apiHost . '/api/getToken?grant_type=client_credential&appid=APPID&secret=APPSECRET';
+        } else {
+            $url = 'https://' . $this->apiHost . '/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET';
+        }
         $url = str_replace('APPID', $this->appinfo['appid'], $url);
         $url = str_replace('APPSECRET', $this->appinfo['appsecret'], $url);
 
@@ -52,6 +62,25 @@ class WxAPI
             'access_token' => $res['access_token'],
             'access_token_expire' => date('Y-m-d H:i:s', time() + $res['expires_in']),
         ]);
+    }
+
+    /**
+     * 获得jsapi_ticket
+     */
+    public function getJsapiTicket()
+    {
+        if (!$this->appinfo['jsapi_ticket'] || time() > $this->appinfo['jsapi_ticket_expire']) {
+            $url = 'https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=' . $this->appinfo['access_token'] . '&type=jsapi';
+            $res = $this->request($url);
+            Appinfo::where('id', $this->appinfo['id'])->update([
+                'jsapi_ticket' => $res['ticket'],
+                'jsapi_ticket_expire' => time() + 7200
+            ]);
+
+            return $res['ticket'];
+        } else {
+            return $this->appinfo['jsapi_ticket'];
+        }
     }
 
     /**
@@ -84,16 +113,23 @@ class WxAPI
     }
 
     /**
-     * 公众号授权
-     * 拉取用户信息
-     * @param string $accessToken 网页授权接口调用凭证,注意：此access_token与基础支持的access_token不同
+     * 拉取获取用户信息(不需要用户关注公众号)
      * @param string $openid 用户的唯一标识
      */
-    public function getUserInfo($accessToken, $openid)
+    public function getUserInfo($openid, $access_token)
     {
-        $url = 'https://' . $this->apiHost . '/sns/userinfo?access_token=' . $this->appinfo['access_token'] . '&openid=OPENID&lang=zh_CN';
+        $url = 'https://' . $this->apiHost . '/sns/userinfo?access_token=' . $access_token . '&openid=' . $openid . '&lang=zh_CN';
 
-        $url = str_replace('OPENID', $openid, $url);
+        return $this->request($url);
+    }
+
+    /**
+     * 获取用户基本信息(需要用户关注公众号)
+     * @param string $openid 用户的唯一标识
+     */
+    public function getUserInfocgi($openid)
+    {
+        $url = 'https://' . $this->apiHost . '/cgi-bin/user/info?access_token=' . $this->appinfo['access_token'] . '&openid=' . $openid . '&lang=zh_CN';
 
         return $this->request($url);
     }
@@ -101,7 +137,11 @@ class WxAPI
     /**统一下单API */
     public function unifiedorder($config)
     {
-        $url = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
+        if (input('platform') == 'MP-QQ') {
+            $url = 'https://qpay.qq.com/cgi-bin/pay/qpay_unified_order.cgi';
+        } else {
+            $url = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
+        }
         $params = [
             'appid' => $this->appinfo['appid'],
             'mch_id' => $this->appinfo['paymchid'],
@@ -215,7 +255,7 @@ class WxAPI
         $url = 'https://' . $this->apiHost . '/cgi-bin/message/wxopen/template/send?access_token=' . $this->appinfo['access_token'];
 
         foreach ($datas as $data) {
-            $this->requestAsync($url, json_encode($data, JSON_UNESCAPED_UNICODE));
+            Common::requestAsync($url, json_encode($data, JSON_UNESCAPED_UNICODE));
         }
 
         // return $this->request($url, json_encode($data, JSON_UNESCAPED_UNICODE));
@@ -256,12 +296,20 @@ class WxAPI
      */
     public function msgCheck($content)
     {
-        $url = 'https://' . $this->apiHost . '/wxa/msg_sec_check?access_token=' . $this->appinfo['access_token'];
+        if (input('platform') == 'MP-QQ') {
+            $url = 'https://' . $this->apiHost . '/api/json/security/MsgSecCheck?access_token=' . $this->appinfo['access_token'];
+            $data = 'content=' . $content;
+        } else {
+            $url = 'https://' . $this->apiHost . '/wxa/msg_sec_check?access_token=' . $this->appinfo['access_token'];
+            $data = json_encode([
+                'content' => $content
+            ], JSON_UNESCAPED_UNICODE);
+        }
 
-        $data = [
-            'content' => $content
-        ];
-        return $this->request($url, json_encode($data, JSON_UNESCAPED_UNICODE));
+        $res = $this->request($url, $data);
+
+        if (isset($res['errcode']) && $res['errcode'] == 87014) Common::res(['code' => 1, 'msg' => '内容被屏蔽']);
+        if (isset($res['errCode']) && $res['errCode'] == 87014) Common::res(['code' => 1, 'msg' => '内容被屏蔽']);
     }
 
     /**校验一张图片是否含有违法违规内容 */
@@ -271,6 +319,36 @@ class WxAPI
 
         $data = ['media' => new \CURLFile($filePath, false, false)];
 
+        return $this->request($url, $data);
+    }
+
+    /**
+     * 发送模板消息
+     */
+    public function sendMessageGzh($data)
+    {
+        $url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" . $this->appinfo['access_token'];
+
+        return $this->request($url, $data);
+    }
+
+    /**
+     * 创建菜单(认证后的订阅号可用)
+     *
+     * @param array $data
+     *            type可以选择为以下几种，其中5-8除了收到菜单事件以外，还会单独收到对应类型的信息。
+     *            1、click：点击推事件
+     *            2、view：跳转URL
+     *            3、scancode_push：扫码推事件
+     *            4、scancode_waitmsg：扫码推事件且弹出“消息接收中”提示框
+     *            5、pic_sysphoto：弹出系统拍照发图
+     *            6、pic_photo_or_album：弹出拍照或者相册发图
+     *            7、pic_weixin：弹出微信相册发图器
+     *            8、location_select：弹出地理位置选择器
+     */
+    public function createMenu($data)
+    {
+        $url = 'https://api.weixin.qq.com/cgi-bin/menu/create?access_token=' .  $this->appinfo['access_token'];
         return $this->request($url, $data);
     }
 }

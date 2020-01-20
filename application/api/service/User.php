@@ -12,11 +12,9 @@ use app\api\model\Rec;
 use app\api\model\Cfg;
 use app\api\model\CfgSignin;
 use app\api\model\UserExt;
-use think\Log;
 
 class User
 {
-
     /**
      * 获取用户openid等信息
      */
@@ -36,16 +34,17 @@ class User
             $res = $wxApi->getAuth($code);
             // code has been used
             if (isset($res['errcode']) && $res['errcode'] == 40163) Common::res(['msg' => '已登录']);
-            if (isset($res['unionid'])) {
-                $res['openid'] = UserModel::where(['unionid' => $res['unionid']])->value('openid');
-                if (!$res['openid']) Common::res(['code' => 202, 'msg' => '请先到同名小程序进行用户授权']);
-            } else {
-                Log::record('未获取到用户信息，缺少unionid', 'error');
-                Common::res(['code' => 202, 'msg' => '未获取到用户信息，缺少unionid']);
-            }
+            // if (isset($res['unionid'])) {
+            //     $res['openid'] = UserModel::where(['unionid' => $res['unionid']])->value('openid');
+            //     if (!$res['openid']) Common::res(['code' => 202, 'msg' => '请先到同名小程序进行用户授权']);
+            // } else {
+            //     Log::record('未获取到用户信息，缺少unionid', 'error');
+            //     Common::res(['code' => 202, 'msg' => '未获取到用户信息，缺少unionid']);
+            // }
         }
-        
-        if (!isset($res['openid'])) {
+
+        if (!isset($res['openid']) || !$res['openid']) {
+            // 登录失败
             Common::res(['code' => 202, 'data' => $res]);
         } else {
             return $res;
