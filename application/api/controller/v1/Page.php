@@ -254,7 +254,7 @@ class Page extends Base
         $this->getUser();
 
         $latest = Hongbao::where('user_id', $this->uid)->order('id desc')->find();
-        $res['send'] = 1800 - (time() - strtotime($latest['create_time']));
+        $res['send'] = 3600 - (time() - strtotime($latest['create_time']));
         Common::res(['data' => $res]);
     }
 
