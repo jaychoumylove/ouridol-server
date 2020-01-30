@@ -19,7 +19,7 @@ class Hongbao extends Base
     public static function sendbox($uid, $count = 10000, $people = 10)
     {
         $latest = self::where('user_id', $uid)->order('id desc')->find();
-        if (time() - strtotime($latest['create_time']) > 1800) {
+        if (time() - strtotime($latest['create_time']) > 3600) {
             $id = self::create(['user_id' => $uid, 'coin' => $count, 'people' => $people]);
         } else {
             $id = $latest['id'];
