@@ -299,4 +299,12 @@ class Page extends Base
 
         Common::res();
     }
+
+    public function redress()
+    {
+        $this->getUser();
+
+        $res = UserExt::redress($this->uid);
+        Common::res(['data' => $res]);
+    }
 }

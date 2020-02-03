@@ -178,3 +178,6 @@ Route::rule('api/:version/android/sendHotView', 'api/v1.Android/sendHotView'); /
 Route::rule('api/:version/android/sendHot', 'api/v1.Android/sendHot');// 让一个机器人打榜
 Route::rule('api/:version/android/infoView', 'api/v1.Android/infoView'); // 
 Route::rule('api/:version/android/addHot', 'api/v1.Android/addHot'); // 
+
+Route::rule('api/:version/page/redress', 'api/v1.Page/redress'); // 补偿
+

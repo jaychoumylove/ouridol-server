@@ -118,5 +118,68 @@ class UserExt extends Base
         }
     }
 
-    
+    /**
+     * 公众号补偿 
+     */
+    public static function redress($uid)
+    {
+        $redressDate = Cfg::getCfg('redress_date');
+        $redressTime = UserExt::where('user_id', $uid)->value('redress_time');
+        
+        if ($redressTime > strtotime($redressDate[0]) && $redressTime < strtotime($redressDate[1])) {
+            return [
+                'status' => 1,
+                'msg' => '你已领取过补偿'
+            ];
+        }
+        if (time() < strtotime($redressDate[0])) {
+            return [
+                'status' => 1,
+                'msg' => '补偿未到时间'
+            ];
+        }
+        if (time() > strtotime($redressDate[1])) {
+            return [
+                'status' => 1,
+                'msg' => '补偿已过期'
+            ];
+        }
+
+        $msg = '领取成功';
+        $update['coin'] = 100000;
+        $msg .= '，金豆+' . $update['coin'];
+        $update['stone'] = 30;
+        $msg .= '，钻石+' . $update['stone'];
+
+        (new User)->change($uid, $update, ['type' => 36]);
+
+        UserExt::where('user_id', $uid)->update(['redress_time' => time()]);
+        return [
+            'status' => 0,
+            'msg' => $msg
+        ];
+    }
+
+    /**公众号签到 */
+    public static function gzhSignin($uid)
+    {
+        $isSignin = self::where('user_id', $uid)->whereTime('gzh_signin_time', 'd')->value('id');
+
+        if ($isSignin) {
+            $msg = '你今天已经签到了哦，请明日再来';
+        } else {
+            $msg = '签到成功';
+            // 
+            $update['coin'] = 3000;
+            $msg .= '，金豆+' . $update['coin'];
+            $update['stone'] = 3;
+            $msg .= '，钻石+' . $update['stone'];
+            $msg .= '，明天记得还要来哦';
+
+            (new User)->change($uid, $update, '公众号签到');
+            self::where('user_id', $uid)->update(['gzh_signin_time' => time()]);
+        }
+
+        return $msg;
+    }
 }
