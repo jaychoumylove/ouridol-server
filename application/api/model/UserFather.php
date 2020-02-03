@@ -78,10 +78,13 @@ class UserFather extends Base
             // 收益
             Db::startTrans();
             try {
-                self::where(['father' => $father, 'son' => $son])->update([
-                    'has_earn_count' => Db::raw('has_earn_count+' . $earn),
+                $isDone = self::where(['father' => $father, 'son' => $son])->update([
                     // 实时贡献清零
                     'cur_contribute' => 0,
+                ]);
+                if (!$isDone) Common::res(['code' => 1]);
+                self::where(['father' => $father, 'son' => $son])->update([
+                    'has_earn_count' => Db::raw('has_earn_count+' . $earn),
                 ]);
 
                 (new UserService())->change($father, [
