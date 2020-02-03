@@ -147,7 +147,7 @@ class UserExt extends Base
 
         $msg = '领取成功';
         $update['coin'] = 100000;
-        $msg .= '，金豆+' . $update['coin'];
+        $msg .= '，能量+' . $update['coin'];
         $update['stone'] = 30;
         $msg .= '，钻石+' . $update['stone'];
 
