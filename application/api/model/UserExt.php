@@ -119,7 +119,7 @@ class UserExt extends Base
     }
 
     /**
-     * 公众号补偿 
+     * 补偿 
      */
     public static function redress($uid)
     {
@@ -149,7 +149,7 @@ class UserExt extends Base
         $update['coin'] = 100000;
         $msg .= '，能量+' . $update['coin'];
         $update['stone'] = 30;
-        $msg .= '，钻石+' . $update['stone'];
+        $msg .= '，灵丹+' . $update['stone'];
 
         (new User)->change($uid, $update, ['type' => 36]);
 
@@ -158,28 +158,5 @@ class UserExt extends Base
             'status' => 0,
             'msg' => $msg
         ];
-    }
-
-    /**公众号签到 */
-    public static function gzhSignin($uid)
-    {
-        $isSignin = self::where('user_id', $uid)->whereTime('gzh_signin_time', 'd')->value('id');
-
-        if ($isSignin) {
-            $msg = '你今天已经签到了哦，请明日再来';
-        } else {
-            $msg = '签到成功';
-            // 
-            $update['coin'] = 3000;
-            $msg .= '，金豆+' . $update['coin'];
-            $update['stone'] = 3;
-            $msg .= '，钻石+' . $update['stone'];
-            $msg .= '，明天记得还要来哦';
-
-            (new User)->change($uid, $update, '公众号签到');
-            self::where('user_id', $uid)->update(['gzh_signin_time' => time()]);
-        }
-
-        return $msg;
     }
 }
