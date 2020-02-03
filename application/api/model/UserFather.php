@@ -82,7 +82,7 @@ class UserFather extends Base
                     // 实时贡献清零
                     'cur_contribute' => 0,
                 ]);
-                if (!$isDone) Common::res(['code' => 1]);
+                if (!$isDone) Common::res(['code' => 1, 'msg' => '请稍后再试']);
                 self::where(['father' => $father, 'son' => $son])->update([
                     'has_earn_count' => Db::raw('has_earn_count+' . $earn),
                 ]);
