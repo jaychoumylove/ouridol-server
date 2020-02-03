@@ -69,11 +69,9 @@ class StarRank extends Base
             $year = substr($value['date'], 0, 4);
             if ($rankField == 'week_hot') {
                 $week = substr($value['date'], -2);
-                // TODO:
-                $value['date'] = $year . '年' . ($week - 19) . '期';
+                $value['date'] = $year . '年' . $week . '周';
             } else if ($rankField == 'month_hot') {
                 $month = substr($value['date'], -2);
-
                 $value['date'] = $year . '年' . $month . '月';
             }
         }
