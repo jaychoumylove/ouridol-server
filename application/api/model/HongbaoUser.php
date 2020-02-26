@@ -20,6 +20,12 @@ class HongbaoUser extends Base
     {
         $isExist = self::where('box_id', $box_id)->where('user_id', $uid)->value('id');
         if ($isExist) return;
+        
+        //不在一个圈子
+        $sendUserId = Hongbao::where('id', $box_id)->value('user_id');
+        $sendStarId = UserStar::where('user_id',$sendUserId)->value('star_id');
+        $getStarId = UserStar::where('user_id',$uid)->value('star_id');
+        if ($sendStarId!=$getStarId)  Common::res(['code' => 1, 'msg' => '不在同一个偶像圈']);
 
         // 宝箱信息
         $boxInfo = Hongbao::where('id', $box_id)->find();

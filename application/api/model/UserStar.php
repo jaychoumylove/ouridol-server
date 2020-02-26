@@ -147,7 +147,7 @@ class UserStar extends Base
         if ($res['score']) {
             $res['rank'] = self::where('star_id', $starid)->where($field, '>', $res['score'])->count() + 1;
         } else {
-            $res['rank'] = '未上榜';
+            $res['rank'] = 'no';
         }
 
         return $res;
