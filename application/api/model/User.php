@@ -149,6 +149,7 @@ class User extends Base
         $vrAvatar = OtherFakeUser::where('1=1')->orderRaw('rand()')->value('avatar');
 
         return self::searchUser([
+            'platform' => $data['platform'],
             'openid' => $data['openid'],
             'unionid' => $data['unionid'],
             'nickname' => $vrNickname,

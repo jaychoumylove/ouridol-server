@@ -53,14 +53,14 @@ class UserStar extends Base
     }
 
     /**加入爱豆圈子 */
-    public static function joinNew($starid, $uid)
+    public static function joinNew($starid, $uid,$platform)
     {
         Db::startTrans();
         try {
             $userType = User::where('id', $uid)->value('type');
             if ($userType == 1) {
                 // 管理员
-                $uid = self::getVirtualUser($starid, $uid);
+                $uid = self::getVirtualUser($starid, $uid,$platform);
             }
 
             if (!self::get(['user_id' => $uid, 'star_id' => $starid])) {
@@ -82,7 +82,7 @@ class UserStar extends Base
      * @param mixed $uid 管理员uid
      * @return mixed 虚拟用户uid
      */
-    public static function getVirtualUser($starid, $uid)
+    public static function getVirtualUser($starid, $uid,$platform)
     {
         $user = User::where('id', $uid)->find();
         if (strpos($user['openid'], '@') !== false) {
@@ -100,6 +100,7 @@ class UserStar extends Base
         $virtualUid = User::where(['openid' => $user['openid'] . '@' . $starid])->value('id');
         if (!$virtualUid) {
             $virtualUid = User::createVirtualUser([
+                'platform' => $platform,
                 'openid' => $user['openid'],
                 'unionid' => $user['unionid'],
             ]);
