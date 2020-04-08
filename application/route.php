@@ -94,6 +94,7 @@ Route::rule('api/:version/user/delFriend', 'api/v1.User/delFriend');// 删好友
 Route::rule('api/:version/user/sendStoneToOther', 'api/v1.User/sendStoneToOther');// 送灵丹给别人
 Route::rule('api/:version/user/sendItemToOther', 'api/v1.User/sendItemToOther');// 送礼物给他人
 Route::rule('api/:version/user/forbidden', 'api/v1.User/forbidden');// 禁言
+Route::rule('api/:version/user/level', 'api/v1.User/level');// 用户等级
 
 // Share
 Route::rule('api/:version/share/mass', 'api/v1.Share/mass');// 分享集结

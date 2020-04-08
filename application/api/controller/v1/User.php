@@ -18,6 +18,7 @@ use app\base\service\WxAPI;
 use app\api\model\CfgSignin;
 use GatewayWorker\Lib\Gateway;
 use app\api\model\RecStarChart;
+use app\api\model\CfgUserLevel;
 
 class User extends Base
 {
@@ -318,5 +319,19 @@ class User extends Base
         } else {
             Common::res(['code' => 1]);
         }
+    }
+    
+    public function level()
+    {
+        //$this->getUser();
+        $user_id = $this->req('user_id', 'integer');
+        
+        $count = UserStar::where('user_id', $user_id)->order('id desc')->value('total_count');
+        $res['level'] = CfgUserLevel::where('total', '<=', $count)->max('level');
+        
+        $nextCount = CfgUserLevel::where('total', '>', $count)->order('level asc')->value('total');
+        $res['gap'] = $nextCount - $count;
+        if ($res['gap'] < 0) $res['gap'] = 0;
+        Common::res(['data' => $res]);
     }
 }
