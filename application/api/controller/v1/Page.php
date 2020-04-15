@@ -2,6 +2,7 @@
 
 namespace app\api\controller\v1;
 
+use app\api\service\Sms;
 use app\base\controller\Base;
 use app\api\model\User;
 use app\api\model\UserCurrency;
@@ -51,7 +52,7 @@ class Page extends Base
             UserFather::join($rer_user_id, $this->uid);
         }
 
-        $res['userInfo'] = User::where(['id' => $this->uid])->field('id,nickname,avatarurl,type')->find();
+        $res['userInfo'] = User::where(['id' => $this->uid])->field('id,nickname,avatarurl,type,phoneNumber')->find();
         $res['userCurrency'] = UserCurrency::getCurrency($this->uid);
         $res['userExt'] = UserExt::where('user_id', $this->uid)->field('is_join_wxgroup')->find();
 
@@ -306,5 +307,23 @@ class Page extends Base
 
         $res = UserExt::redress($this->uid);
         Common::res(['data' => $res]);
+    }
+    public function sendSms()
+    {
+
+        $phoneNumber = input('phoneNumber',0);
+        $this->getUser();
+
+        $phoneNumber = strpos($phoneNumber,'86')!==false && strpos($phoneNumber,'86')==0 ? substr($phoneNumber, -11) : $phoneNumber;
+        $hasExist = User::where('phoneNumber',$phoneNumber)->count();
+        if($hasExist) Common::res(['code' => 1, 'msg' => '该号码已被占用']);
+
+        $sms = json_decode(UserExt::where('user_id',$this->uid)->value('sms'),true);
+        if(isset($sms['phoneNumber']) && time()-$sms['sms_time']<=24*3600 && $sms['phoneNumber']==$phoneNumber ) Common::res(['code' => 1, 'msg' => '验证码已发送，1天只能发送一次']);
+
+        $content = (new Sms())->send($phoneNumber);
+        UserExt::where('user_id',$this->uid)->update(['sms'=>json_encode($content)]);
+        if($content['Code'] != 'OK') Common::res(['code' => 1, 'msg' => $content['Message']]);
+        Common::res();
     }
 }

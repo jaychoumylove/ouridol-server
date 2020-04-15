@@ -30,7 +30,7 @@ class WxAPI
         if (isset($res['errmsg'])) $errMsg = $res['errmsg'];
         else if (isset($res['errMsg'])) $errMsg = $res['errMsg'];
 
-        if (isset($errMsg) && strpos($errMsg, 'access_token') !== false) {
+        if (isset($errMsg) && (strpos($errMsg, 'token') !== false || strpos($errMsg, '错误') !== false)) {
             // 更新access_token
             $oldAccessToken = $this->appinfo['access_token'];
             $this->getAccessToken();

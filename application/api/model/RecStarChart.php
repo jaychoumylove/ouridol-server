@@ -71,9 +71,10 @@ class RecStarChart extends Base
     public static function sendMsg($uid, $starid, $content, $client_id = NULL)
     {
         // 校验
-        if (input('platform') == 'MP-WEIXIN') {
-            self::verifyWord($content);
-        }
+        self::verifyWord($content);
+//        if (input('platform') == 'MP-WEIXIN') {
+//            self::verifyWord($content);
+//        }
         
         Db::startTrans();
         try {

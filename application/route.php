@@ -64,6 +64,7 @@ Route::rule('api/:version/banner/list', 'api/v1.Banner/getList');// 获取轮播
 Route::rule('api/:version/user/login', 'api/v1.User/login');// 登录
 
 Route::rule('api/:version/user/saveinfo', 'api/v1.User/saveInfo');// 保存用户详细信息
+Route::rule('api/:version/user/savephone', 'api/v1.User/savePhone');// 保存用户手机号
 Route::rule('api/:version/user/info', 'api/v1.User/getInfo');// 获取用户详细信息
 Route::rule('api/:version/user/currency', 'api/v1.User/getCurrency');// 获取用户货币
 Route::rule('api/:version/user/item', 'api/v1.User/getItem');// 获取用户道具
@@ -107,7 +108,7 @@ Route::rule('api/:version/share/group/join', 'api/v1.Share/groupMassJoin');// �
 Route::rule('api/:version/share/group/settle', 'api/v1.Share/groupMassSettle');// 群集结结算
 Route::rule('api/:version/share/group/groupDayReback', 'api/v1.Share/groupDayReback');// 群贡献奖励
 
-
+Route::rule('api/:version/page/sendSms', 'api/v1.Page/sendSms');//发送验证码
 
 // Sprite
 Route::rule('api/:version/sprite', 'api/v1.UserSprite/info');// 精灵信息
@@ -137,6 +138,12 @@ Route::rule('api/:version/active/list', 'api/v1.Ext/activeList');// 活动列表
 Route::rule('api/:version/active/userrank', 'api/v1.Ext/userRank');// 用户打卡排名
 
 Route::rule('api/:version/ext/log', 'api/v1.Ext/log');// 用户日志
+
+//signin
+Route::rule('api/:version/rank/getSignin', 'api/v1.Signin/getSignin');// 获取签到信息
+Route::rule('api/:version/rank/signin', 'api/v1.Signin/joinSignin');// 签到
+
+
 
 // 
 Route::rule('api/:version/uploadIndex', 'api/v1.Ext/uploadIndex');// 文件上传
