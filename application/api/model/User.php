@@ -136,7 +136,8 @@ class User extends Base
                 'city' => isset($data['city']) ? $data['city'] : null,
                 'province' => isset($data['province']) ? $data['province'] : null,
                 'country' => isset($data['country']) ? $data['country'] : null,
-            ]);
+            ]);            
+            if(!$update['nickname']) unset($update['nickname']);
         }
         self::where('id', $currentUid)->update($update);
         return self::get($currentUid);
