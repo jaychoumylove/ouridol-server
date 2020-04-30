@@ -161,7 +161,10 @@ class UserStar extends Base
     public static function getActiveInfo($uid, $starid, $active_id)
     {
         // 活动信息
-        $res = CfgActive::get($active_id);
+        $res = CfgActive::get($active_id);        
+        $tmp = CfgActiveReplace::where('id',$active_id)->where('ex_star_id',$starid)->find();
+        if($tmp) $res = $tmp;
+        
         // 离活动结束还剩
         $res['active_end'] = strtotime(json_decode($res['active_date'], true)[1]) - time();
         // 活动说明

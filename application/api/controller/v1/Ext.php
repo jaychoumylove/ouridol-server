@@ -17,6 +17,7 @@ use app\api\model\UserSprite;
 use app\api\model\RecActive;
 use app\api\model\GuideCron;
 use app\api\model\UserActive;
+use app\api\model\CfgActiveReplace;
 
 class Ext extends Base
 {
@@ -59,7 +60,10 @@ class Ext extends Base
         $list = CfgActive::all();
         $starid = $this->req('starid', 'integer');
 
-        foreach ($list as &$value) {
+        foreach ($list as $key => &$value) {
+            $tmp = CfgActiveReplace::where('id',$value['id'])->where('ex_star_id',$starid)->find();
+            if($tmp) $list[$key] = $tmp;
+            
             // 离活动结束还剩
             $value['active_end'] = strtotime(json_decode($value['active_date'], true)[1]) - time();
             $value['progress'] = UserActive::getProgress($starid, $value['id'], $value['min_days']);
