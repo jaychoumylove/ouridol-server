@@ -190,7 +190,7 @@ class UserStar extends Base
         // 我的打卡信息
         $myCardInfo = UserActive::getOneInfo($uid, $starid, $active_id);
         if ($myCardInfo['is_card_today']) Common::res(['code' => 1, 'msg' => '你今天已经打卡了哦']);
-        if ($myCardInfo['is_userlevel_needup']) Common::res(['code' => 1, 'msg' => '打卡资源有限，请先为爱豆冲榜提升等级']);
+        if ($myCardInfo['card_need_userlevel']) Common::res(['code' => 1, 'msg' => "打卡资源有限\n用户等级需要达到".$myCardInfo['card_need_userlevel']."级\n请先为爱豆冲榜提升等级"]);
 
         // 打卡数+1
         UserActive::addClock($uid, $starid, $active_id);

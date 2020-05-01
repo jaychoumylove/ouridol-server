@@ -23,7 +23,11 @@ class UserActive extends Base
         //用户等级是否达标，1天1级
         $count = UserStar::where('user_id', $uid)->where('star_id', $starid)->order('id desc')->value('total_count');
         $userLevel = CfgUserLevel::where('total', '<=', $count)->max('level');
-        $data['is_userlevel_needup'] = $userLevel < (isset($data['total_clocks']) ? $data['total_clocks'] : 1);
+        $minDays = CfgActive::where('id',$active_id)->value('min_days');
+
+        //最后一天的打卡时，用户等级3级以下提示需要升级
+        $data['card_need_userlevel'] = Cfg::where('key','card_need_userlevel')->value('value');
+        $data['card_need_userlevel'] = isset($data['total_clocks']) && $data['total_clocks']==$minDays-1 && $userLevel<$data['card_need_userlevel'] ? $data['card_need_userlevel'] : 0;//$userLevel < (isset($data['total_clocks']) ? $data['total_clocks'] : 1);
 
         return $data;
     }
