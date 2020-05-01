@@ -13,12 +13,18 @@ class UserActive extends Base
         return  $this->belongsTo('User', 'user_id', 'id')->field('id,avatarurl,nickname');
     }
 
-    /**获取用户的大咖信息 */
+    /**获取用户的打卡信息 */
     public static function getOneInfo($uid, $starid, $active_id)
     {
         $data = self::where('user_id', $uid)->where('star_id', $starid)->where('active_id', $active_id)->find();
         // 今日是否已打卡
         $data['is_card_today'] = date('Ymd', strtotime($data['update_time'])) == date('Ymd');
+
+        //用户等级是否达标，1天1级
+        $count = UserStar::where('user_id', $uid)->where('star_id', $starid)->order('id desc')->value('total_count');
+        $userLevel = CfgUserLevel::where('total', '<=', $count)->max('level');
+        $data['is_userlevel_needup'] = $userLevel < (isset($data['total_clocks']) ? $data['total_clocks'] : 1);
+
         return $data;
     }
 

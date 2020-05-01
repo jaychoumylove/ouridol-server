@@ -75,7 +75,7 @@ class Ext extends Base
     /**活动信息 */
     public function getActiveInfo()
     {
-        $starid = input('starid');
+        $starid =  $this->req('starid', 'integer');
         $active_id = $this->req('id', 'integer');
         $this->getUser();
 

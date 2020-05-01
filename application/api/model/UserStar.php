@@ -161,7 +161,9 @@ class UserStar extends Base
     public static function getActiveInfo($uid, $starid, $active_id)
     {
         // 活动信息
-        $res = CfgActive::get($active_id);        
+        $res = CfgActive::get($active_id);
+        if(!$res) Common::res(['code' => 1, 'msg' => '参数错误']);
+
         $tmp = CfgActiveReplace::where('id',$active_id)->where('ex_star_id',$starid)->find();
         if($tmp) $res = $tmp;
         
@@ -188,6 +190,7 @@ class UserStar extends Base
         // 我的打卡信息
         $myCardInfo = UserActive::getOneInfo($uid, $starid, $active_id);
         if ($myCardInfo['is_card_today']) Common::res(['code' => 1, 'msg' => '你今天已经打卡了哦']);
+        if ($myCardInfo['is_userlevel_needup']) Common::res(['code' => 1, 'msg' => '打卡资源有限，请先为爱豆冲榜提升等级']);
 
         // 打卡数+1
         UserActive::addClock($uid, $starid, $active_id);
