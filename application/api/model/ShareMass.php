@@ -20,7 +20,7 @@ class ShareMass extends Base
         $item = self::get(['user_id' => $uid]);
 
         if (!$item) {
-            $item = self::create(['user_id' => $uid]);
+            $item = self::create(['user_id' => $uid,'mass_start_time' => 0,'mass_settle_time' => 0,'mass_times' => 0]);
         }
         if ($item['mass_times'] != 0 && date('Ymd', $item['mass_start_time']) != date('Ymd', time())) {
             // 集结次数次日清零
