@@ -46,19 +46,9 @@ class Notify extends Base
                     "url": "https://ouridol.anaculture.com/#/pages/charge/charge"
                 },
                 {
-                    "name": "联系我们",
-                    "sub_button": [
-                        {
-                            "type": "click",
-                            "name": "在线客服",
-                            "key": "CLICK_kefu"
-                        },
-                        {
-                            "type": "click",
-                            "name": "联系我们",
-                            "key": "CLICK_lianxi"
-                        }
-                    ]
+                    "type": "click",
+                    "name": "520表白",
+                    "key": "biaobai520"
                 }
             ]
         }';
