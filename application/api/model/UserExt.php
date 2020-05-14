@@ -159,4 +159,45 @@ class UserExt extends Base
             'msg' => $msg
         ];
     }
+    
+    /**
+     * 公众号表白
+     */
+    public static function biaobai($user_id,$star_id,$star_name)
+    {
+        $isSignin = self::where('user_id', $user_id)->whereTime('gzh_signin_time', 'd')->value('id');
+
+        if ($isSignin) {
+            $msg = "你今天已经表白了哦，请明日再来!";
+            
+        } else {
+            try {
+
+                $isDone = GzhBiaobai::where('star_id', $star_id)->update([
+                    'ticket' => Db::raw('ticket+1')
+                ]);
+                
+                if(!$isDone) GzhBiaobai::create([
+                    'star_id'=>$star_id,
+                ]);
+                
+                self::where('user_id', $user_id)->update(['gzh_signin_time'=>time()]);                
+                Db::commit();
+                
+            } catch (\Exception $e) {
+                Db::rollBack();    
+                $msg = "rollBack: ". $e->getMessage();
+            }
+
+            $tickets = GzhBiaobai::where('star_id',$star_id)->value('ticket')+1;
+            $star_rank = GzhBiaobai::where('ticket', 'GT', $tickets)->count() + 1;
+            $next_star_rank = $star_rank + 1;
+            
+            $msg = "恭喜，已经成功向{$star_name}表白。";
+            $msg .= "\n{$star_name}目前{$tickets}票排名第{$star_rank}，第{$next_star_rank}名就要追上来啦。";
+            $msg .= "\n你还可以分享链接邀请你的小伙伴一起来向{$star_name}表白，还有更多福利等着你。";
+        }
+
+        return $msg;
+    }
 }

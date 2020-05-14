@@ -3,8 +3,8 @@ namespace app\api\controller\v1;
 
 use app\base\service\WxMsg;
 use app\base\controller\Base;
-use think\Log;
 use app\base\service\WxAPI;
+use think\Log;
 
 class Notify extends Base
 {
@@ -12,46 +12,58 @@ class Notify extends Base
     public function receive()
     {
         $wxMsg = new WxMsg(input('appid'));
-
+    
         $wxMsg->checkSignature();
-        $msg = $wxMsg->getMsg();
-
-        // {"ToUserName":"gh_7c87eaf27f5a",
-        // "FromUserName":"oj77y5LIpHuIWUU2kW8BHVP4goPc","CreateTime":"1558089549",
-        // "MsgType":"text","Content":"99","MsgId":"22306477788296821"}
-        Log::record(json_encode($msg));
-
-        if ($msg['MsgType'] == 'text') {
-            $media_id = $wxMsg->getMediaId(ROOT_PATH . 'public/uploads/cust-0.jpg');
-
-            if (isset($msg['Content'])) {
-                if ($msg['Content'] == '1') {
-                    // 充值
-                    $media_id = $wxMsg->getMediaId(ROOT_PATH . 'public/uploads/cust-1.jpg');
-                } else if ($msg['Content'] == '2') {
-                    // 打卡
-                    $media_id = $wxMsg->getMediaId(ROOT_PATH . 'public/uploads/cust-2.jpg');
-                
-                }else if ($msg['Content'] == '3') {
-                    // 加群
-                    $media_id = $wxMsg->getMediaId(ROOT_PATH . 'public/uploads/cust-3.jpg');
-                }
-            }
-
-            $ret = (new WxAPI(input('appid')))->sendCustomerMsg(
-                $msg['FromUserName'],
-                'image',
-                [
-                    'media_id' => $media_id
-                ]
-            );
+        $msgFrom = $wxMsg->getMsg();
+        $msgTo = $wxMsg->msgHandler($msgFrom);        
+        if($msgTo['type']=='gzh'){
+            $wxMsg->autoSend($msgFrom,  $msgTo['MsgType'], ['Content' => $msgTo['content']]);
+            
+            //公众号表白
+//             if (strpos($msgFrom['Content'],'表白') === 0){
+//                 $media_id = $wxMsg->getMediaId(ROOT_PATH . 'public/uploads/biaobai520.jpg');
+//                 $wxMsg->autoSend($msgFrom, 'image', ['MediaId' => $media_id]);
+//             }
         }
-
-        // $wxMsg->autoSend($msg, 'text', [
-        //     'Content' =>
-        //     "欢迎！回复：\n1 签到\n2 补充能量\n3 人工服务",
-        // ]);
-
+    
         die('success');
     }
+    
+    public function createMenu()
+    {
+        $data = '{
+            "button": [
+                {
+                    "type": "miniprogram",
+                    "name": "打榜应援",
+                    "url": "https://mp.weixin.qq.com/s/V-Zw-FDPKLKY4GJfBdZS7w",
+                    "appid": "wx7dc912994c80d9ac",
+                    "pagepath":"pages/open/open"
+                },
+                {
+                    "type": "view",
+                    "name": "购买礼物",
+                    "url": "https://ouridol.anaculture.com/#/pages/charge/charge"
+                },
+                {
+                    "name": "联系我们",
+                    "sub_button": [
+                        {
+                            "type": "click",
+                            "name": "在线客服",
+                            "key": "CLICK_kefu"
+                        },
+                        {
+                            "type": "click",
+                            "name": "联系我们",
+                            "key": "CLICK_lianxi"
+                        }
+                    ]
+                }
+            ]
+        }';
+    
+        dump((new WxAPI('wx3120fe6dc469ae29'))->createMenu($data));
+    }
+    
 }
