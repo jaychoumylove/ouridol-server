@@ -186,10 +186,10 @@ class UserExt extends Base
                 
             } catch (\Exception $e) {
                 Db::rollBack();    
-                $msg = "rollBack: ". $e->getMessage();
+                return "rollBack: ". $e->getMessage();
             }
 
-            $tickets = GzhBiaobai::where('star_id',$star_id)->value('ticket')+1;
+            $tickets = GzhBiaobai::where('star_id',$star_id)->value('ticket');
             $star_rank = GzhBiaobai::where('ticket', 'GT', $tickets)->count() + 1;
             $next_star_rank = $star_rank + 1;
             
