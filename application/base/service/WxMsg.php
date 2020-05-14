@@ -166,7 +166,14 @@ class WxMsg
                 $star_id = Star::where('name',$star_name)->value('id');
                 if(!$star_id) $content = "未找到你表白的爱豆，请先进入【我们的偶像】小程序打榜\n<a data-miniprogram-appid='wx7dc912994c80d9ac' data-miniprogram-path='/pages/open/open' href='https://mp.weixin.qq.com/s/NRovcmTDj_Tziu8qe_DY9Q'>点击这里给爱豆打榜</a>";
                 elseif (!$user_id) $content = "未找到用户，可能是因为您还未进入【我们的偶像】小程序打榜\n<a data-miniprogram-appid='wx7dc912994c80d9ac' data-miniprogram-path='/pages/open/open' href='https://mp.weixin.qq.com/s/NRovcmTDj_Tziu8qe_DY9Q'>点击这里给爱豆打榜</a>";
-                else  $content = UserExt::biaobai($user_id,$star_id,$star_name); 
+                else {
+                    $content = UserExt::biaobai($user_id,$star_id,$star_name); 
+                    
+                    $media_id = $this->getMediaId(ROOT_PATH . 'public/uploads/biaobai520.png');
+                    $ret = (new WxAPI(input('appid')))->sendCustomerMsg($msg['FromUserName'], 'image', [
+                        'media_id' => $media_id
+                    ]);
+                }
                 
             } else if ($msg['Content'] == '签到' || $msg['Content'] == 2) {
                 
