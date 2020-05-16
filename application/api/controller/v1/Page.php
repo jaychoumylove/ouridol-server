@@ -33,6 +33,8 @@ use app\api\model\Wxgroup;
 use app\api\model\WxgroupDynamic;
 use app\api\service\User as ServiceUser;
 use think\Db;
+use app\api\model\ActiveFudai;
+use app\api\model\ActiveFudaiUser;
 
 class Page extends Base
 {
@@ -298,6 +300,58 @@ class Page extends Base
         $this->getUser();
         HongbaoUser::getDouble($this->uid);
 
+        Common::res();
+    }
+    
+    /*我的福袋列表 */
+    public function fudai()
+    {
+        $this->getUser();
+    
+        $res = ActiveFudai::where('user_id', $this->uid)->order('id desc')->select();
+        Common::res(['data' => $res]);
+    }
+
+    /*发福袋 */
+    public function sendFudai()
+    {
+        $this->getUser();
+    
+        $fudaiId = ActiveFudai::sendbox($this->uid);
+        Common::res(['data' => $fudaiId]);
+    }
+    
+    /*开福袋*/
+    public function getFudai()
+    {
+        $box_id = $this->req('id', 'integer');
+    
+        $this->getUser();
+    
+        $res['open'] = ActiveFudaiUser::openBox($this->uid, $box_id);
+    
+        $res['info'] = ActiveFudai::with('user')->where('id', $box_id)->find();
+    
+        $res['self'] = ActiveFudaiUser::with('user')->where('box_id', $box_id)->where('user_id', $this->uid)->find();
+        if (!$res['self']) $res['self'] = ['count' => 0];
+    
+        $res['list'] = ActiveFudaiUser::with('user')->where('box_id', $box_id)->order('id desc')->select();
+        // 已领取
+        $res['info']['isEarn'] = ActiveFudaiUser::where('box_id', $box_id)->sum('count');
+        // 手气最佳
+        $res['lucky'] = ActiveFudaiUser::where('box_id', $box_id)->order('count desc')->value('user_id');
+        // // 奖品type 1coin
+        // $res['award_type'] = RecLottery::with(['lottery'])->where('id', $box_id)->find()['lottery']['type'];
+    
+        Common::res(['data' => $res]);
+    }
+
+    /*开福袋双倍*/
+    public function getFudaiDouble()
+    {
+        $this->getUser();
+        ActiveFudaiUser::getDouble($this->uid);
+    
         Common::res();
     }
 

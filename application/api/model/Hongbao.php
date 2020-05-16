@@ -2,10 +2,7 @@
 
 namespace app\api\model;
 
-use app\api\service\User as UserService;
 use app\base\model\Base;
-use app\base\service\Common;
-use think\Db;
 use think\Model;
 
 class Hongbao extends Base

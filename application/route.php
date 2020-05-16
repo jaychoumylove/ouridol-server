@@ -40,6 +40,11 @@ Route::rule('api/:version/page/sendHongbao', 'api/v1.Page/sendHongbao');// 新�
 Route::rule('api/:version/page/getBox', 'api/v1.Page/getBox');// 新春红包发
 Route::rule('api/:version/page/getHongbaoDouble', 'api/v1.Page/getHongbaoDouble');// 新春红包双倍
 
+Route::rule('api/:version/page/fudai', 'api/v1.Page/fudai');// 我的福袋列表
+Route::rule('api/:version/page/sendFudai', 'api/v1.Page/sendFudai');// 送福袋
+Route::rule('api/:version/page/getFudai', 'api/v1.Page/getFudai');// 开福袋
+Route::rule('api/:version/page/getFudaiDouble', 'api/v1.Page/getFudaiDouble');// 开福袋双倍
+
 // Remote
 Route::rule('api/:version/remote/zuimei', 'api/v1.Remote/zuimei');
 
