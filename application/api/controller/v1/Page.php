@@ -306,9 +306,15 @@ class Page extends Base
     /*我的福袋列表 */
     public function fudai()
     {
+
+        $page = $this->req('page','require');
         $this->getUser();
     
-        $res = ActiveFudai::where('user_id', $this->uid)->order('id desc')->select();
+        $res = ActiveFudai::where('user_id', $this->uid)->order('id desc')->page($page,10)->select();
+        foreach ($res as &$value){
+            $value['opened_people'] = ActiveFudaiUser::where('box_id',$value['id'])->count();
+            $value['status'] = $value['opened_people']>=$value['people'] ? 1 : 0;
+        }
         Common::res(['data' => $res]);
     }
 
