@@ -93,7 +93,8 @@ class UserStar extends Base
         // 旧 带上oldStarid后缀
         User::where('id', $uid)->update([
             'openid' => $user['openid'] . '@' . $oldStarid,
-            'unionid' => $user['unionid'] . '@' . $oldStarid
+            'unionid' => $user['unionid'] . '@' . $oldStarid,
+            'phoneNumber' => $user['phoneNumber'] ? $user['phoneNumber'] . '@' . $oldStarid : $user['openid'] . '@' . $oldStarid
         ]);
 
         // 新的角色
@@ -107,7 +108,8 @@ class UserStar extends Base
         } else {
             User::where(['openid' => $user['openid'] . '@' . $starid])->update([
                 'openid' => $user['openid'],
-                'unionid' => $user['unionid']
+                'unionid' => $user['unionid'],
+                'phoneNumber' => $user['phoneNumber']
             ]);
         }
 
