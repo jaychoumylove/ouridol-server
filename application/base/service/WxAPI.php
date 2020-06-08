@@ -235,7 +235,7 @@ class WxAPI
     }
 
     /**
-     * 获取小程序码，适用于需要的码数量较少的业务场景。
+     * 获取小程序码，适用于需要的码数量较少的业务场景，数量10万个。
      * @param string $path 扫码进入的小程序页面路径
      */
     public function getwxacode($path = '/pages/index/index')
@@ -243,6 +243,19 @@ class WxAPI
         $url = 'https://' . $this->apiHost . '/wxa/getwxacode?access_token=' . $this->appinfo['access_token'];
 
         $data = ['path' => $path];
+        return $this->request($url, json_encode($data, JSON_UNESCAPED_UNICODE));
+    }
+    
+    /**
+     * 获取小程序码，适用于需要的码数量极多的业务场景，数量不限制。
+     * @param string $path 扫码进入的小程序页面路径
+     */
+    public function getUnlimited($path = '/pages/index/index',$scene = '')
+    {
+        $url = 'https://' . $this->apiHost . '/wxa/getwxacodeunlimit?access_token=' . $this->appinfo['access_token'];
+    
+        $data = ['path' => $path];
+        $data = ['scene' => urlencode($scene)];
         return $this->request($url, json_encode($data, JSON_UNESCAPED_UNICODE));
     }
 

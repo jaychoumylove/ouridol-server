@@ -12,17 +12,10 @@ class UserRank extends Base
     {
         $starid = input('starid', 0);
         $type = input('type', 0);
+        $field = $this->req('field', 'require', 'thisweek_count');
+        if ($type==0) $field = 'thisweek_count'; 
         $open_id = $this->req('open_id', 'integer', 0); // 开屏图id
 
-        switch ($type) {
-            case 0:
-                $field = 'thisweek_count';
-                break;
-
-            default:
-                # code...
-                break;
-        }
         $page = input('page', 1);
         $size = input('size', 10);
 

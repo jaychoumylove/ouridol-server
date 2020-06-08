@@ -112,7 +112,7 @@ class UserRelation extends Base
             if ($res) {
                 foreach ($res as $key => &$value) {
                     $update_time = UserStar::where(['user_id' => $value['user']['id']])->value('update_time');
-                    if (time() - strtotime($update_time) > 3 * 3600 * 24) {
+                    if (time() - strtotime($update_time) > Cfg::getCfg('Inactive_days') * 3600 * 24) {
                         // 不活跃的不能收
                         $value['off'] = true;
                     } else {

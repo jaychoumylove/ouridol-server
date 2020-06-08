@@ -18,12 +18,6 @@ class Notify extends Base
         $msgTo = $wxMsg->msgHandler($msgFrom);        
         if($msgTo['type']=='gzh'){
             $wxMsg->autoSend($msgFrom,  $msgTo['MsgType'], ['Content' => $msgTo['content']]);
-            
-            //公众号表白
-//             if (strpos($msgFrom['Content'],'表白') === 0){
-//                 $media_id = $wxMsg->getMediaId(ROOT_PATH . 'public/uploads/biaobai520.jpg');
-//                 $wxMsg->autoSend($msgFrom, 'image', ['MediaId' => $media_id]);
-//             }
         }
     
         die('success');
@@ -43,12 +37,7 @@ class Notify extends Base
                 {
                     "type": "view",
                     "name": "购买礼物",
-                    "url": "https://ouridol.anaculture.com/#/pages/charge/charge"
-                },
-                {
-                    "type": "click",
-                    "name": "520表白",
-                    "key": "biaobai520"
+                    "url": "https://ouridol.anaculture.com/#/pages/recharge/recharge"
                 }
             ]
         }';
