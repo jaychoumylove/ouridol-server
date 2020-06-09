@@ -56,6 +56,13 @@ class ActiveFudaiUser extends Base
 
             (new UserService)->change($uid, ['coin' => $awardNum],  ['type' => 37]);//抢到福袋
 
+            // 更新福袋被领取的数量与状态
+            $fdUpdate = [];
+            $fdUpdate['receive'] = bcadd($boxInfo['receive'], 1, 0);
+            if ($fdUpdate['receive'] >= $boxInfo['people']) $fdUpdate['finished'] = 1;
+
+            ActiveFudai::update($fdUpdate, ['id' => $boxInfo['id']]);
+
             Db::commit();
         } catch (\Exception $e) {
             Db::rollback();

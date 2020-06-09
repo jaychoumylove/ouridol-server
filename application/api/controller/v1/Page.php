@@ -302,19 +302,28 @@ class Page extends Base
 
         Common::res();
     }
-    
-    /*我的福袋列表 */
-    public function fudai()
-    {
 
-        $page = $this->req('page','require');
+    /**
+     * 我的福袋列表
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function fudai ()
+    {
+        $page = $this->req('page', 'require');
         $this->getUser();
-    
-        $res = ActiveFudai::where('user_id', $this->uid)->order('id desc')->page($page,10)->select();
-        foreach ($res as &$value){
-            $value['opened_people'] = ActiveFudaiUser::where('box_id',$value['id'])->count();
-            $value['status'] = $value['opened_people']>=$value['people'] ? 1 : 0;
-        }
+
+        $today = date('Y-m-d') . " 00:00:00";
+
+        //opened_people,status
+        $res = (new ActiveFudai)->where('user_id', $this->uid)
+            ->where('create_time', '>', $today)
+            ->field("*, finished as status, receive as opened_people")
+            ->order('finished asc, create_time desc')
+            ->page($page, 2)
+            ->select();
+
         Common::res(['data' => $res]);
     }
 
@@ -322,25 +331,25 @@ class Page extends Base
     public function sendFudai()
     {
         $this->getUser();
-    
+
         $fudaiId = ActiveFudai::sendbox($this->uid);
         Common::res(['data' => $fudaiId]);
     }
-    
+
     /*开福袋*/
     public function getFudai()
     {
         $box_id = $this->req('id', 'integer');
-    
+
         $this->getUser();
-    
+
         $res['open'] = ActiveFudaiUser::openBox($this->uid, $box_id);
-    
+
         $res['info'] = ActiveFudai::with('user')->where('id', $box_id)->find();
-    
+
         $res['self'] = ActiveFudaiUser::with('user')->where('box_id', $box_id)->where('user_id', $this->uid)->find();
         if (!$res['self']) $res['self'] = ['count' => 0];
-    
+
         $res['list'] = ActiveFudaiUser::with('user')->where('box_id', $box_id)->order('id desc')->select();
         // 已领取
         $res['info']['isEarn'] = ActiveFudaiUser::where('box_id', $box_id)->sum('count');
@@ -348,7 +357,7 @@ class Page extends Base
         $res['lucky'] = ActiveFudaiUser::where('box_id', $box_id)->order('count desc')->value('user_id');
         // // 奖品type 1coin
         // $res['award_type'] = RecLottery::with(['lottery'])->where('id', $box_id)->find()['lottery']['type'];
-    
+
         Common::res(['data' => $res]);
     }
 
@@ -357,7 +366,7 @@ class Page extends Base
     {
         $this->getUser();
         ActiveFudaiUser::getDouble($this->uid);
-    
+
         Common::res();
     }
 
