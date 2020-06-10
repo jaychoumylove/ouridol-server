@@ -61,7 +61,7 @@ class ActiveFudaiUser extends Base
             $fdUpdate['receive'] = bcadd($boxInfo['receive'], 1, 0);
             if ($fdUpdate['receive'] >= $boxInfo['people']) $fdUpdate['finished'] = 1;
 
-            ActiveFudai::update($fdUpdate, ['id' => $boxInfo['id']]);
+            ActiveFudai::where('id', $box_id)->update($fdUpdate);
 
             Db::commit();
         } catch (\Exception $e) {

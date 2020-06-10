@@ -4,9 +4,13 @@ namespace app\api\model;
 
 use app\base\model\Base;
 use think\Model;
+use traits\model\SoftDelete;
 
 class ActiveFudai extends Base
 {
+    use SoftDelete;
+    protected $deleteTime = 'delete_time';
+
     public function user()
     {
         return $this->belongsTo('User', 'user_id', 'id')->field('id,nickname,avatarurl');
