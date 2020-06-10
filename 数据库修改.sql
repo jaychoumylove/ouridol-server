@@ -30,7 +30,13 @@ ADD COLUMN `active_finished_fee`  float UNSIGNED NULL DEFAULT 0 COMMENT '活动�
 ALTER TABLE `f_user_star`
 MODIFY COLUMN `active_subscribe`  tinyint(4) NULL DEFAULT 0 COMMENT '活动消息订阅 0未订阅 1已取消订阅 2已订阅 ' AFTER `fanclub_id`;
 
-
+--  2020年06月10日14:17:40 新增对道具上下架的控制
+ALTER TABLE f_prop ADD status enum('OFF', 'ON') DEFAULT 'ON' NOT NULL COMMENT 'ON 上架中
+OFF 已下架';
+ALTER TABLE f_prop
+  MODIFY COLUMN status enum('OFF', 'ON') NOT NULL DEFAULT 'ON' COMMENT 'ON 上架中
+OFF 已下架' AFTER fee;
+-- end
 
 
 

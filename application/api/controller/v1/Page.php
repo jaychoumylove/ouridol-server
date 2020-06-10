@@ -190,7 +190,7 @@ class Page extends Base
 
     public function prop()
     {
-        Common::res(['data' => Prop::all()]);
+        Common::res(['data' => Prop::all(['status' => Prop::ON])]);
     }
 
     public function myprop()
