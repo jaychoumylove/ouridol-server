@@ -36,6 +36,7 @@ OFF 已下架';
 ALTER TABLE f_prop
   MODIFY COLUMN status enum('OFF', 'ON') NOT NULL DEFAULT 'ON' COMMENT 'ON 上架中
 OFF 已下架' AFTER fee;
+CREATE INDEX f_prop_status_index ON f_prop (status);
 -- end
 
 
