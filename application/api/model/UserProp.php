@@ -2,7 +2,7 @@
 
 namespace app\api\model;
 
-use think\Model;
+use think\Cache;
 use app\base\model\Base;
 use app\base\service\Common;
 use think\Db;
@@ -10,6 +10,9 @@ use app\api\service\User;
 
 class UserProp extends Base
 {
+    const DOUBLE_STEAL_CARD = 2;
+    const TRIPLE_STEAL_CARD = 3;
+
     public function Prop()
     {
         return $this->belongsTo('Prop', 'prop_id', 'id');
@@ -86,6 +89,14 @@ class UserProp extends Base
                         'coin' => $awards[$rd]
                     ], ['type' => 26]);
                     $res['awards'] = $awards[$rd];
+                case 5:
+                    $expireTime = self::useMultipleStealCard($prop['user_id'], self::DOUBLE_STEAL_CARD);
+                    $res['expire_time'] = date('Y-m-d H:i:s', $expireTime);
+                    break;
+                case 6:
+                    $expireTime = self::useMultipleStealCard($prop['user_id'], self::TRIPLE_STEAL_CARD);
+                    $res['expire_time'] = date('Y-m-d H:i:s', $expireTime);
+                    break;
                 default:
                     # code...
                     break;
@@ -104,4 +115,82 @@ class UserProp extends Base
         return $res;
     }
 
+    /**
+     * 获取用户使用多倍卡的缓存key
+     * @param $userId
+     * @return string
+     */
+    public static function generateMultipleStealCardKey ($userId)
+    {
+        return sprintf("steal_card_%s", $userId);
+    }
+
+    /**
+     * 创建多倍卡的缓存
+     * @param $userId
+     * @param $multiple
+     * @return int|string
+     */
+    public static function useMultipleStealCard ($userId, $multiple)
+    {
+        $exist = self::checkMultipleStealCard($userId);
+        if ($exist) Common::res(['code' => 1, 'msg' => '抱歉，无法叠加']);
+
+        $stealCard = [
+            self::DOUBLE_STEAL_CARD => [
+                'multiple'     => self::DOUBLE_STEAL_CARD,
+                'cooling_time' => 40
+            ],
+            self::TRIPLE_STEAL_CARD => [
+                'multiple'     => self::TRIPLE_STEAL_CARD,
+                'cooling_time' => 10
+            ]
+        ];
+
+        $value = $stealCard[$multiple];
+
+        $expireTime = bcmul(60, 60);
+
+        $value['expire_time'] = time() + $expireTime; // 一小时后过期
+
+        Cache::set(self::generateMultipleStealCardKey($userId), $value, $expireTime);
+
+        return $value['expire_time'];
+    }
+
+    /**
+     * 获取多倍卡参数
+     * @param             $userId
+     * @param string|null $var
+     * @param bool        $default
+     * @return bool|mixed
+     */
+    public static function getMultipleStealCardVar ($userId, $var = null, $default = false)
+    {
+        if (empty($userId)) return $default;
+
+        $value = self::checkMultipleStealCard($userId);
+        if (empty($value)) return $default;
+
+        if (empty($var)) return $value;
+
+        return array_key_exists($var, $value) ? $value[$var]: $default;
+    }
+
+    /**
+     * 检查用户是否有多倍卡的使用
+     * @param $userId
+     * @return bool|mixed
+     */
+    public static function checkMultipleStealCard ($userId)
+    {
+        if (empty($userId)) return false;
+
+        $key = self::generateMultipleStealCardKey($userId);
+
+        $value = Cache::get($key);
+        if (empty($value)) return false;
+
+        return $value;
+    }
 }

@@ -1,6 +1,7 @@
 <?php
 namespace app\api\controller\v1;
 
+use app\api\model\UserProp;
 use app\base\controller\Base;
 use app\api\service\Star as StarService;
 use app\api\model\Star as StarModel;
@@ -134,26 +135,36 @@ class Star extends Base
     /**
      * 偷花
      */
-    public function steal()
+    public function steal ()
     {
         $starid = $this->req('starid', 'integer');
-        $index = input('index');
-        if (! $starid)
+        $index  = input('index');
+        if (!$starid)
             Common::res([
                 'code' => 100
             ]);
         $this->getUser();
-        
+
         $spriteLevel = UserSprite::where([
             'user_id' => $this->uid
         ])->value('sprite_level');
-        $stealCount = Cfg::getCfg('stealCount') * $spriteLevel;
+
+        // 是否使用偷取多倍卡
+        $useCard = UserProp::getMultipleStealCardVar($this->uid);
+
+        $stealLimitTime = $useCard ? $useCard['cooling_time'] : Cfg::getCfg('stealLimitTime');
+        $stealMultiple  = $useCard ? $useCard['multiple'] : Cfg::getCfg('stealCount');
+
+        $stealCount = $stealMultiple * $spriteLevel;
+
         (new StarService())->steal($starid, $this->uid, $stealCount);
-        
+
         UserExt::setTime($this->uid, $index);
+
         Common::res([
             'data' => [
-                'count' => $stealCount
+                'count' => $stealCount,
+                'steal' => $stealLimitTime
             ]
         ]);
     }

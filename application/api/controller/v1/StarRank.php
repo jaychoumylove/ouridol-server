@@ -2,6 +2,7 @@
 
 namespace app\api\controller\v1;
 
+use app\api\model\UserProp;
 use app\base\controller\Base;
 use app\api\model\StarRank as StarRankModel;
 use app\base\service\Common;
@@ -28,19 +29,26 @@ class StarRank extends Base
             // 偷花倒计时
             $this->getUser();
             $res = UserExt::get(['user_id' => $this->uid]);
+            // 获取使用偷取多倍卡信息
+            $useCard = UserProp::getMultipleStealCardVar($this->uid);
+
+            $stealLimitTime = $useCard ? $useCard['cooling_time'] : Cfg::getCfg('stealLimitTime');
             $leftTime = json_decode($res['left_time']);
             foreach ($leftTime as &$value) {
-                $time =  Cfg::getCfg('stealLimitTime') - (time() - $value);
+                $time =  $stealLimitTime - (time() - $value);
                 if ($time < 0) {
                     $time = 0;
                 }
                 $value = $time;
             }
             $spriteLevel = UserSprite::where(['user_id' => $this->uid])->value('sprite_level');
+
+            $stealMultiple = $useCard ? $useCard['multiple'] : Cfg::getCfg('stealCount');
+
             Common::res(['data' => [
                 'list' => $list,
                 'steal' => $leftTime,
-                'steal_count' => Cfg::getCfg('stealCount') * $spriteLevel,
+                'steal_count' => bcmul($stealMultiple, $spriteLevel),
                 'sprite_level' => $spriteLevel,
                 'steal_times' => $res['steal_times'],
                 'steal_times_max' => Cfg::getCfg('steal_limit'),
