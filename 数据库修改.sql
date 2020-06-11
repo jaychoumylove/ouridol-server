@@ -45,4 +45,11 @@ ALTER TABLE f_prop
   MODIFY COLUMN stone int(11) NOT NULL DEFAULT 0 COMMENT '花费灵丹' AFTER fee;
 -- END
 
+-- 2020-06-11 15:46:49 新增灵丹兑换type
+INSERT INTO `f_cfg_rec_type`(`id`, `content`, `create_time`, `update_time`, `delete_time`) VALUES (39, '兑换【$0】个【$1】', '2020-06-11 09:54:52', '2020-06-11 10:57:35', NULL);
+ -- 新增两个道具
+ INSERT INTO `f_prop`(`id`, `title`, `name`, `img`, `fee`, `stone`, `status`, `desc`, `remain`, `create_time`, `update_time`, `delete_time`) VALUES (5, '道具购买', '偷取能量双倍卡', NULL, 2, 40, 'OFF', '使用后，一小时内，偷取能量双倍获得，冷却时间缩短到40秒', 100, '2020-06-09 14:52:40', '2020-06-11 09:57:03', NULL);
+INSERT INTO `f_prop`(`id`, `title`, `name`, `img`, `fee`, `stone`, `status`, `desc`, `remain`, `create_time`, `update_time`, `delete_time`) VALUES (6, '道具购买', '偷取能量三倍卡', NULL, 4, 80, 'ON', '使用后，一小时内，偷取能量三倍获得，冷却时间缩短到10秒', 100, '2020-06-09 14:53:31', '2020-06-11 09:57:03', NULL);
+-- wnd
+
 
