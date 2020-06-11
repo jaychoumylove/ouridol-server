@@ -144,4 +144,13 @@ class UserFather extends Base
             }
         }
     }
+
+    /**
+     * 接触师徒关系
+     * @param $relation
+     */
+    public static function breakRelationship ($relation)
+    {
+        self::destroy($relation, true);
+    }
 }
