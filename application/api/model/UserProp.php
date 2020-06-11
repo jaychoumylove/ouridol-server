@@ -2,7 +2,6 @@
 
 namespace app\api\model;
 
-use think\Cache;
 use app\base\model\Base;
 use app\base\service\Common;
 use think\Db;
@@ -10,8 +9,21 @@ use app\api\service\User;
 
 class UserProp extends Base
 {
+    const DOUBLE_STEAL_CARD_ID = 5;
+    const TRIPLE_STEAL_CARD_ID = 6;
     const DOUBLE_STEAL_CARD = 2;
     const TRIPLE_STEAL_CARD = 3;
+
+    public static $stealCard = [
+        self::DOUBLE_STEAL_CARD_ID => [
+            'multiple'     => self::DOUBLE_STEAL_CARD,
+            'cooling_time' => 40
+        ],
+        self::TRIPLE_STEAL_CARD_ID => [
+            'multiple'     => self::TRIPLE_STEAL_CARD,
+            'cooling_time' => 10
+        ]
+    ];
 
     public function Prop()
     {
@@ -89,11 +101,11 @@ class UserProp extends Base
                         'coin' => $awards[$rd]
                     ], ['type' => 26]);
                     $res['awards'] = $awards[$rd];
-                case 5:
+                case self::DOUBLE_STEAL_CARD_ID:
                     $expireTime = self::useMultipleStealCard($prop['user_id'], self::DOUBLE_STEAL_CARD);
                     $res['expire_time'] = date('Y-m-d H:i:s', $expireTime);
                     break;
-                case 6:
+                case self::TRIPLE_STEAL_CARD_ID:
                     $expireTime = self::useMultipleStealCard($prop['user_id'], self::TRIPLE_STEAL_CARD);
                     $res['expire_time'] = date('Y-m-d H:i:s', $expireTime);
                     break;
@@ -132,6 +144,7 @@ class UserProp extends Base
         if ($prop['status'] == Prop::OFF) Common::res(['code' => 1, 'msg' => '道具已下架']);
 
         if ((int) $prop['stone'] < 1) Common::res(['code' => 1, 'msg' => '道具已禁止兑换']);
+        if ((int) $prop['remain'] < $num) Common::res(['code' => 1, 'msg' => sprintf('%s仅剩%s个', $prop['name'], $prop['remain'])]);
 
         // 所花费的砖石
         $tokenStone = bcmul($prop['stone'], $num);
@@ -139,19 +152,11 @@ class UserProp extends Base
 
         self::addProp($uid, $propId, $num);
 
+        Prop::where(['id' => $propId])->update(['remain' => bcsub($prop['remain'], $num)]);
+
         $recordContent = sprintf('["%s", "%s"]', $num, $prop['name']);
 
         (new User())->change($uid, ['stone' => -$tokenStone], ['type' => 39, 'content' => $recordContent]);// 扣除灵丹并记录
-    }
-
-    /**
-     * 获取用户使用多倍卡的缓存key
-     * @param $userId
-     * @return string
-     */
-    public static function generateMultipleStealCardKey ($userId)
-    {
-        return sprintf("steal_card_%s", $userId);
     }
 
     /**
@@ -159,30 +164,18 @@ class UserProp extends Base
      * @param $userId
      * @param $multiple
      * @return int|string
+     * @throws \think\exception\DbException
      */
     public static function useMultipleStealCard ($userId, $multiple)
     {
         $exist = self::checkMultipleStealCard($userId);
         if ($exist) Common::res(['code' => 1, 'msg' => '抱歉，无法叠加']);
 
-        $stealCard = [
-            self::DOUBLE_STEAL_CARD => [
-                'multiple'     => self::DOUBLE_STEAL_CARD,
-                'cooling_time' => 40
-            ],
-            self::TRIPLE_STEAL_CARD => [
-                'multiple'     => self::TRIPLE_STEAL_CARD,
-                'cooling_time' => 10
-            ]
-        ];
-
-        $value = $stealCard[$multiple];
+        $value = self::$stealCard[$multiple];
 
         $expireTime = bcmul(60, 60);
 
         $value['expire_time'] = time() + $expireTime; // 一小时后过期
-
-        Cache::set(self::generateMultipleStealCardKey($userId), $value, $expireTime);
 
         return $value['expire_time'];
     }
@@ -193,6 +186,7 @@ class UserProp extends Base
      * @param string|null $var
      * @param bool        $default
      * @return bool|mixed
+     * @throws \think\exception\DbException
      */
     public static function getMultipleStealCardVar ($userId, $var = null, $default = false)
     {
@@ -210,16 +204,22 @@ class UserProp extends Base
      * 检查用户是否有多倍卡的使用
      * @param $userId
      * @return bool|mixed
+     * @throws \think\exception\DbException
      */
     public static function checkMultipleStealCard ($userId)
     {
         if (empty($userId)) return false;
 
-        $key = self::generateMultipleStealCardKey($userId);
+        $time = bcsub(time(), 3600);
 
-        $value = Cache::get($key);
-        if (empty($value)) return false;
+        $propIds = [self::DOUBLE_STEAL_CARD_ID, self::TRIPLE_STEAL_CARD_ID];
 
-        return $value;
+        $where = sprintf('`user_id` = %s and `use_time` > %s and `prop_id` in (%s)', $userId, $time, implode(',', $propIds));
+
+        $exist = self::get($where);
+
+        if (empty($exist)) return false;
+
+        return self::$stealCard[$exist['prop_id']];
     }
 }
