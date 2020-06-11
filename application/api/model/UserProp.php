@@ -102,11 +102,11 @@ class UserProp extends Base
                     ], ['type' => 26]);
                     $res['awards'] = $awards[$rd];
                 case self::DOUBLE_STEAL_CARD_ID:
-                    $expireTime = self::useMultipleStealCard($prop['user_id'], self::DOUBLE_STEAL_CARD);
+                    $expireTime = self::useMultipleStealCard($prop['user_id'], self::DOUBLE_STEAL_CARD_ID);
                     $res['expire_time'] = date('Y-m-d H:i:s', $expireTime);
                     break;
                 case self::TRIPLE_STEAL_CARD_ID:
-                    $expireTime = self::useMultipleStealCard($prop['user_id'], self::TRIPLE_STEAL_CARD);
+                    $expireTime = self::useMultipleStealCard($prop['user_id'], self::TRIPLE_STEAL_CARD_ID);
                     $res['expire_time'] = date('Y-m-d H:i:s', $expireTime);
                     break;
                 default:
@@ -214,9 +214,15 @@ class UserProp extends Base
 
         $propIds = [self::DOUBLE_STEAL_CARD_ID, self::TRIPLE_STEAL_CARD_ID];
 
-        $where = sprintf('`user_id` = %s and `use_time` > %s and `prop_id` in (%s)', $userId, $time, implode(',', $propIds));
+        $where = sprintf('`user_id` = %s and `use_time` > %s and `prop_id` in (%s)',
+            $userId,
+            $time,
+            implode(',', $propIds)
+        );
 
-        $exist = self::get($where);
+        $exist = self::get(function ($query) use ($where) {
+            $query->where($where);
+        });
 
         if (empty($exist)) return false;
 
