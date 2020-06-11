@@ -116,6 +116,35 @@ class UserProp extends Base
     }
 
     /**
+     * 使用灵丹兑换道具
+     * @param $uid
+     * @param $propId
+     * @param $num
+     * @throws \think\exception\DbException
+     */
+    public static function exchange ($uid, $propId, $num)
+    {
+        $userCurrency = UserCurrency::get(['uid' => $uid]);
+        if (empty($userCurrency)) Common::res(['code' => 1, 'msg' => '不存在的用户']);
+
+        $prop = Prop::get($propId);
+        if (empty($prop)) Common::res(['code' => 1, 'msg' => "未知道具"]);
+        if ($prop['status'] == Prop::OFF) Common::res(['code' => 1, 'msg' => '道具已下架']);
+
+        if ((int) $prop['stone'] < 1) Common::res(['code' => 1, 'msg' => '道具已禁止兑换']);
+
+        // 所花费的砖石
+        $tokenStone = bcmul($prop['stone'], $num);
+        if ($tokenStone > $userCurrency['stone']) Common::res(['code' => 1, 'msg' => '灵丹不足']);
+
+        self::addProp($uid, $propId, $num);
+
+        $recordContent = sprintf('["%s", "%s"]', $num, $prop['name']);
+
+        (new User())->change($uid, ['stone' => -$tokenStone], ['type' => 39, 'content' => $recordContent]);// 扣除灵丹并记录
+    }
+
+    /**
      * 获取用户使用多倍卡的缓存key
      * @param $userId
      * @return string

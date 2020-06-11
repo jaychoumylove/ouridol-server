@@ -39,5 +39,10 @@ OFF 已下架' AFTER fee;
 CREATE INDEX f_prop_status_index ON f_prop (status);
 -- end
 
+-- 2020-06-10 17:56:35 新增道具灵丹兑换
+ALTER TABLE f_prop ADD stone int(11) DEFAULT 0 NOT NULL COMMENT '花费灵丹';
+ALTER TABLE f_prop
+  MODIFY COLUMN stone int(11) NOT NULL DEFAULT 0 COMMENT '花费灵丹' AFTER fee;
+-- END
 
 

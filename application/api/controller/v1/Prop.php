@@ -17,4 +17,24 @@ class Prop extends Base
         $res = UserProp::use($id);
         Common::res(['data' => $res]);
     }
+
+    /**
+     * 灵丹兑换道具入口
+     * @throws \think\exception\DbException
+     */
+    public function exchange ()
+    {
+        $num = input('num');
+        $propId  = input('id');
+
+        if ((int) $num < 1) Common::res(['code' => 100, 'msg' => '请输入正确的数量']);
+        if ((int) $propId < 1) Common::res(['code' => 100, 'msg' => '请选择道具']);
+
+        $this->getUser();
+        $uid = $this->uid;
+
+        UserProp::exchange($uid, $propId, $num);
+
+        Common::res(['msg' => '兑换成功']);
+    }
 }

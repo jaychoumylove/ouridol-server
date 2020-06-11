@@ -128,6 +128,9 @@ Route::rule('api/:version/pay/order', 'api/v1.Payment/order');// 支付下单
 Route::rule('api/:version/pay/notify', 'api/v1.Payment/notify');// 支付通知
 Route::rule('api/:version/pay/goods', 'api/v1.Payment/goods');// 商品列表
 
+// Props
+Route::rule('api/:version/prop/exchange', 'api/v1.Prop/exchange');// 灵丹兑换道具
+
 // Task
 Route::rule('api/:version/task', 'api/v1.Task/index');// 任务
 Route::rule('api/:version/task/settle', 'api/v1.Task/settle');// 任务领取
