@@ -14,7 +14,7 @@ use app\base\model\Base;
 class RecReport extends Base
 {
     // 限制五分钟内十人举报自动永久禁言
-    const LIMIT_REPORT = 5;
+    const LIMIT_REPORT = 10;
     const LIMIT_MINUTE = 5;
 
     /**

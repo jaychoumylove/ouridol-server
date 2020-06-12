@@ -261,7 +261,7 @@ class User extends Base
         ]);
 
         // 保存聊天记录
-        RecStarChart::create([
+        $rec = RecStarChart::create([
             'user_id' => $this->uid,
             'star_id' => UserStar::where('user_id', $this->uid)->value('star_id'),
             'content' => $content,
@@ -277,6 +277,8 @@ class User extends Base
                 'avatarurl' => $user['avatarurl'],
                 'content' => $content,
                 'nickname' => $user['nickname'],
+                'id' => $this->uid,
+                'rec' => $rec['id']
             ],
         ], JSON_UNESCAPED_UNICODE));
 
@@ -431,7 +433,7 @@ class User extends Base
             'report_id' => $userId
         ])->find();
 
-        if ($reported) Common::res(['code' => 1, 'msg' => '已举报']);
+        if ($reported) Common::res();
 
         $data = [
             'star_id' => $starId,
