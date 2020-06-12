@@ -52,4 +52,12 @@ INSERT INTO `f_cfg_rec_type`(`id`, `content`, `create_time`, `update_time`, `del
 INSERT INTO `f_prop`(`id`, `title`, `name`, `img`, `fee`, `stone`, `status`, `desc`, `remain`, `create_time`, `update_time`, `delete_time`) VALUES (6, '道具购买', '偷取能量三倍卡', NULL, 4, 80, 'OFF', '使用后，一小时内，偷取能量三倍获得，冷却时间缩短到10秒', 100, '2020-06-09 14:53:31', '2020-06-11 09:57:03', NULL);
 -- wnd
 
+-- 2020-06-12 10:40:14 新增解禁时间
+ALTER TABLE f_user_ext ADD forbidden_time int(11) NULL COMMENT '发言喊话解禁时间';
+ALTER TABLE f_user_ext
+  MODIFY COLUMN forbidden_time int(11) COMMENT '发言喊话解禁时间' AFTER gzh_signin_time;
+-- end
+--- 2020-06-12 11:43:16 新增禁言配置
+INSERT INTO `f_cfg`(`id`, `description`, `key`, `value`, `show`, `create_time`, `update_time`, `delete_time`) VALUES (69, '禁言时间', 'forbidden_time', '[{\"key\": \"1hours\", \"value\": \"禁言1小时\"},{\"key\": \"3hours\", \"value\": \"禁言3小时\"},{\"key\": \"1day\", \"value\": \"禁言24小时\"},{\"key\": \"1week\", \"value\": \"禁言7天\"},{\"key\": \"1year\", \"value\": \"禁言365天\"}]', 1, '2020-06-12 11:41:23', '2020-06-12 11:42:13', NULL);
+-- end
 

@@ -70,12 +70,18 @@ class RecStarChart extends Base
      */
     public static function sendMsg($uid, $starid, $content, $client_id = NULL)
     {
+        $isForbidden = User::checkForbidden($uid);
+        if ($isForbidden) Common::res([
+            'code' => 1,
+            'msg' => '你已被禁言'
+        ]);
+
         // 校验
         self::verifyWord($content);
 //        if (input('platform') == 'MP-WEIXIN') {
 //            self::verifyWord($content);
 //        }
-        
+
         Db::startTrans();
         try {
             // 保存聊天记录
@@ -100,14 +106,6 @@ class RecStarChart extends Base
             
             $totalCount = $res['user']['user_star']['total_count'];
             $res['user']['level'] = CfgUserLevel::where('total', '<=', $totalCount)->max('level');
-            
-            if ($res['user']['type'] == 2) {
-                Db::rollback();
-                Common::res([
-                    'code' => 1,
-                    'msg' => '你已被禁言'
-                ]);
-            }
             
             // 如果是新用户,群主默认回复一段话
             //if ($client_id) self::GrouperSayHello($starid, $uid);

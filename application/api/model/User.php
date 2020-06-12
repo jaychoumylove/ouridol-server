@@ -8,6 +8,9 @@ use think\Db;
 
 class User extends Base
 {
+    const USER_ADMIN = 1; // type 为 1 时，该用户为管理员
+    const USER_FORBIDDEN = 2; // type 为 2 时，该用户被永久禁言
+
     public function UserStar()
     {
         return $this->hasOne('UserStar', 'user_id', 'id', [], 'LEFT');
@@ -183,5 +186,75 @@ class User extends Base
         if (!$uid) Common::res(['code' => 1, 'msg' => '该圈子未找到Android']);
 
         return $uid;
+    }
+
+    /**
+     * 禁言
+     * @param      $userId
+     * @param      $forbiddenId
+     * @param null $time
+     * @return bool
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function forbidden ($userId, $forbiddenId, $time = null)
+    {
+        $check = self::checkForbidden($forbiddenId);
+        if (true == $check) return true;
+
+        $model = new self();
+
+        $self = $model::get($userId);
+
+        if ($self['type'] == self::USER_ADMIN) {
+            $isDone = $model->where('id', $forbiddenId)->update(['type' => self::USER_FORBIDDEN]);
+
+            if (empty($isDone)) Common::res(['code' => 1, 'msg' => '禁言失败']);
+
+            return true;
+        }
+
+        $userExt = UserStar::where(['user_id' => $userId])->find();
+
+        if (empty($userExt)) Common::res(['code' => 1, 'msg' => '禁言失败']);
+
+        if ($userExt['captain'] == UserStar::CAPTAIN) {
+            if (empty($time)) Common::res(['code' => 1, 'msg' => '请选择禁言时间']);
+
+            $forbiddenTimeCfg = Cfg::getCfg(Cfg::FORBIDDEN_TIME);
+
+            $time = $forbiddenTimeCfg[$time]['key'];
+
+            $forbiddenTime = strtotime(sprintf('+%s', $time));
+
+            $isDone = UserExt::where(['user_id' => $forbiddenId])->update(['forbidden_time' => $forbiddenTime]);
+
+            if (empty($isDone)) Common::res(['code' => 1, 'msg' => '禁言失败']);
+
+            return true;
+        }
+
+        Common::res(['code' => 1, 'msg' => '你无权禁言']);
+    }
+
+    /**
+     * 检查是否是禁言状态
+     * @param $forbiddenId
+     * @return bool
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function checkForbidden ($forbiddenId)
+    {
+        $user = self::get($forbiddenId);
+        if ($user['type'] == self::USER_FORBIDDEN) return true;
+
+        $userExit = UserExt::where(['user_id' => $forbiddenId])->find();
+        if (empty($userExit)) return false;
+
+        if (empty($userExit['forbidden_time'])) return false;
+        if ($userExit['forbidden_time'] > time()) return true;
     }
 }

@@ -241,6 +241,12 @@ class User extends Base
         if (input('platform') == 'MP-WEIXIN') {
             RecStarChart::verifyWord($content);
         }
+
+        $isForbidden = UserModel::checkForbidden($this->uid);
+        if ($isForbidden) Common::res([
+            'code' => 1,
+            'msg' => '你已被禁言'
+        ]);
         // 扣除喇叭
         (new UserService())->change($this->uid, [
             'trumpet' => -1
@@ -348,18 +354,21 @@ class User extends Base
         Common::res();
     }
 
+    /**
+     * 用户禁言
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public function forbidden()
     {
+        $this->getUser();
         $user_id = input('user_id');
+        $time = input('time', null);
 
-        $type = 2;
+        UserModel::forbidden($this->uid, $user_id, $time);
 
-        $isDone = UserModel::where('id', $user_id)->update(['type' => $type]);
-        if ($isDone) {
-            Common::res();
-        } else {
-            Common::res(['code' => 1]);
-        }
+        Common::res();
     }
     
     public function level()

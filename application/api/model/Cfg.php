@@ -6,6 +6,8 @@ use app\base\model\Base;
 
 class Cfg extends Base
 {
+    const FORBIDDEN_TIME = 'forbidden_time';
+
     public static function getCfg($key)
     {
         $value = self::where(['key' => $key])->value('value');

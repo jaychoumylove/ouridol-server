@@ -9,6 +9,8 @@ use app\base\service\WxAPI;
 
 class UserStar extends Base
 {
+    const CAPTAIN = 1;
+
     public function User()
     {
         return  $this->belongsTo('User', 'user_id', 'id')->field('id,avatarurl,nickname');
