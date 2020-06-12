@@ -61,3 +61,40 @@ ALTER TABLE f_user_ext
 INSERT INTO `f_cfg`(`id`, `description`, `key`, `value`, `show`, `create_time`, `update_time`, `delete_time`) VALUES (69, '禁言时间', 'forbidden_time', '[{\"key\": \"1hours\", \"value\": \"禁言1小时\"},{\"key\": \"3hours\", \"value\": \"禁言3小时\"},{\"key\": \"1day\", \"value\": \"禁言24小时\"},{\"key\": \"1week\", \"value\": \"禁言7天\"},{\"key\": \"1year\", \"value\": \"禁言365天\"}]', 1, '2020-06-12 11:41:23', '2020-06-12 11:42:13', NULL);
 -- end
 
+-- 2020-06-12 13:58:17 新增举报记录表
+
+CREATE TABLE `f_rec_report` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL COMMENT '举报用户id',
+  `report_id` int(11) NOT NULL COMMENT '被举报者用户id',
+  `create_time` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `delete_time` timestamp DEFAULT null,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `report_id_uindex` (`id`),
+  KEY `f_rec_report_report_index` (`report_id`),
+  KEY `f_rec_report_report_create_index` (`report_id`,`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='举报记录表';
+
+ALTER TABLE f_rec_report ADD report_type int NOT NULL COMMENT '被举报原因类型';
+ALTER TABLE f_rec_report ADD extend varchar(255) NULL COMMENT '举报携带数据';
+ALTER TABLE f_rec_report CHANGE report_type type int(11) NOT NULL COMMENT '被举报原因类型';
+ALTER TABLE f_rec_report
+  MODIFY COLUMN type int(11) NOT NULL COMMENT '被举报原因类型' AFTER report_id,
+  MODIFY COLUMN extend varchar(255) COMMENT '举报携带数据' AFTER type;
+
+-- end
+
+-- 2020-06-12 15:36:02
+ALTER TABLE f_rec_star_chart ADD type enum('WORLD', 'MESSAGE') DEFAULT 'MESSAGE' NULL COMMENT '发言类型
+world 世界喊话
+message 普通发言';
+ALTER TABLE f_rec_star_chart
+  MODIFY COLUMN type enum('WORLD', 'MESSAGE') DEFAULT 'MESSAGE' COMMENT '发言类型
+world 世界喊话
+message 普通发言' AFTER content;
+-- end
+
+-- 2020-06-12 15:58:28  新增举报原因配置信息
+INSERT INTO `f_cfg`(`id`, `description`, `key`, `value`, `show`, `create_time`, `update_time`, `delete_time`) VALUES (70, '举报类别列表', 'report_reason', '[{\"value\":\"该用户存在赌博行为\"},{\"value\":\"该用户存在欺诈骗钱行为\"},{\"value\":\"该用户发布不适当信息对我进行骚扰\"},{\"value\":\"该用户传播谣言信息\"}]', 1, '2020-06-12 15:57:17', '2020-06-12 15:58:06', NULL);
+-- end

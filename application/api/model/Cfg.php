@@ -7,6 +7,7 @@ use app\base\model\Base;
 class Cfg extends Base
 {
     const FORBIDDEN_TIME = 'forbidden_time';
+    const REPORT_REASON = 'report_reason';
 
     public static function getCfg($key)
     {

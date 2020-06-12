@@ -2,6 +2,7 @@
 
 namespace app\api\controller\v1;
 
+use app\api\model\RecReport;
 use app\base\controller\Base;
 use app\api\model\User as UserModel;
 use app\base\service\Common;
@@ -242,21 +243,30 @@ class User extends Base
     {
         $content = $this->req('content', 'require');
         $this->getUser();
-        // 发言内容校验
-        if (input('platform') == 'MP-WEIXIN') {
-            RecStarChart::verifyWord($content);
-        }
 
         $isForbidden = UserModel::checkForbidden($this->uid);
         if ($isForbidden) Common::res([
             'code' => 1,
             'msg' => '你已被禁言'
         ]);
+        // 发言内容校验
+        if (input('platform') == 'MP-WEIXIN') {
+            RecStarChart::verifyWord($content);
+        }
         // 扣除喇叭
         (new UserService())->change($this->uid, [
             'trumpet' => -1
         ], [
             'type' => 3
+        ]);
+
+        // 保存聊天记录
+        RecStarChart::create([
+            'user_id' => $this->uid,
+            'star_id' => UserStar::where('user_id', $this->uid)->value('star_id'),
+            'content' => $content,
+            'type' => RecStarChart::WORLD,
+            'create_time' => time()
         ]);
 
         $user = UserModel::where(['id' => $this->uid])->field('nickname,avatarurl')->find();
@@ -390,8 +400,52 @@ class User extends Base
         Common::res(['data' => $res]);
     }
 
+    /**
+     * 举报
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public function report ()
     {
+        $userId = input('user_id');
+        $type = input('type');
+        $recChat = input('id');
+        $this->getUser();
 
+        $recChatInfo = RecStarChart::get($recChat);
+        if (empty($recChatInfo)) Common::res(['code' => 1]);
+
+        if ($userId != $recChatInfo['user_id']) Common::res(['code' => 1]);
+
+        $starId = UserStar::getStarId($userId);
+        if (empty($starId)) Common::res(['code' => 1]);
+        if ($starId != $recChatInfo['star_id']) Common::res(['code' => 1]);
+
+        $reportCfg = Cfg::getCfg(Cfg::REPORT_REASON);
+        if (array_key_exists($type, $reportCfg) == false) Common::res(['code' => 1]);
+
+        // 重复举报
+        $reported = RecReport::where([
+            'user_id' => $this->uid,
+            'report_id' => $userId
+        ])->find();
+
+        if ($reported) Common::res(['code' => 1, 'msg' => '已举报']);
+
+        $data = [
+            'star_id' => $starId,
+            'rec_chat_id' => $recChat,
+            'content' => $recChatInfo['content']
+        ];
+        RecReport::addReport($this->uid, $userId, $type, $data);
+
+        // 如果符合禁言条件直接永久禁言
+        $isForbidden = RecReport::checkReport($userId);
+        if (true == $isForbidden) {
+            UserModel::forbiddenUser($userId, UserModel::FOREVER_FORBIDDEN);
+        }
+
+        Common::res(['msg' => '已举报']);
     }
 }

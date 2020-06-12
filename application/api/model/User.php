@@ -193,13 +193,13 @@ class User extends Base
      * 禁言
      * @param      $userId
      * @param      $forbiddenId
-     * @param null $time
+     * @param int  $time
      * @return bool
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public static function forbidden ($userId, $forbiddenId, $time = null)
+    public static function forbidden ($userId, $forbiddenId, $time = -1)
     {
         $check = self::checkForbidden($forbiddenId);
         if (true == $check) return true;
@@ -209,7 +209,7 @@ class User extends Base
         $self = $model::get($userId);
 
         if ($self['type'] == self::USER_ADMIN) {
-            $isDone = $model->where('id', $forbiddenId)->update(['type' => self::USER_FORBIDDEN]);
+            $isDone = $model->forbiddenUser($forbiddenId, self::FOREVER_FORBIDDEN);
 
             if (empty($isDone)) Common::res(['code' => 1, 'msg' => '禁言失败']);
 
@@ -221,15 +221,8 @@ class User extends Base
         if (empty($userExt)) Common::res(['code' => 1, 'msg' => '禁言失败']);
 
         if ($userExt['captain'] == UserStar::CAPTAIN) {
-            if (empty($time)) Common::res(['code' => 1, 'msg' => '请选择禁言时间']);
-
-            $forbiddenTimeCfg = Cfg::getCfg(Cfg::FORBIDDEN_TIME);
-
-            $time = $forbiddenTimeCfg[$time]['key'];
-
-            $forbiddenTime = strtotime(sprintf('+%s', $time));
-
-            $isDone = UserExt::where(['user_id' => $forbiddenId])->update(['forbidden_time' => $forbiddenTime]);
+            if ((int) $time < 0) Common::res(['code' => 1, 'msg' => '请选择禁言时间']);
+            $isDone = $model->forbiddenUser($forbiddenId, $time);
 
             if (empty($isDone)) Common::res(['code' => 1, 'msg' => '禁言失败']);
 
@@ -258,5 +251,28 @@ class User extends Base
 
         if (empty($userExit['forbidden_time'])) return false;
         if ($userExit['forbidden_time'] > time()) return $time ? $userExit['forbidden_time']: true;
+    }
+
+    /**
+     * 禁言
+     * @param $forbiddenId
+     * @param $type
+     * @return User|UserExt
+     */
+    public static function forbiddenUser ($forbiddenId, $type)
+    {
+        if ($type == self::FOREVER_FORBIDDEN) {
+            return self::where('id', $forbiddenId)->update(['type' => self::USER_FORBIDDEN]);
+        }
+
+        if ($type > -1) {
+            $forbiddenTimeCfg = Cfg::getCfg(Cfg::FORBIDDEN_TIME);
+
+            $time = $forbiddenTimeCfg[$type]['key'];
+
+            $forbiddenTime = strtotime(sprintf('+%s', $time));
+
+            return UserExt::where(['user_id' => $forbiddenId])->update(['forbidden_time' => $forbiddenTime]);
+        }
     }
 }

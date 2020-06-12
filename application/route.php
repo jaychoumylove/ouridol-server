@@ -89,6 +89,7 @@ Route::rule('api/:version/user/reset/father', 'api/v1.UserFather/resetFather');/
 Route::rule('api/:version/user/reset/son', 'api/v1.UserFather/resetSon');// 逐出师门
 
 Route::rule('api/:version/user/sayworld', 'api/v1.User/sayworld');// 世界喊话
+Route::rule('api/:version/user/report', 'api/v1.User/report');// 举报世界喊话
 Route::rule('api/:version/user/bind', 'api/v1.User/bindClientId');// 绑定client_id
 
 Route::rule('api/:version/user/saveformid', 'api/v1.Ext/saveFormId');// 保存formId
