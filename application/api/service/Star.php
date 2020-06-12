@@ -2,6 +2,7 @@
 
 namespace app\api\service;
 
+use app\api\model\ActiveFudai;
 use app\api\model\StarRank as StarRankModel;
 use think\Db;
 use app\api\model\UserStar;
@@ -48,6 +49,7 @@ class Star
             Common::res(['code' => 1, 'msg' => '榜单结算中，请稍后再试！']);
         }
 
+        $res = [];
         Db::startTrans();
         try {
             $moreInfo = ''; // 日志记录的更多信息
@@ -104,6 +106,14 @@ class Star
                     ]
                 ], JSON_UNESCAPED_UNICODE));
 
+                $fudai = ActiveFudai::sendbox($uid, bcmul($hot, ActiveFudai::FUDAI_ACTIVE), ActiveFudai::MAX_PEOPLE);
+
+                $res['fudai'] = [
+                    'id'     => $fudai['id'],
+                    'coin'   => $fudai['coin'],
+                    'people' => $fudai['people']
+                ];
+
                 // 全服推送
                 Gateway::sendToAll(json_encode([
                     'type' => 'sayworld',
@@ -152,6 +162,8 @@ class Star
             Db::rollBack();
             Common::res(['code' => 400, 'data' => $e->getMessage()]);
         }
+
+        return $res;
     }
 
     /**今日偷取数额上限 */

@@ -7,6 +7,9 @@ use think\Model;
 
 class ActiveFudai extends Base
 {
+    const FUDAI_ACTIVE = 0.1;
+    const MAX_PEOPLE   = 20;
+
     public function user()
     {
         return $this->belongsTo('User', 'user_id', 'id')->field('id,nickname,avatarurl');
