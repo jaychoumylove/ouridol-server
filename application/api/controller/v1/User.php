@@ -142,6 +142,11 @@ class User extends Base
         }
 
         $res = UserModel::where(['id' => $uid])->field('id,nickname,avatarurl,type')->find();
+        $forbiddenTime = UserModel::checkForbidden($uid, true);
+        $res['forbidden'] = false == $forbiddenTime ? false: true;
+        if ($res['forbidden']) {
+            $res['forbidden_time'] = $forbiddenTime == UserModel::FOREVER_FORBIDDEN ? UserModel::FOREVER_FORBIDDEN: date('Y-m-d H:i:s', $forbiddenTime);
+        }
         $res['userStar'] = UserStar::where('user_id', $uid)->field('total_count,thismonth_count,thisweek_count')->find();
         $res['level'] = UserSprite::where('user_id', $uid)->value('sprite_level');
         Common::res(['data' => $res]);
@@ -370,7 +375,7 @@ class User extends Base
 
         Common::res();
     }
-    
+
     public function level()
     {
         //$this->getUser();
@@ -383,5 +388,10 @@ class User extends Base
         $res['gap'] = $nextCount - $count;
         if ($res['gap'] < 0) $res['gap'] = 0;
         Common::res(['data' => $res]);
+    }
+
+    public function report ()
+    {
+
     }
 }

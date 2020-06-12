@@ -10,6 +10,7 @@ class User extends Base
 {
     const USER_ADMIN = 1; // type 为 1 时，该用户为管理员
     const USER_FORBIDDEN = 2; // type 为 2 时，该用户被永久禁言
+    const FOREVER_FORBIDDEN = 'ever'; // 永久禁言
 
     public function UserStar()
     {
@@ -240,21 +241,22 @@ class User extends Base
 
     /**
      * 检查是否是禁言状态
-     * @param $forbiddenId
+     * @param      $forbiddenId
+     * @param bool $time
      * @return bool
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public static function checkForbidden ($forbiddenId)
+    public static function checkForbidden ($forbiddenId, $time = false)
     {
         $user = self::get($forbiddenId);
-        if ($user['type'] == self::USER_FORBIDDEN) return true;
+        if ($user['type'] == self::USER_FORBIDDEN) return $time ? self::FOREVER_FORBIDDEN: true;
 
         $userExit = UserExt::where(['user_id' => $forbiddenId])->find();
         if (empty($userExit)) return false;
 
         if (empty($userExit['forbidden_time'])) return false;
-        if ($userExit['forbidden_time'] > time()) return true;
+        if ($userExit['forbidden_time'] > time()) return $time ? $userExit['forbidden_time']: true;
     }
 }
