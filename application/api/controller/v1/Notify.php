@@ -84,7 +84,7 @@ class Notify extends Base
                 $Content = $this->signDay($msg);
             }
             if ($msg['Content'] == '618') {
-                $Content = UserItem::check618Active() ? $this->active618($msg): '活动已下线\n';
+                $Content = UserItem::check618Active() ? $this->active618($msg): "活动已下线\n";
             }
 
         } elseif (isset($msg['Event']) && $msg['Event'] == 'CLICK' && $msg['EventKey'] == 'CLICK_kefu') { //按钮操作
