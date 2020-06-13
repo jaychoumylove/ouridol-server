@@ -70,7 +70,7 @@ class Star
 
                 if ($isDone) {
                     // 贡献度提升20%
-                    $moreHot = floor($hot * 0.2);
+                    $moreHot = bcmul($hot, 0.2);
                     $hot += $moreHot;
                     $moreInfo = '+' . $moreHot . '能量';
                 }
