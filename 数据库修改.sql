@@ -98,3 +98,7 @@ message 普通发言' AFTER content;
 -- 2020-06-12 15:58:28  新增举报原因配置信息
 INSERT INTO `f_cfg`(`id`, `description`, `key`, `value`, `show`, `create_time`, `update_time`, `delete_time`) VALUES (70, '举报类别列表', 'report_reason', '[{\"value\":\"该用户存在赌博行为\"},{\"value\":\"该用户存在欺诈骗钱行为\"},{\"value\":\"该用户发布不适当信息对我进行骚扰\"},{\"value\":\"该用户传播谣言信息\"}]', 1, '2020-06-12 15:57:17', '2020-06-12 15:58:06', NULL);
 -- end
+
+-- 2020-06-13 16:23:59  新增618活动领取type
+INSERT INTO `f_cfg_rec_type`(`id`, `content`, `create_time`, `update_time`, `delete_time`) VALUES (40, '\"618\"活动-领取【怦然心动】', '2020-06-13 16:21:31', '2020-06-13 16:21:53', NULL);
+-- end

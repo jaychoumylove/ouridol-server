@@ -3,6 +3,7 @@ namespace app\api\controller\v1;
 
 use app\api\model\User as UserModel;
 use app\api\model\GzhUser;
+use app\api\model\User;
 use app\api\service\User as UserService;
 use app\base\service\WxMsg;
 use app\base\controller\Base;
@@ -77,8 +78,13 @@ class Notify extends Base
 
         $Content = '';
 
-        if ($msg['MsgType'] == 'text' && isset($msg['Content']) && ($msg['Content'] == '2' || $msg['Content'] == '签到')) {
-            $Content .= $this->signDay($msg);
+        if ($msg['MsgType'] == 'text' && isset($msg['Content'])) {
+            if ($msg['Content'] == '2' || $msg['Content'] == '签到') {
+                $Content .= $this->signDay($msg);
+            }
+            if ($msg['Content'] == '618') {
+                $Content .= $this->active618($msg);
+            }
 
         } elseif (isset($msg['Event']) && $msg['Event'] == 'CLICK' && $msg['EventKey'] == 'CLICK_kefu') { //按钮操作
             $Content = " 【联系客服】\n请加客服（薇薇姐2）微信：ouridol2\n请一定注明反馈的问题或者建议，否则可能会被忽略哦！";
@@ -104,6 +110,18 @@ class Notify extends Base
         $this->wxMsg->autoSend($msg, 'text', [
             'Content' => $Content
         ]);
+    }
+
+    private function active618 ($msg)
+    {
+        $user_id = $this->getUserId($msg);
+        if(!$user_id) return "没有关联到用户，请先到小程序打榜！\n<a data-miniprogram-appid=\"wx7dc912994c80d9ac\" data-miniprogram-path=\"/pages/index/index\">点击此链接去打榜吧~</a>\n----------------------------\n\n";
+
+        User::active618gift($user_id);
+
+        $msg = "成功领取【怦然心动】(2000能量)\n";
+        $msg .= "<a data-miniprogram-appid='wx7dc912994c80d9ac' data-miniprogram-path='/pages/gift_package/gift_package' href='https://mp.weixin.qq.com/s/NRovcmTDj_Tziu8qe_DY9Q'>点击这里查看我的礼物</a>\n";
+        return $msg;
     }
 
     /**

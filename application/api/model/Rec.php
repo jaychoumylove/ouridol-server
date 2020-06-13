@@ -8,6 +8,9 @@ class Rec extends Base
 {
     //
 
+    const ACTIVE618GIFT = 40; // 618活动领取"怦然心动"
+    const EXCHANGE = 39; // 灵丹兑换
+
     public function Type()
     {
         return $this->belongsTo('CfgRecType', 'type', 'id');

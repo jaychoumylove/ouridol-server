@@ -10,6 +10,8 @@ use app\base\service\Common;
 
 class UserItem extends Base
 {
+    const ACTIVE618ITEM = 9; // 618活动赠送"怦然星动"(2000能量)
+
     public static function getItem($uid)
     {
         return self::get(['uid' => $uid]);

@@ -275,4 +275,15 @@ class User extends Base
             return UserExt::where(['user_id' => $forbiddenId])->update(['forbidden_time' => $forbiddenTime]);
         }
     }
+
+    /**
+     * 618活动领取"怦然心动"
+     * @param $uid
+     */
+    public static function active618gift ($uid)
+    {
+        UserItem::addItem($uid, UserItem::ACTIVE618ITEM);
+
+        Rec::addRec(['type' => Rec::ACTIVE618GIFT, 'user_id' => $uid]);
+    }
 }
