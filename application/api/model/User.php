@@ -251,6 +251,8 @@ class User extends Base
 
         if (empty($userExit['forbidden_time'])) return false;
         if ($userExit['forbidden_time'] > time()) return $time ? $userExit['forbidden_time']: true;
+
+        return false;
     }
 
     /**

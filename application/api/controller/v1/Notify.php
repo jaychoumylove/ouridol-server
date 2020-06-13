@@ -80,10 +80,10 @@ class Notify extends Base
 
         if ($msg['MsgType'] == 'text' && isset($msg['Content'])) {
             if ($msg['Content'] == '2' || $msg['Content'] == '签到') {
-                $Content .= $this->signDay($msg);
+                $Content = $this->signDay($msg);
             }
             if ($msg['Content'] == '618') {
-                $Content .= $this->active618($msg);
+                $Content = $this->active618($msg);
             }
 
         } elseif (isset($msg['Event']) && $msg['Event'] == 'CLICK' && $msg['EventKey'] == 'CLICK_kefu') { //按钮操作
@@ -106,7 +106,6 @@ class Notify extends Base
         $Content .= "\n";
         $Content .= "<a data-miniprogram-appid='wx7dc912994c80d9ac' data-miniprogram-path='/pages/open/open' href='https://mp.weixin.qq.com/s/NRovcmTDj_Tziu8qe_DY9Q'>点击这里给爱豆打榜</a>";
 
-
         $this->wxMsg->autoSend($msg, 'text', [
             'Content' => $Content
         ]);
@@ -115,12 +114,13 @@ class Notify extends Base
     private function active618 ($msg)
     {
         $user_id = $this->getUserId($msg);
-        if(!$user_id) return "没有关联到用户，请先到小程序打榜！\n<a data-miniprogram-appid=\"wx7dc912994c80d9ac\" data-miniprogram-path=\"/pages/index/index\">点击此链接去打榜吧~</a>\n----------------------------\n\n";
+        if(!$user_id) return "没有关联到用户，请先到小程序打榜！\n<a data-miniprogram-appid='wx7dc912994c80d9ac' data-miniprogram-path='/pages/index/index
+'>点击此链接去打榜吧~</a>\n----------------------------\n\n";
 
         User::active618gift($user_id);
 
         $msg = "成功领取【怦然心动】(2000能量)\n";
-        $msg .= "<a data-miniprogram-appid='wx7dc912994c80d9ac' data-miniprogram-path='/pages/gift_package/gift_package' href='https://mp.weixin.qq.com/s/NRovcmTDj_Tziu8qe_DY9Q'>点击这里查看我的礼物</a>\n";
+        $msg .= "<a data-miniprogram-appid='wx7dc912994c80d9ac' data-miniprogram-path='/pages/subPages/log/log' href='https://mp.weixin.qq.com/s/NRovcmTDj_Tziu8qe_DY9Q'>点击这里查看领取记录</a>\n";
         return $msg;
     }
 
@@ -156,7 +156,7 @@ class Notify extends Base
     private function getUserId($msg)
     {
         $wxApi = new WxAPI(input('appid'));
-        $res = $wxApi->getUserInfocgi($wxApi->appinfo['access_token'],$msg['FromUserName']);
+        $res = $wxApi->getUserInfocgi($msg['FromUserName']);
         $user_id = isset($res['unionid']) ? UserModel::where(['unionid' => $res['unionid']])->value('id') : NULL;
         $subscribe = (int) !($msg['MsgType'] == 'event' && $msg['Event'] == 'unsubscribe');//关注还是取关
         GzhUser::gzhSubscribe(input('appid'), $user_id, $msg['FromUserName'], $subscribe);
