@@ -108,7 +108,7 @@ class Star
 
                 $fudai = ActiveFudai::sendbox($uid, bcmul($hot, ActiveFudai::FUDAI_ACTIVE), ActiveFudai::MAX_PEOPLE);
 
-                $res['fudai'] = [
+                $res['fudai'] = ($fudai == ActiveFudai::FUDAI_OFF) ? false: [
                     'id'     => $fudai['id'],
                     'coin'   => $fudai['coin'],
                     'people' => $fudai['people']

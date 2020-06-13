@@ -118,7 +118,7 @@ class Page extends Base
 
         $starService = new Star();
         $res['starInfo']['star_rank']['week_hot_rank'] = $starService->getRank($res['starInfo']['star_rank']['week_hot'], 'week_hot');
-
+        $res['fudai'] = ActiveFudai::checkFudai();
         $res['userRank'] = UserStar::getRank($starid, 'thisweek_count', 1, 5);
         $res['captain'] = UserStar::where('user_id', $this->uid)->value('captain');
         // 聊天内容
@@ -321,7 +321,7 @@ class Page extends Base
             ->where('create_time', '>', $today)
             ->field("*, finished as status, receive as opened_people")
             ->order('finished asc, create_time desc')
-            ->page($page, 2)
+            ->page($page, 10)
             ->select();
 
         Common::res(['data' => $res]);
