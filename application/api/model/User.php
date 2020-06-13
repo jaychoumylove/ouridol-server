@@ -281,11 +281,21 @@ class User extends Base
     /**
      * 618活动领取"怦然心动"
      * @param $uid
+     * @return bool
+     * @throws \think\exception\DbException
      */
     public static function active618gift ($uid)
     {
+        $exist = Rec::get(function ($query) use ($uid){
+            $query->where(['type' => Rec::ACTIVE618GIFT, 'user_id' => $uid]);
+        });
+
+        if ($exist) return false;
+
         UserItem::addItem($uid, UserItem::ACTIVE618ITEM);
 
         Rec::addRec(['type' => Rec::ACTIVE618GIFT, 'user_id' => $uid]);
+
+        return true;
     }
 }

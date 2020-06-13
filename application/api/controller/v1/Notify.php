@@ -4,6 +4,7 @@ namespace app\api\controller\v1;
 use app\api\model\User as UserModel;
 use app\api\model\GzhUser;
 use app\api\model\User;
+use app\api\model\UserItem;
 use app\api\service\User as UserService;
 use app\base\service\WxMsg;
 use app\base\controller\Base;
@@ -83,7 +84,7 @@ class Notify extends Base
                 $Content = $this->signDay($msg);
             }
             if ($msg['Content'] == '618') {
-                $Content = $this->active618($msg);
+                $Content = UserItem::check618Active() ? $this->active618($msg): '活动已下线';
             }
 
         } elseif (isset($msg['Event']) && $msg['Event'] == 'CLICK' && $msg['EventKey'] == 'CLICK_kefu') { //按钮操作
@@ -111,16 +112,25 @@ class Notify extends Base
         ]);
     }
 
+    /**
+     * @param $msg
+     * @return string
+     * @throws \think\exception\DbException
+     */
     private function active618 ($msg)
     {
         $user_id = $this->getUserId($msg);
         if(!$user_id) return "没有关联到用户，请先到小程序打榜！\n<a data-miniprogram-appid='wx7dc912994c80d9ac' data-miniprogram-path='/pages/index/index
 '>点击此链接去打榜吧~</a>\n----------------------------\n\n";
 
-        User::active618gift($user_id);
+        $receive = User::active618gift($user_id);
 
-        $msg = "成功领取【怦然心动】(2000能量)\n";
-        $msg .= "<a data-miniprogram-appid='wx7dc912994c80d9ac' data-miniprogram-path='/pages/subPages/log/log' href='https://mp.weixin.qq.com/s/NRovcmTDj_Tziu8qe_DY9Q'>点击这里查看领取记录</a>\n";
+        if ($receive == false) {
+            $msg = "不可以重复领取哦~\n";
+        } else {
+            $msg = "成功领取【怦然心动】(2000能量)\n";
+            $msg .= "<a data-miniprogram-appid='wx7dc912994c80d9ac' data-miniprogram-path='/pages/subPages/log/log' href='https://mp.weixin.qq.com/s/NRovcmTDj_Tziu8qe_DY9Q'>点击这里查看领取记录</a>\n";
+        }
         return $msg;
     }
 

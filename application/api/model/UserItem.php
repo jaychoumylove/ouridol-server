@@ -11,6 +11,7 @@ use app\base\service\Common;
 class UserItem extends Base
 {
     const ACTIVE618ITEM = 9; // 618活动赠送"怦然星动"(2000能量)
+    const ACTIVE618TIME = '2020-06-22'; // 618 活动 22号下线
 
     public static function getItem($uid)
     {
@@ -100,5 +101,14 @@ class UserItem extends Base
             Db::rollBack();
             Common::res(['code' => 400, 'data' => $e->getMessage()]);
         }
+    }
+
+    /**
+     * 检测618活动是否过期
+     * @return bool
+     */
+    public static function check618Active ()
+    {
+        return date('Y-m-d') < self::ACTIVE618TIME;
     }
 }
