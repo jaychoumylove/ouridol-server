@@ -9,7 +9,7 @@ class ActiveFudai extends Base
 {
     const FUDAI_ACTIVE = 0.1;
     const MAX_PEOPLE   = 20;
-    const LIMIT_TIME = '2020-06-23';
+    const LIMIT_TIME = '2020-07-01';
     const FUDAI_OFF = 'FUDAI_OFF';
 
     public function user()
