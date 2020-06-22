@@ -86,6 +86,9 @@ class Notify extends Base
             if ($msg['Content'] == '618') {
                 $Content = UserItem::check618Active() ? $this->active618($msg): "活动已下线\n";
             }
+            if ($msg['Content'] == '端午节') {
+                $Content = UserItem::checkDWJActive() ? $this->activeDWJ($msg): "活动已下线\n";
+            }
 
         } elseif (isset($msg['Event']) && $msg['Event'] == 'CLICK' && $msg['EventKey'] == 'CLICK_kefu') { //按钮操作
             $Content = " 【联系客服】\n请加客服（薇薇姐2）微信：ouridol2\n请一定注明反馈的问题或者建议，否则可能会被忽略哦！";
@@ -129,6 +132,23 @@ class Notify extends Base
             $msg = "不可以重复领取哦~\n";
         } else {
             $msg = "成功领取【怦然心动】(2000能量)\n";
+            $msg .= "<a data-miniprogram-appid='wx7dc912994c80d9ac' data-miniprogram-path='/pages/subPages/log/log' href='https://mp.weixin.qq.com/s/NRovcmTDj_Tziu8qe_DY9Q'>点击这里查看领取记录</a>\n";
+        }
+        return $msg;
+    }
+
+    private function activeDWJ ($msg)
+    {
+        $user_id = $this->getUserId($msg);
+        if(!$user_id) return "没有关联到用户，请先到小程序打榜！\n<a data-miniprogram-appid='wx7dc912994c80d9ac' data-miniprogram-path='/pages/index/index
+'>点击此链接去打榜吧~</a>\n----------------------------\n\n";
+
+        $receive = User::activeDWJgift($user_id);
+
+        if ($receive == false) {
+            $msg = "不可以重复领取哦~\n";
+        } else {
+            $msg = "成功领取(2000能量+20灵丹+2喇叭)\n";
             $msg .= "<a data-miniprogram-appid='wx7dc912994c80d9ac' data-miniprogram-path='/pages/subPages/log/log' href='https://mp.weixin.qq.com/s/NRovcmTDj_Tziu8qe_DY9Q'>点击这里查看领取记录</a>\n";
         }
         return $msg;
@@ -195,5 +215,5 @@ class Notify extends Base
     
         dump((new WxAPI('wx3120fe6dc469ae29'))->createMenu($data));
     }
-    
+
 }

@@ -2,9 +2,14 @@
 
 namespace app\api\model;
 
+use app\api\service\User as UserService;
 use app\base\model\Base;
 use app\base\service\Common;
+use Exception;
 use think\Db;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\ModelNotFoundException;
+use think\exception\DbException;
 
 class User extends Base
 {
@@ -84,7 +89,7 @@ class User extends Base
                 }
             }
             Db::commit();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollback();
             Common::res(['code' => 400, 'msg' => $e->getMessage()]);
         }
@@ -140,7 +145,7 @@ class User extends Base
                 'city' => isset($data['city']) ? $data['city'] : null,
                 'province' => isset($data['province']) ? $data['province'] : null,
                 'country' => isset($data['country']) ? $data['country'] : null,
-            ]);            
+            ]);
             if(!$update['nickname']) unset($update['nickname']);
         }
         self::where('id', $currentUid)->update($update);
@@ -195,9 +200,9 @@ class User extends Base
      * @param      $forbiddenId
      * @param int  $time
      * @return bool
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public static function forbidden ($userId, $forbiddenId, $time = -1)
     {
@@ -237,9 +242,9 @@ class User extends Base
      * @param      $forbiddenId
      * @param bool $time
      * @return bool
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public static function checkForbidden ($forbiddenId, $time = false)
     {
@@ -282,11 +287,11 @@ class User extends Base
      * 618活动领取"怦然心动"
      * @param $uid
      * @return bool
-     * @throws \think\exception\DbException
+     * @throws DbException
      */
     public static function active618gift ($uid)
     {
-        $exist = Rec::get(function ($query) use ($uid){
+        $exist = Rec::get(function ($query) use ($uid) {
             $query->where(['type' => Rec::ACTIVE618GIFT, 'user_id' => $uid]);
         });
 
@@ -295,6 +300,29 @@ class User extends Base
         UserItem::addItem($uid, UserItem::ACTIVE618ITEM);
 
         Rec::addRec(['type' => Rec::ACTIVE618GIFT, 'user_id' => $uid]);
+
+        return true;
+    }
+
+    /**
+     * 端午节领取奖励
+     * @param $uid
+     * @return bool
+     * @throws DbException
+     */
+    public static function activeDWJgift ($uid)
+    {
+        $exist = Rec::get(function ($query) use ($uid) {
+            $query->where(['type' => Rec::ACTIVEDWJGIFT, 'user_id' => $uid]);
+        });
+
+        if ($exist) return false;
+
+        (new UserService())->change($uid, [
+            'stone'   => 20,
+            'coin'    => 2000,
+            'trumpet' => 2
+        ], ['type' => Rec::ACTIVEDWJGIFT]);
 
         return true;
     }

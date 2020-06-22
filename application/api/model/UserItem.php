@@ -12,6 +12,7 @@ class UserItem extends Base
 {
     const ACTIVE618ITEM = 9; // 618活动赠送"怦然星动"(2000能量)
     const ACTIVE618TIME = '2020-06-22'; // 618 活动 22号下线
+    const ACTIVE_DWJ_TIME = '2020-07-01'; // 618 活动 22号下线
 
     public static function getItem($uid)
     {
@@ -110,5 +111,14 @@ class UserItem extends Base
     public static function check618Active ()
     {
         return date('Y-m-d') < self::ACTIVE618TIME;
+    }
+
+    /**
+     * 检查端午节活动是否过期
+     * @return bool
+     */
+    public static function checkDWJActive ()
+    {
+        return date('Y-m-d') < self::ACTIVE_DWJ_TIME;
     }
 }
