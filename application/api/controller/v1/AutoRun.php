@@ -2,6 +2,7 @@
 
 namespace app\api\controller\v1;
 
+use app\api\model\CfgActive;
 use app\base\controller\Base;
 use app\api\model\StarRank;
 use think\Db;
@@ -139,10 +140,21 @@ class AutoRun extends Base
             die('本月已执行过');
         }
 
-        Lock::setVal('month_end', 1);
+        //Lock::setVal('month_end', 1);
 
         Db::startTrans();
         try {
+
+            // 应援打卡开启，上个月打卡日志保留一个月
+            $preShowId = Db::name('cfg_active')->where('delete_time','NOT NULL')->column('id');
+            CfgActive::destroy(function ($query){
+                $query -> where('1=1');
+            });
+            $active_date = json_encode([date('Y-m-d'),date('Y-m-d',strtotime("+1 month"))]);
+            Db::name('cfg_active')->whereIn('id',$preShowId)->update(['active_date'=>$active_date,'delete_time'=>NULL]);
+            Db::name('user_active')->whereIn('active_id',$preShowId)->update(['total_clocks'=>0]);
+
+
             // 用户月贡献清零
             UserStar::where('1=1')->update([
                 'lastmonth_count' => Db::raw('thismonth_count'),
@@ -163,8 +175,6 @@ class AutoRun extends Base
                 'month_hot' => 10000,
             ]);
 
-            // 应援结算
-            // RecCardHistory::settle();
 
             // 后援会贡献重置
             Fanclub::where('1=1')->update(['month_count' => 0]);
