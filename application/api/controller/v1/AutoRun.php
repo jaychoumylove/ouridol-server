@@ -140,7 +140,7 @@ class AutoRun extends Base
             die('本月已执行过');
         }
 
-        //Lock::setVal('month_end', 1);
+        Lock::setVal('month_end', 1);
 
         Db::startTrans();
         try {
