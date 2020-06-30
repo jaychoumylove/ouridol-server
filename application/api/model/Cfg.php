@@ -8,6 +8,7 @@ class Cfg extends Base
 {
     const FORBIDDEN_TIME = 'forbidden_time';
     const REPORT_REASON = 'report_reason';
+    const ACTIVE_YINGYUAN = 'active_yingyuan';
 
     public static function getCfg($key)
     {

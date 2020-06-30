@@ -67,6 +67,17 @@ class UserRelation extends Base
         }
         // 分配好友
         // self::giveFriend($starid, $uid);
+
+        $checkYingyuan = ActiveYingyuan::checkYingyuan (ActiveYingyuan::EXT);
+        if (true === $checkYingyuan) {
+            $isYingyuan = self::where(['ral_user_id' => $uid])
+                ->where('status', '<>', 0)
+                ->find ();
+
+            if ($isYingyuan) {
+                ActiveYingyuan::setCard ($starid, $uid, ActiveYingyuan::EXT);
+            }
+        }
     }
 
     /**给新加入圈子的用户5个本圈子内的用户作为初始好友 */

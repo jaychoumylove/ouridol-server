@@ -146,6 +146,9 @@ Route::rule('api/:version/config', 'api/v1.Ext/config');// 配置信息
 
 Route::rule('api/:version/active/info', 'api/v1.Ext/getActiveInfo');// 活动信息
 Route::rule('api/:version/active/card', 'api/v1.Ext/setCard');// 打卡
+Route::rule('api/:version/yingyuan/card', 'api/v1.Ext/setYingYuanCard');// 打卡
+Route::rule('api/:version/yingyuan/info', 'api/v1.Ext/getYingyuan');// 打卡详情
+Route::rule('api/:version/yingyuan/list', 'api/v1.Ext/getYingyuanList');// 打卡列表
 Route::rule('api/:version/active/list', 'api/v1.Ext/activeList');// 活动列表
 Route::rule('api/:version/active/userrank', 'api/v1.Ext/userRank');// 用户打卡排名
 

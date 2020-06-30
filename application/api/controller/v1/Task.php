@@ -77,6 +77,8 @@ class Task extends Base
             $text = Cfg::getCfg('weibo_share_text_1');
         } else if ($type == 3) {
             $text = Cfg::getCfg('pyq_share_text_1');
+        } else if ($type == 4) {
+            $text = Cfg::getCfg('weibo_share_text_2');
         }
         // $text = "#STARNAME[超话]#今天我已为爱豆打榜，STARNAME加油，我爱你，我会每天支持你，
         //     不离不弃。爱STARNAME的伙伴们，一起来支持STARNAME吧？微信小程序搜索：APPNAME，夺取冠军福利，就等
