@@ -11,6 +11,7 @@ class Rec extends Base
     const ACTIVE618GIFT = 40; // 618活动领取"怦然心动"
     const EXCHANGE = 39; // 灵丹兑换
     const ACTIVEDWJGIFT = 41; // 灵丹兑换
+    const YINGYUAN = 42; // 打卡赢取能量1000
 
     public function Type()
     {

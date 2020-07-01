@@ -129,3 +129,8 @@ CREATE TABLE `f_active_yingyuan` (
 INSERT INTO `f_cfg`(`description`, `key`, `value`, `show`, `create_time`, `update_time`, `delete_time`) VALUES ('应援打卡活动信息', 'active_yingyuan', '{\"date\":[\"2020-07-01\",\"2020-07-31\"],\"platform\":[\"MP-WEIXIN\"],\"progress\":[{\"step\":\"0\",\"reward\":\"0\"},{\"step\":\"5\",\"reward\":\"100\"},{\"step\":\"7\",\"reward\":\"200\"},{\"step\":\"15\",\"reward\":\"300\"},{\"step\":\"30\",\"reward\":\"500\"}],\"title\":\"\",\"desc\":[{\"label\":\"活动说明\",\"content\":\"在7月31日前，按照满足300人解锁的天数，获得相对应的奖励\"},{\"label\":\"参与方式\",\"content\":\"每天观看视频打卡解锁即可\"},{\"label\":\"重要提示\",\"content\":\"从7月6日开始可进行补签，增加自己的解锁天数。每成功邀请一个新用户，那么自己解锁的天数就增加一天。\"},{\"label\":\"福利领取\",\"content\":\"官方后援会入驻领取/或者置换同等资源奖励\"},{\"label\":\"其他说明\",\"content\":\"本次活动奖励由7月月榜前十的爱豆领取。\"}],\"ext_time\":\"2020-07-06\",\"people\":\"300\",\"banner\":\"https://mmbiz.qpic.cn/mmbiz_png/w5pLFvdua9G7daV3Af1OunCQ57ibl9fyLJenqbWNlRT6jJz3MOst5oQ49nhTDW6wXiaBP60VaVKCW5b28nynDVyg/0\"}', 1, '2020-06-29 18:05:22', '2020-06-30 18:23:24', NULL);
 INSERT INTO `f_cfg`(`description`, `key`, `value`, `show`, `create_time`, `update_time`, `delete_time`) VALUES ('应援微博分享文本', 'weibo_share_text_2', '#STARNAME[超话]# 我们的偶像7月应援福利：只要有300人打卡就可免费领取500元应援金，月榜还有超高曝光宣传LED大屏和应援金奖励，我想要更多人知道STARNAME，你呢？vx搜索小程序“我们的偶像”加入STARNAME偶像圈，赢取福利。【详情请戳】→https://m.weibo.cn/2572021642/4445814006778753 @我们的偶像IDOL', 0, '2020-06-30 18:04:30', '2020-06-30 18:08:18', NULL);
 -- end
+
+
+-- 2020-07-01 10:39:42 打卡应援获取能量记录type id 42
+INSERT INTO `f_cfg_rec_type`(`content`, `create_time`, `update_time`, `delete_time`) VALUES ('参加每日打卡应援', '2020-07-01 10:04:46', '2020-07-01 10:04:46', NULL);
+-- end

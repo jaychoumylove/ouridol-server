@@ -4,6 +4,7 @@
 namespace app\api\model;
 
 
+use app\api\service\User as UserService;
 use app\base\model\Base;
 use app\base\service\Common;
 use think\Request;
@@ -68,7 +69,6 @@ class ActiveYingyuan extends Base
         $exist = self::where ('star_id', $starId)->where ('user_id', $uid)->find ();
 
         if ($exist) {
-            $field = $type == self::SUP ? 'sup_num': 'sup_ext';
             if ($type == self::SUP) {
                 $time = $exist['sup_time'];
                 $day = explode (' ', $time)[0];
@@ -97,6 +97,11 @@ class ActiveYingyuan extends Base
                 'sup_ext' => $type == self::SUP ? 0: 1,
             ]);
         }
+
+        // 打卡赢能量
+        if ($type == self::SUP) {
+            (new UserService())->change ($uid, ['coin' => 1000], ['type' => Rec::YINGYUAN]);
+        }
     }
 
     /**
@@ -104,6 +109,7 @@ class ActiveYingyuan extends Base
      * @param $starId
      * @param $uid
      * @return array
+     * @throws \think\Exception
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
@@ -139,7 +145,7 @@ class ActiveYingyuan extends Base
             ->where('sup_num', '>', 0)
             ->order ('sup_num', 'desc')
             ->limit (bcsub ($info['people'], 1), 1)
-            ->find ();
+            ->select ();
 
         // 参与人数
         $joinNum = self::where ('star_id', $starId)
@@ -149,8 +155,8 @@ class ActiveYingyuan extends Base
         if ($joinNum) $people['join_num'] = $joinNum;
 
         if ($list) {
-            // 参与人数要达到30人
-            $minNum = $list['sup_num'];
+            // 参与人数要达到人数要求
+            $minNum = $list[0]['sup_num'];
             $progressing['done'] = $minNum;
 
             // 获取下一阶段的奖励和进程
@@ -208,6 +214,8 @@ class ActiveYingyuan extends Base
 
             return $item;
         }, $step);
+
+        array_values ($step);
         $sup_ext = date('Y-m-d') < $info['ext_time'] ? false: true;
 
         return compact ('self', 'reward', 'progressing', 'info', 'people', 'step', 'is_today', 'sup_ext');
