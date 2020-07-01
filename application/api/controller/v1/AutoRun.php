@@ -152,7 +152,7 @@ class AutoRun extends Base
             });
             $active_date = json_encode([date('Y-m-d'),date('Y-m-d',strtotime("+1 month"))]);
             Db::name('cfg_active')->whereIn('id',$preShowId)->update(['active_date'=>$active_date,'delete_time'=>NULL]);
-            Db::name('user_active')->whereIn('active_id',$preShowId)->update(['total_clocks'=>0]);
+            Db::name('user_active')->whereIn('active_id',$preShowId)->delete();
 
 
             // 用户月贡献清零
