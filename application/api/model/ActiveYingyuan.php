@@ -164,8 +164,8 @@ class ActiveYingyuan extends Base
                 $progressing['doing'] = $end['step'];
                 $reward['doing'] = $end['reward'];
             } else {
-                $progressing['doing'] = $nextSteps[0]['step'];
-                $reward['doing'] = $nextSteps[0]['reward'];
+                $progressing['doing'] = $nextSteps['step'];
+                $reward['doing'] = $nextSteps['reward'];
             }
         }
         if (empty($self)) {
