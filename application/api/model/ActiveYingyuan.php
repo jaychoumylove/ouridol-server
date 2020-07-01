@@ -158,14 +158,14 @@ class ActiveYingyuan extends Base
                  return $item['step'] > $minNum;
             });
 
-            $nextSteps = array_values ($nextSteps);
-
             if (empty($nextSteps)) {
                 // 已解锁最高奖励
                 $end = $infoProgress[bcsub (count ($infoProgress), 1)];
                 $progressing['doing'] = $end['step'];
                 $reward['doing'] = $end['reward'];
             } else {
+                $nextSteps = array_values ($nextSteps);
+
                 $progressing['doing'] = $nextSteps[0]['step'];
                 $reward['doing'] = $nextSteps[0]['reward'];
             }
