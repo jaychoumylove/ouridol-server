@@ -48,9 +48,9 @@ class UserProp extends Base
         self::insertAll($insert);
     }
 
-    public static function getList($uid)
+    public static function getList($uid, $page, $size)
     {
-        $list = self::with('Prop')->where('user_id', $uid)->order('id desc')->select();
+        $list = self::with('Prop')->where('user_id', $uid)->order('id desc')->page ($page, $size)->select();
 
         // 检查是否已过期
         foreach ($list as &$value) {

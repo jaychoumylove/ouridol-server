@@ -196,7 +196,9 @@ class Page extends Base
     public function myprop()
     {
         $this->getUser();
-        $res['list'] = UserProp::getList($this->uid);
+        $page = input ('page', 1);
+        $size = input ('size', 10);
+        $res['list'] = UserProp::getList($this->uid, $page, $size);
         Common::res(['data' => $res]);
     }
 
