@@ -139,7 +139,7 @@ class ActiveYingyuan extends Base
             ->where('sup_num', '>', 0)
             ->order ('sup_num', 'desc')
             ->limit (bcsub ($info['people'], 1), 1)
-            ->select ();
+            ->find ();
 
         // 参与人数
         $joinNum = self::where ('star_id', $starId)
@@ -150,7 +150,7 @@ class ActiveYingyuan extends Base
 
         if ($list) {
             // 参与人数要达到30人
-            $minNum = $list[0]['sup_num'];
+            $minNum = $list['sup_num'];
             $progressing['done'] = $minNum;
 
             // 获取下一阶段的奖励和进程
