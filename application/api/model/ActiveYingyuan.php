@@ -85,7 +85,7 @@ class ActiveYingyuan extends Base
             ];
 
             if ($type == self::SUP) {
-                $update['sup_time'] = time ();
+                $update['sup_time'] = date ('Y-m-d H:i:s');
             }
             if ($type == self::EXT) {
                 $update['sup_ext'] = bcadd ($exist['sup_ext'], 1);
