@@ -66,7 +66,10 @@ class ActiveYingyuan extends Base
         $typeMap = [self::SUP, self::EXT];
         if (in_array ($type, $typeMap) == false) Common::res (['msg' => "打卡错误", 'code' => 1]);
 
-        $exist = self::where ('star_id', $starId)->where ('user_id', $uid)->find ();
+        $exist = self::where ('star_id', $starId)
+            ->where ('user_id', $uid)
+            ->order ('id', 'asc')
+            ->find ();
 
         if ($exist) {
             if ($type == self::SUP) {
@@ -88,7 +91,7 @@ class ActiveYingyuan extends Base
                 $update['sup_ext'] = bcadd ($exist['sup_ext'], 1);
             }
 
-            self::update ($update, ['id' => $exist['id']]);
+            self::where(['id' => $exist['id']])->update ($update);
         } else {
             self::create ([
                 'user_id' => $uid,
