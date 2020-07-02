@@ -8,6 +8,7 @@ use app\api\service\User as UserService;
 use app\base\model\Base;
 use app\base\service\Common;
 use think\Request;
+use think\Response;
 
 class ActiveYingyuan extends Base
 {
@@ -105,6 +106,38 @@ class ActiveYingyuan extends Base
         if ($type == self::SUP) {
             (new UserService())->change ($uid, ['coin' => 1000], ['type' => Rec::YINGYUAN]);
         }
+    }
+
+    public function fixCard()
+    {
+        $list = self::withTrashed()->select ();
+        if (is_object ($list)) $list = $list->toArray ();
+        $update = [];
+        $delete = [];
+        $updateId = [];
+
+        foreach ($list as $item) {
+            if (array_key_exists ($item['user_id'], $update)) {
+                $update[$item['user_id']] = 2;
+                $updateId[$item['user_id']] = $item['id'];
+            } else {
+                $update[$item['user_id']] = ($item['sup_num'] > 2) ? 2: 1;
+                $updateId[$item['user_id']] = $item['id'];
+            }
+        }
+
+        $udtNum = 0;
+        foreach ($update as $key => $item) {
+            $res = self::where ('user_id', $key)->update(['sup_num' => $item, 'sup_ext' => 0]);
+            $udtNum += (int)$res;
+        }
+
+        $ids = array_column ($list, 'id');
+        $updateIds = array_values ($updateId);
+        $deleteIDs = array_diff ($ids, $updateIds);
+        $deleteIDs = implode (',', $deleteIDs);
+
+        return Response::create (compact ('delNum', 'udtNum', 'update', 'deleteIDs'), 'json');
     }
 
     /**

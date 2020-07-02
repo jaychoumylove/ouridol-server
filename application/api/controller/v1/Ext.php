@@ -240,6 +240,11 @@ class Ext extends Base
         Common::res (['data' => $data]);
     }
 
+    public function yingYuanFix()
+    {
+        return (new ActiveYingyuan)->fixCard ();
+    }
+
     public function getYingyuanList()
     {
         $msg = ActiveYingyuan::checkYingyuan ();
