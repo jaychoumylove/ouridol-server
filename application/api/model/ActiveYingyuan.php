@@ -228,7 +228,7 @@ class ActiveYingyuan extends Base
         }
 
         $finishNum = self::where ('star_id', $starId)
-            ->where('sup_num', '>', $progressing['doing'])
+            ->where('sup_num', '>=', $progressing['doing'])
             ->count ();
 
         if ($finishNum) $people['finish_num'] = $finishNum;
