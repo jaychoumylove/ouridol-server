@@ -239,13 +239,13 @@ class ActiveYingyuan extends Base
 
         $step = array_map(function ($item) use ($people, $progressing, $info) {
             if ($item['step'] < $progressing['doing']) {
-                $item['percent'] = 100;
+                $item['precent'] = 100;
             }
             if ($item['step'] == $progressing['doing']) {
-                $item['percent'] = bcdiv ($people['finish_num'], $info['people']);
+                $item['precent'] = bcdiv ($people['finish_num'], $info['people'], 2) * 100;
             }
             if ($item['step'] > $progressing['doing']) {
-                $item['percent'] = 0;
+                $item['precent'] = 0;
             }
 
             return $item;
