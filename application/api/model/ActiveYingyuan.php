@@ -245,21 +245,28 @@ class ActiveYingyuan extends Base
             return $item['step'] > 0;
         });
 
-        $step = array_map(function ($item) use ($people, $progressing, $info) {
+        array_values ($step);
+        foreach ($step as $index => $item) {
             if ($item['step'] < $progressing['doing']) {
                 $item['precent'] = 100;
             }
             if ($item['step'] == $progressing['doing']) {
-                $item['precent'] = bcdiv ($people['finish_num'], $info['people'], 2) * 100;
+                $lastIndex = $index - 1;
+                if (array_key_exists ($lastIndex, $step)) {
+                    $diff = bcsub ($step[$lastIndex]['step'], $item['step']);
+                    $doingDiff = bcsub ($minNum, $item['step']);
+                    $item['precent'] = 100 * bcdiv ($doingDiff, $diff, 2);
+                } else {
+                    $item['precent'] = 100;
+                }
             }
             if ($item['step'] > $progressing['doing']) {
                 $item['precent'] = 0;
             }
 
-            return $item;
-        }, $step);
+            $step[$index] = $item;
+        }
 
-        array_values ($step);
         $sup_ext = date('Y-m-d') < $info['ext_time'] ? false: true;
 
         return compact ('self', 'reward', 'progressing', 'info', 'people', 'step', 'is_today', 'sup_ext');
