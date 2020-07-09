@@ -252,13 +252,14 @@ class ActiveYingyuan extends Base
             }
             if ($item['step'] == $progressing['doing']) {
                 $lastIndex = $index - 1;
+                $lastStep = 0;
                 if (array_key_exists ($lastIndex, $step)) {
-                    $diff = bcsub ($step[$lastIndex]['step'], $item['step']);
-                    $doingDiff = bcsub ($minNum, $item['step']);
-                    $item['precent'] = 100 * bcdiv ($doingDiff, $diff, 2);
-                } else {
-                    $item['precent'] = 100;
+                    $lastStep = $step[$lastIndex]['step'];
                 }
+
+                $diff = bcsub ($item['step'], $lastStep);
+                $doingDiff = bcsub ($minNum, $lastStep);
+                $item['precent'] = bcmul (100, bcdiv ($doingDiff, $diff, 2));
             }
             if ($item['step'] > $progressing['doing']) {
                 $item['precent'] = 0;
