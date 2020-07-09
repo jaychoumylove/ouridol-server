@@ -211,6 +211,14 @@ class ActiveYingyuan extends Base
                 $progressing['doing'] = $nextSteps[0]['step'];
                 $reward['doing'] = $nextSteps[0]['reward'];
             }
+
+            $finishSteps = array_filter ($infoProgress, function ($item) use ($minNum) {
+                return $item['step'] <= $minNum;
+            });
+
+            if ($finishSteps) {
+                $reward['done'] = end ($finishSteps)['reward'];
+            }
         }
         if (empty($self)) {
             // 用户打卡贡献不再前30名内
