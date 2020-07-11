@@ -191,6 +191,35 @@ class AutoRun extends Base
         die('done');
     }
 
+    /**每分钟执行 */
+    public function minuteHandle()
+    {
+        $lock = Lock::getVal('minute_end');
+
+        if (time()-60 < strtotime($lock['time'])) {
+            return '本分钟已执行过';
+        }
+
+        // lock
+        Lock::setVal('minute_end', 1);
+
+        Db::startTrans();
+        try {
+            //当道具不够的时候恢复
+            Prop::where('remain','<',10)->update(['remain'=>99]);
+
+            Db::commit();
+        } catch (\Exception $e) {
+            Db::rollBack();
+
+            die('rollBack:' . $e->getMessage());
+        }
+
+        Lock::setVal('month_end', 0);
+
+        die('done');
+    }
+
     /**解锁消息推送 */
     public function sendTmp()
     {
