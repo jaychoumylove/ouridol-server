@@ -197,7 +197,7 @@ class ActiveYingyuan extends Base
 
             // 获取下一阶段的奖励和进程
             $nextSteps = array_filter ($infoProgress, function ($item) use ($minNum) {
-                 return $item['step'] > $minNum;
+                return $item['step'] > $minNum;
             });
 
             if (empty($nextSteps)) {
@@ -245,29 +245,21 @@ class ActiveYingyuan extends Base
             return $item['step'] > 0;
         });
 
-        array_values ($step);
-        foreach ($step as $index => $item) {
+        $step = array_map(function ($item) use ($people, $progressing, $info) {
             if ($item['step'] < $progressing['doing']) {
                 $item['precent'] = 100;
             }
             if ($item['step'] == $progressing['doing']) {
-                $lastIndex = $index - 1;
-                $lastStep = 0;
-                if (array_key_exists ($lastIndex, $step)) {
-                    $lastStep = $step[$lastIndex]['step'];
-                }
-
-                $diff = bcsub ($item['step'], $lastStep);
-                $doingDiff = bcsub ($minNum, $lastStep);
-                $item['precent'] = bcmul (100, bcdiv ($doingDiff, $diff, 2));
+                $item['precent'] = bcdiv ($people['finish_num'], $info['people'], 2) * 100;
             }
             if ($item['step'] > $progressing['doing']) {
                 $item['precent'] = 0;
             }
 
-            $step[$index] = $item;
-        }
+            return $item;
+        }, $step);
 
+        array_values ($step);
         $sup_ext = date('Y-m-d') < $info['ext_time'] ? false: true;
 
         return compact ('self', 'reward', 'progressing', 'info', 'people', 'step', 'is_today', 'sup_ext');
