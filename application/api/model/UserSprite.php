@@ -31,7 +31,13 @@ class UserSprite extends Base
 
         // 能量收益
         $duratime = time() - $item['settle_time'];
-        $spriteLimitTime =  Cfg::getCfg('spriteLimitTime');
+        $storage_time = CfgEgg::where('level',$item['egg_level'])->value('storage_time');
+        if($storage_time){
+            $spriteLimitTime =  $storage_time * 3600;
+        }else{
+            $spriteLimitTime =  Cfg::getCfg('spriteLimitTime');
+        }
+
         if ($duratime >= $spriteLimitTime) {
             $item['isFull'] = true;
             $duratime = $spriteLimitTime;
