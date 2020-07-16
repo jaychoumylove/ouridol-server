@@ -31,6 +31,7 @@ class UserSprite extends Base
 
         // 能量收益
         $duratime = time() - $item['settle_time'];
+        //能量蛋等级存储时间
         $storage_time = CfgEgg::where('level',$item['egg_level'])->value('storage_time');
         if($storage_time){
             $spriteLimitTime =  $storage_time * 3600;
