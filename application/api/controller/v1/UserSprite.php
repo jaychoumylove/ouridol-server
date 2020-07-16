@@ -28,9 +28,11 @@ class UserSprite extends Base
         $earn = UserSpriteModel::settle($user_id, $this->uid);
 
         if ($user_id != $this->uid) {
+
+            Common::res(['code' => 1, 'msg' => '不能帮别人收取能量了']);
             // 为别人收能量
-            $myEarn = UserSpriteModel::getTip($earn, $this->uid);
-            Common::res(['data' => $myEarn]);
+//            $myEarn = UserSpriteModel::getTip($earn, $this->uid);
+//            Common::res(['data' => $myEarn]);
         } else {
             Common::res(['data' => $earn]);
         }
