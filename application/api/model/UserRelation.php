@@ -121,13 +121,7 @@ class UserRelation extends Base
                 $res = array_merge($res, $ralUser);
             }
             if ($res) {
-                foreach ($res as $key => &$value) {
-
-                    $value['sprite'] = ['earn' => 0];
-                    if (isset($value['user']['id'])) {
-                        // 精灵收益
-                        $value['sprite'] = UserSprite::getInfo($value['user']['id'], $uid);
-                    }
+                foreach ($res as $key => $value) {
 
                     // 排序
                     $sort[$key] = $value['intimacy'];
