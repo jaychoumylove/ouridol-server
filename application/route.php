@@ -207,3 +207,8 @@ Route::rule('api/:version/android/addHot', 'api/v1.Android/addHot'); //
 
 Route::rule('api/:version/page/redress', 'api/v1.Page/redress'); // 补偿
 
+// TreasureBox
+Route::rule('api/:version/treasureBox/info', 'api/v1.TreasureBox/info');// 宝箱信息
+Route::rule('api/:version/treasureBox/open', 'api/v1.TreasureBox/open'); // 打开宝箱
+Route::rule('api/:version/treasureBox/log', 'api/v1.TreasureBox/log'); // 宝箱记录
+
