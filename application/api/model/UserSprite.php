@@ -32,7 +32,8 @@ class UserSprite extends Base
         // 能量收益
         $duratime = time() - $item['settle_time'];
         //能量蛋等级存储时间及能量蛋图片
-        $item['egg_icon'] = CfgEgg::where('level',$item['egg_level'])->value('icon');
+        $item['egg_info'] = CfgEgg::where('level',$item['egg_level'])->find();
+        $item['next_egg_info'] = CfgEgg::where('level',$item['egg_level']+1)->find();
         $storage_time = CfgEgg::where('level',$item['egg_level'])->value('storage_time');
         if($storage_time){
             $spriteLimitTime =  $storage_time * 3600;
@@ -121,6 +122,7 @@ class UserSprite extends Base
                 }
                 $field = 'sprite_level';
                 $need_stone = $userSprite['need_stone'];
+                $type = 11;
                 break;
             case 1:
                 // 技能一升级
@@ -128,7 +130,15 @@ class UserSprite extends Base
                 if (!$nextSkill)  Common::res(['code' => 1, 'msg' => '已经是顶级了！']);
                 $field = 'skillone_level';
                 $need_stone = $nextSkill['need_stone'];
-
+                $type = 11;
+                break;
+            case 2:
+                // 能量蛋升级
+                $nextEgg = CfgEgg::get(['level' => $userSprite['egg_level'] + 1]);
+                if (!$nextEgg)  Common::res(['code' => 1, 'msg' => '已经是顶级了！']);
+                $field = 'egg_level';
+                $need_stone = $nextEgg['need_stone'];
+                $type = 43;
                 break;
             default:
                 # code...
@@ -144,7 +154,7 @@ class UserSprite extends Base
             (new User())->change($uid, [
                 'stone' => $need_stone / -1,
             ], [
-                'type' => 11
+                'type' => $type
             ]);
             Db::commit();
         } catch (\Exception $e) {
