@@ -31,16 +31,7 @@ class UserSprite extends Base
 
         // 能量收益
         $duratime = time() - $item['settle_time'];
-        //能量蛋等级存储时间及能量蛋图片
-        $item['egg_info'] = CfgEgg::where('level',$item['egg_level'])->find();
-        $item['next_egg_info'] = CfgEgg::where('level',$item['egg_level']+1)->find();
-        $storage_time = CfgEgg::where('level',$item['egg_level'])->value('storage_time');
-        if($storage_time){
-            $spriteLimitTime =  $storage_time * 3600;
-        }else{
-            $spriteLimitTime =  Cfg::getCfg('spriteLimitTime');
-        }
-
+        $spriteLimitTime =  Cfg::getCfg('spriteLimitTime');
         if ($duratime >= $spriteLimitTime) {
             $item['isFull'] = true;
             $duratime = $spriteLimitTime;
@@ -59,7 +50,7 @@ class UserSprite extends Base
             // 精灵生产加速卡
             $prop_id = 2;
             $item['isUseCard'] = UserProp::where(['user_id' => $uid, 'status' => 1, 'prop_id' => $prop_id])
-                ->where('use_time', '>=', time() - 2 * 3600)->value('id') == true;
+                    ->where('use_time', '>=', time() - 2 * 3600)->value('id') == true;
         }
 
         // if($uid == 1){
@@ -122,7 +113,6 @@ class UserSprite extends Base
                 }
                 $field = 'sprite_level';
                 $need_stone = $userSprite['need_stone'];
-                $type = 11;
                 break;
             case 1:
                 // 技能一升级
@@ -130,15 +120,7 @@ class UserSprite extends Base
                 if (!$nextSkill)  Common::res(['code' => 1, 'msg' => '已经是顶级了！']);
                 $field = 'skillone_level';
                 $need_stone = $nextSkill['need_stone'];
-                $type = 11;
-                break;
-            case 2:
-                // 能量蛋升级
-                $nextEgg = CfgEgg::get(['level' => $userSprite['egg_level'] + 1]);
-                if (!$nextEgg)  Common::res(['code' => 1, 'msg' => '已经是顶级了！']);
-                $field = 'egg_level';
-                $need_stone = $nextEgg['need_stone'];
-                $type = 43;
+
                 break;
             default:
                 # code...
@@ -154,7 +136,7 @@ class UserSprite extends Base
             (new User())->change($uid, [
                 'stone' => $need_stone / -1,
             ], [
-                'type' => $type
+                'type' => 11
             ]);
             Db::commit();
         } catch (\Exception $e) {

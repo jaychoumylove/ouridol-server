@@ -187,4 +187,33 @@ class Common
             'data' => $data
         ];
     }
+
+    /**
+     * 抽奖算法
+     * @param array $data
+     *  exp: [
+     *         ['id' => 1,'chance'=>50, ...],
+     *         ['id' => 2,'chance'=>30, ...],
+     *         ['id' => 3,'chance'=>20, ...],
+     *       ]
+     * @return ['id' => 3,'chance'=>20, ...],
+     */
+    public static function lottery($data, $chance = 'chance')
+    {
+        // 数组需要先根据chance 升序排序
+        foreach ($data as $key => $value) {
+            $sort[$key] = $value[$chance];
+        }
+        array_multisort($sort, SORT_ASC, $data);
+        $totalPt = array_sum(array_column($data, $chance));
+        $randPt = mt_rand(0, $totalPt);  // 随机一个分数
+        $basePt = 0; // 分数堆叠
+        foreach ($data as $value) {
+            if ($randPt <= $value[$chance] + $basePt) {
+                return $value;
+            } else {
+                $basePt += $value[$chance];
+            }
+        }
+    }
 }

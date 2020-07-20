@@ -75,7 +75,7 @@ class UserRelation extends Base
                 ->find ();
 
             if ($isYingyuan) {
-                ActiveYingyuan::setCard ($starid, $uid, ActiveYingyuan::EXT);
+                ActiveYingyuan::setCard ($starid, $isYingyuan['rer_user_id'], ActiveYingyuan::EXT);
             }
         }
     }
@@ -111,7 +111,7 @@ class UserRelation extends Base
             $friend_max = Cfg::getCfg('friend_max');
             if (!$friend_max) $friend_max = 100;
             // 我邀请的人、、加的好友
-            $res = UserRelation::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2, 3, 4]]])->order('intimacy desc')->limit($friend_max)->select();
+            $res = UserRelation::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2, 3, 4]]])->order('create_time desc')->limit($friend_max)->select();
             if (count($res) < $friend_max) {
                 // 邀请我的人、手动被加的好友
                 $ralUser = self::with('RerUser')->where(['ral_user_id' => $uid, 'status' => ['in', [1, 2, 4]]])->limit($friend_max - count($res))->select();
@@ -121,10 +121,27 @@ class UserRelation extends Base
                 $res = array_merge($res, $ralUser);
             }
             if ($res) {
-                foreach ($res as $key => $value) {
+                foreach ($res as $key => &$value) {
+                    $update_time = UserStar::where(['user_id' => $value['user']['id']])->value('update_time');
+                    if (time() - strtotime($update_time) > Cfg::getCfg('Inactive_days') * 3600 * 24) {
+                        // 不活跃的不能收
+                        $value['off'] = true;
+                    } else {
+                        $value['off'] = false;
+                    }
+
+                    $value['sprite'] = ['earn' => 0];
+                    if (isset($value['user']['id'])) {
+                        // 精灵收益
+                        $value['sprite'] = UserSprite::getInfo($value['user']['id'], $uid);
+                    }
 
                     // 排序
-                    $sort[$key] = $value['intimacy'];
+                    if ($value['off'] && $value['sprite']['earn']) {
+                        $sort[$key] = -1 / $value['sprite']['earn'];
+                    } else {
+                        $sort[$key] = $value['sprite']['earn'];
+                    }
                 }
 
                 array_multisort($sort, SORT_DESC, $res);
