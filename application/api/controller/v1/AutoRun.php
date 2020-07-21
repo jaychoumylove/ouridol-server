@@ -3,6 +3,7 @@
 namespace app\api\controller\v1;
 
 use app\api\model\CfgActive;
+use app\api\model\UserRelation;
 use app\base\controller\Base;
 use app\api\model\StarRank;
 use think\Db;
@@ -178,6 +179,9 @@ class AutoRun extends Base
 
             // 后援会贡献重置
             Fanclub::where('1=1')->update(['month_count' => 0]);
+
+            //月清好友亲密度
+            UserRelation::where('1=1')->update(['intimacy' => 0]);
 
             Db::commit();
         } catch (\Exception $e) {
