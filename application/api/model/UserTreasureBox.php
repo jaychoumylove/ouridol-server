@@ -43,64 +43,86 @@ class UserTreasureBox extends Base
         return $res;
     }
 
-    public static function openBox($uid,$self,$index){
+    public static function openBox($uid, $self, $index)
+    {
 
-        Common::res(['code' => 1, 'msg' => '未开启']);
-        //验证
-        if($uid!=$self){
-            if($index==0)Common::res(['code' => 1, 'msg' => '该宝箱不能开启']);
-            $conditions1 = UserRelation::where(['rer_user_id'=>$self,'ral_user_id'=>$uid])->count();
-            $conditions2 = UserRelation::where(['rer_user_id'=>$uid,'ral_user_id'=>$self])->count();
-            if(!$conditions1 && !$conditions2)Common::res(['code' => 1, 'msg' => '您还不是他的好友']);
+        //验证能否开启宝箱
+        if ($uid != $self) {
+            if ($index == 0 || $index > 5) Common::res(['code' => 1, 'msg' => '该宝箱不能开启']);
+            $conditions1 = (new UserRelation)->readMaster()->where(['rer_user_id' => $self, 'ral_user_id' => $uid])->count();
+            $conditions2 = (new UserRelation)->readMaster()->where(['rer_user_id' => $uid, 'ral_user_id' => $self])->count();
+            if (!$conditions1 && !$conditions2) Common::res(['code' => 1, 'msg' => '您还不是他的好友']);
 
-        }else{
-            if($index!=0)Common::res(['code' => 1, 'msg' => '该宝箱不能开启']);
+        } else {
+            if ($index != 0 || $index > 5) Common::res(['code' => 1, 'msg' => '该宝箱不能开启']);
         }
 
+        //检查时间段
         $checkTimeInfo = self::checkTime();
-        $check = self::where(['user_id'=>$uid,'index'=>$index,'create_date_hour'=>$checkTimeInfo['date']])->find();
-        if($check)Common::res(['code' => 1, 'msg' => '宝箱已经开启过了']);
 
         //抽取一个奖品
         $treasureBoxList = CfgTreasureBox::all();
         $treasureBoxList = json_decode(json_encode($treasureBoxList, JSON_UNESCAPED_UNICODE), true);
         $data = Common::lottery($treasureBoxList);
 
-        if($data['type']==0){
-            $prop_id = $data['prop_id'];
-        }elseif ($data['type']==1){
-            $num = mt_rand(100,1000);
-            $currency=['coin' => $num];
-        }elseif ($data['type']==2){
-            $num = mt_rand(1,3);
-            $currency=['coin' => $num];
+        if ($data['type'] == 0) {
+            $data['num'] = 1;
+        } elseif ($data['type'] == 1) {
+            $data['num'] = mt_rand(100, 1000);
+            $currency = ['coin' => $data['num']];
+        } elseif ($data['type'] == 2) {
+            $data['num'] = mt_rand(1, 3);
+            $currency = ['coin' => $data['num']];
         }
-
-        var_dump($data);die;
 
         Db::startTrans();
         try {
 
-            //todo
-//            UserTreasureBox::create([
-//
-//            ]);
+            //帮助开启
+            if ($uid != $self) {
 
-            if($data['type']!=0){
-                (new User())->change($uid, $currency,['type'=>44,''=>'开启宝箱']);
-                //帮助开启
-                if($uid!=$self){
-                    (new User())->change($uid, $currency,['type'=>44,''=>'帮助好友开启宝箱']);
-                    UserRelation::whereOr(['rer_user_id'=>$self,'ral_user_id'=>$uid])->update([
-                        'intimacy' => Db::raw('intimacy+1'),
-                    ]);
-                    UserRelation::whereOr(['rer_user_id'=>$uid,'ral_user_id'=>$self])->update([
+                $extUpdate = UserExt::where('user_id', $self)->update(['treasure_box_count'=>Db::raw('treasure_box_count-1'),]);
+                if (!$extUpdate) Common::res(['code' => 1, 'msg' => '没有帮助次数了']);
+
+                $is_help = (new UserTreasureBox())->readMaster()->where(['user_id' => $uid, 'help_user_id' => $self])->whereTime('create_time','d')->find();
+                if ($is_help) Common::res(['code' => 1, 'msg' => '已经帮助过该好友了']);
+
+                if ($data['type'] != 0) {
+                    (new User())->change($uid, $currency, ['type' => 44, 'content' => '开启宝箱']);
+                    (new User())->change($self, $currency, ['type' => 44, 'content' => '帮助好友开启宝箱']);
+                } else {
+                    UserProp::addProp($uid, $data['prop_id'], 1);
+                    UserProp::addProp($self, $data['prop_id'], 1);
+                }
+
+                $res = UserRelation::whereOr(['rer_user_id' => $self, 'ral_user_id' => $uid])->update([
+                    'intimacy' => Db::raw('intimacy+1'),
+                ]);
+                if(!$res){
+                    UserRelation::whereOr(['rer_user_id' => $uid, 'ral_user_id' => $self])->update([
                         'intimacy' => Db::raw('intimacy+1'),
                     ]);
                 }
             }else{
-                UserProp::addProp($uid, $prop_id, 1);
+                if ($data['type'] != 0) {
+                    (new User())->change($uid, $currency, ['type' => 44, 'content' => '开启宝箱']);
+                } else {
+                    UserProp::addProp($uid, $data['prop_id'], 1);
+                }
             }
+
+            //添加记录
+            $addRes = UserTreasureBox::create([
+                'user_id' => $uid,
+                'treasure_box_id' => $data['id'],
+                'index' => $index,
+                'count' => $data['num'],
+                'type' => $data['type'],
+                'create_date_hour' => $checkTimeInfo['date'],
+                'help_user_id' => $uid==$self?'':$self,
+            ]);
+            if(!$addRes) Common::res(['code' => 1, 'msg' => '宝箱已经开启过了']);
+
 
             Db::commit();
         } catch (\Exception $e) {
@@ -111,7 +133,6 @@ class UserTreasureBox extends Base
         return $data;
 
     }
-
 
 
 }
