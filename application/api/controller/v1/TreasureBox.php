@@ -12,7 +12,7 @@ use app\base\service\Common;
 class TreasureBox extends Base
 {
 
-    protected $box_notice_id = 2;
+    protected $box_notice_id = 38;
     /**
      * 宝箱列表信息
      */
