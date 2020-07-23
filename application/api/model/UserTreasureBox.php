@@ -49,9 +49,10 @@ class UserTreasureBox extends Base
         //验证能否开启宝箱
         if ($uid != $self) {
             if ($index == 0 || $index > 5) Common::res(['code' => 1, 'msg' => '该宝箱不能开启']);
-            $conditions1 = (new UserRelation)->readMaster()->where(['rer_user_id' => $self, 'ral_user_id' => $uid])->count();
-            $conditions2 = (new UserRelation)->readMaster()->where(['rer_user_id' => $uid, 'ral_user_id' => $self])->count();
-            if (!$conditions1 && !$conditions2) Common::res(['code' => 1, 'msg' => '您还不是他的好友']);
+
+            $uid_star_id = (new UserStar())->readMaster()->where(['user_id' => $uid])->value('star_id');
+            $self_star_id = (new UserStar())->readMaster()->where(['user_id' => $self])->value('star_id');
+            if (!$self_star_id || ($uid_star_id!=$self_star_id)) Common::res(['code' => 1, 'msg' => '你们不在同一个圈子']);
 
         } else {
             if ($index != 0 || $index > 5) Common::res(['code' => 1, 'msg' => '该宝箱不能开启']);

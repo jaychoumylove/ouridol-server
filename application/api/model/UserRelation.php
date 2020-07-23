@@ -112,25 +112,28 @@ class UserRelation extends Base
             if (!$friend_max) $friend_max = 100;
             // 我邀请的人、、加的好友
             $res = UserRelation::with('User')->where(['rer_user_id' => $uid, 'status' => ['in', [1, 2, 3, 4]]])->order('intimacy desc,create_time desc')->limit($friend_max)->select();
+            $res = json_decode(json_encode($res), true);
             if (count($res) < $friend_max) {
                 // 邀请我的人、手动被加的好友
                 $ralUser = self::with('RerUser')->where(['ral_user_id' => $uid, 'status' => ['in', [1, 2, 4]]])->limit($friend_max - count($res))->select();
+                $ralUser = json_decode(json_encode($ralUser), true);
                 foreach ($ralUser as &$value) {
                     $value['user'] = $value['rer_user'];
                 }
                 $res = array_merge($res, $ralUser);
             }
+
             if ($res) {
-                foreach ($res as $key => $value) {
+
+                foreach ($res as $k => $val) {
 
                     $checkTimeInfo = UserTreasureBox::checkTime();
-                    $res[$key]['treasure_box_count'] = 5-(UserTreasureBox::where('user_id', $value['user']['id'])->where('index','<>',0)->where('create_date_hour',$checkTimeInfo['date'])->count());
-                    $res[$key]['treasure_box_times'] = UserExt::where('user_id', $uid)->value('treasure_box_times');
+                    $res[$k]['treasure_box_count'] = 5-(UserTreasureBox::where('user_id', $val['user']['id'])->where('index','<>',0)->where('create_date_hour',$checkTimeInfo['date'])->count());
+                    $res[$k]['treasure_box_times'] = UserExt::where('user_id', $uid)->value('treasure_box_times');
 
                     // 排序
-                    $sort[$key] = $value['intimacy'];
+                    $sort[$k] = $val['intimacy'];
                 }
-
                 array_multisort($sort, SORT_DESC, $res);
                 $data['total_count'] = count($res);
                 $data['list'] = array_slice($res, ($page - 1) * $size, $size);
