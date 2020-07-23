@@ -51,9 +51,10 @@ class AutoRun extends Base
             Prop::where('1=1')->update([
                 'remain' => 100
             ]);
-            // 每日参与群集结次数重置
+            // 每日参与群集结次数重置,剩余开启宝箱次数刷新
             UserExt::where('1=1')->update([
-                'group_mass_times' => 0
+                'group_mass_times' => 0,
+                'treasure_box_times' => 5
             ]);
             // 群贡献
             Wxgroup::dayInit();

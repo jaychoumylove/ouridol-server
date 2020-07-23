@@ -4,6 +4,7 @@ namespace app\api\controller\v1;
 
 use app\api\model\CfgTreasureBox;
 use app\api\model\User;
+use app\api\model\UserExt;
 use app\api\model\UserTreasureBox;
 use app\base\controller\Base;
 use app\base\service\Common;
@@ -59,6 +60,7 @@ class TreasureBox extends Base
         }
 
         $is_get_info['user']=User::where('id',$user_id)->field('id,nickname,avatarurl')->find();
+        $is_get_info['treasure_box_times'] = UserExt::where('user_id', $this->uid)->value('treasure_box_times');
 
         Common::res(['data' => $is_get_info]);
     }
@@ -74,6 +76,19 @@ class TreasureBox extends Base
         if (!$user_id) Common::res(['code' => 100]);
 
         $res=UserTreasureBox::openBox($user_id,$this->uid,$index);
+        Common::res(['data'=>$res]);
+    }
+
+    /**
+     * 打开其他人宝箱，好友列表帮助开宝箱
+     */
+    public function openOther ()
+    {
+        $this->getUser();
+        $user_id = input('user_id');
+        if (!$user_id) Common::res(['code' => 100]);
+
+        $res=UserTreasureBox::openOtherBox($user_id,$this->uid);
         Common::res(['data'=>$res]);
     }
 

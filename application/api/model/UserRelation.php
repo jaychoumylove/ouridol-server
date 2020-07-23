@@ -125,6 +125,8 @@ class UserRelation extends Base
 
                     $checkTimeInfo = UserTreasureBox::checkTime();
                     $res[$key]['treasure_box_count'] = 5-(UserTreasureBox::where('user_id', $value['user']['id'])->where('index','<>',0)->where('create_date_hour',$checkTimeInfo['date'])->count());
+                    $res[$key]['treasure_box_times'] = UserExt::where('user_id', $uid)->value('treasure_box_times');
+
                     // 排序
                     $sort[$key] = $value['intimacy'];
                 }

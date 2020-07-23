@@ -211,5 +211,6 @@ Route::rule('api/:version/page/redress', 'api/v1.Page/redress'); // 补偿
 Route::rule('api/:version/treasureBox/index', 'api/v1.TreasureBox/index');// 宝箱列表信息
 Route::rule('api/:version/treasureBox/info', 'api/v1.TreasureBox/info');// 宝箱信息
 Route::rule('api/:version/treasureBox/open', 'api/v1.TreasureBox/open'); // 打开宝箱
+Route::rule('api/:version/treasureBox/openOther', 'api/v1.TreasureBox/openOther'); // 打开其他人宝箱，好友列表帮助开宝箱
 Route::rule('api/:version/treasureBox/log', 'api/v1.TreasureBox/log'); // 宝箱记录
 

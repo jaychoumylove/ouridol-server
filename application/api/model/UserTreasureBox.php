@@ -15,9 +15,9 @@ class UserTreasureBox extends Base
         $logList = self::where(['user_id' => $uid])->order('id desc')->page($page, $size)->select();
         $logList = json_decode(json_encode($logList, JSON_UNESCAPED_UNICODE), true);
 
-//        foreach ($logList as &$value) {
-//
-//        }
+        foreach ($logList as &$value) {
+            $value['treasure_box'] = CfgTreasureBox::where('id',$value['treasure_box_id'])->field('id,prizeName,imgsrc')->find();
+        }
         return $logList;
     }
 
@@ -72,7 +72,7 @@ class UserTreasureBox extends Base
             $currency = ['coin' => $data['num']];
         } elseif ($data['type'] == 2) {
             $data['num'] = mt_rand(1, 3);
-            $currency = ['coin' => $data['num']];
+            $currency = ['stone' => $data['num']];
         }
 
         Db::startTrans();
@@ -81,15 +81,22 @@ class UserTreasureBox extends Base
             //帮助开启
             if ($uid != $self) {
 
-                $extUpdate = UserExt::where('user_id', $self)->update(['treasure_box_count'=>Db::raw('treasure_box_count-1'),]);
-                if (!$extUpdate) Common::res(['code' => 1, 'msg' => '没有帮助次数了']);
-
                 $is_help = (new UserTreasureBox())->readMaster()->where(['user_id' => $uid, 'help_user_id' => $self])->whereTime('create_time','d')->find();
                 if ($is_help) Common::res(['code' => 1, 'msg' => '已经帮助过该好友了']);
 
+                $is_help_count = (new UserTreasureBox())->readMaster()->where(['help_user_id' => $self])->whereTime('create_time','d')->count();
+                if ($is_help_count>=100) Common::res(['code' => 1, 'msg' => '每日最多帮开100次宝箱']);
+
+                $treasure_box_times = (new UserExt)->readMaster()->where('user_id', $self)->value('treasure_box_times');
+                if ($treasure_box_times>0) {
+                    UserExt::where('user_id', $self)->update(['treasure_box_times'=>Db::raw('treasure_box_times-1'),]);
+                }else{
+                    (new User())->change($self, ['stone' => -20], ['type' => 46, 'content' => '使用灵丹帮助好友开启宝箱']);
+                }
+
                 if ($data['type'] != 0) {
                     (new User())->change($uid, $currency, ['type' => 44, 'content' => '开启宝箱']);
-                    (new User())->change($self, $currency, ['type' => 44, 'content' => '帮助好友开启宝箱']);
+                    (new User())->change($self, $currency, ['type' => 45, 'content' => '帮助好友开启宝箱获得']);
                 } else {
                     UserProp::addProp($uid, $data['prop_id'], 1);
                     UserProp::addProp($self, $data['prop_id'], 1);
@@ -112,7 +119,7 @@ class UserTreasureBox extends Base
             }
 
             //添加记录
-            $addRes = UserTreasureBox::create([
+            $addRes = self::create([
                 'user_id' => $uid,
                 'treasure_box_id' => $data['id'],
                 'index' => $index,
@@ -133,6 +140,27 @@ class UserTreasureBox extends Base
         return $data;
 
     }
+
+    public static function openOtherBox($uid, $self)
+    {
+
+        $checkTimeInfo = self::checkTime();
+        $indexs = [1,2,3,4,5];
+        $index = 0;
+        foreach ($indexs as $value){
+            $is_get_indexs = (new UserTreasureBox())->readMaster()->where(['user_id' => $uid])->where('index',$value)->where('create_date_hour',$checkTimeInfo['date'])->field('id')->find();
+            if(!$is_get_indexs){
+                $index = $value;
+                break;
+            }
+        }
+        if($index ==0)Common::res(['code' => 1, 'msg' => '当前好友宝箱已经被开完了']);
+
+        $data = self::openBox($uid, $self, $index);
+
+        return $data;
+    }
+
 
 
 }
