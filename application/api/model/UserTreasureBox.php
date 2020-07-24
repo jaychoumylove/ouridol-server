@@ -56,8 +56,8 @@ class UserTreasureBox extends Base
         if ($uid != $self) {
             if ($index == 0 || $index > 5) Common::res(['code' => 1, 'msg' => '该宝箱不能开启']);
 
-            $uid_star_id = (new UserStar())->readMaster()->where(['user_id' => $uid])->value('star_id');
-            $self_star_id = (new UserStar())->readMaster()->where(['user_id' => $self])->value('star_id');
+            $uid_star_id = (new UserStar())->where(['user_id' => $uid])->value('star_id');
+            $self_star_id = (new UserStar())->where(['user_id' => $self])->value('star_id');
             if (!$self_star_id || ($uid_star_id!=$self_star_id)) Common::res(['code' => 1, 'msg' => '你们不在同一个圈子']);
 
         } else {
@@ -72,7 +72,7 @@ class UserTreasureBox extends Base
         $treasureBoxList = json_decode(json_encode($treasureBoxList, JSON_UNESCAPED_UNICODE), true);
         $data = Common::lottery($treasureBoxList);
 
-        if ($data['type'] == 0) {
+        if ($data['type'] == 0) {//道具
             $data['num'] = 1;
 
             $reelect =false;//是否重选
@@ -93,10 +93,10 @@ class UserTreasureBox extends Base
                 $currency = ['coin' => $data['num']];
             }
 
-        } elseif ($data['type'] == 1) {
+        } elseif ($data['type'] == 1) {//能量
             $data['num'] = mt_rand(100, 500);
             $currency = ['coin' => $data['num']];
-        } elseif ($data['type'] == 2) {
+        } elseif ($data['type'] == 2) {//灵丹
             $data['num'] = mt_rand(1, 3);
             $currency = ['stone' => $data['num']];
 
@@ -157,7 +157,7 @@ class UserTreasureBox extends Base
             }
 
             //添加记录
-            $addRes = self::create([
+            self::create([
                 'user_id' => $uid,
                 'treasure_box_id' => $data['id'],
                 'index' => $index,
@@ -166,7 +166,6 @@ class UserTreasureBox extends Base
                 'create_date_hour' => $checkTimeInfo['date'],
                 'help_user_id' => $uid==$self?'':$self,
             ]);
-            if(!$addRes) Common::res(['code' => 1, 'msg' => '宝箱已经开启过了']);
 
 
             Db::commit();
