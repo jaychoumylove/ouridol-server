@@ -104,4 +104,26 @@ class TreasureBox extends Base
 
         Common::res(['data' => $logList]);
     }
+
+    /**
+     * 全服开箱排行榜
+     */
+    public function getOpenBoxRank()
+    {
+        $this->getUser();
+        $page = input('page', 1);
+        $size = input('size', 10);
+        $data['list'] = UserExt::with('User')->where('help_open_times','>',0)->field('id,user_id,help_open_times,update_time')->order('help_open_times desc,update_time asc')->page($page, $size)->select();
+        $data['my_help_open_times'] = UserExt::where('user_id',$this->uid)->value('help_open_times');
+        $data['my_help_open_rank'] = (UserExt::where('help_open_times','>',$data['my_help_open_times'])->order('help_open_times desc,update_time asc')->count())+1;
+        if($page==1 && count($data['list'])==0){
+            $data['my_help_open_rank'] = 0;
+        }
+        if($data['my_help_open_rank']>=10000){
+            $data['my_help_open_rank'] = '999+';
+        }
+
+        Common::res(['data' => $data]);
+    }
+
 }

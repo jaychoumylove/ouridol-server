@@ -9,6 +9,11 @@ use app\api\service\User;
 
 class UserExt extends Base
 {
+    public function User()
+    {
+        return $this->belongsTo('User', 'user_id', 'id')->field('id,nickname,avatarurl');
+    }
+
     public static function setTime($uid, $index)
     {
         $item = self::get(['user_id' => $uid]);

@@ -213,4 +213,5 @@ Route::rule('api/:version/treasureBox/info', 'api/v1.TreasureBox/info');// 宝�
 Route::rule('api/:version/treasureBox/open', 'api/v1.TreasureBox/open'); // 打开宝箱
 Route::rule('api/:version/treasureBox/openOther', 'api/v1.TreasureBox/openOther'); // 打开其他人宝箱，好友列表帮助开宝箱
 Route::rule('api/:version/treasureBox/log', 'api/v1.TreasureBox/log'); // 宝箱记录
+Route::rule('api/:version/treasureBox/getOpenBoxRank', 'api/v1.TreasureBox/getOpenBoxRank'); // 全服开箱排行榜
 

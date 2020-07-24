@@ -83,18 +83,21 @@ class UserTreasureBox extends Base
             if ($uid != $self) {
 
                 $is_help = (new UserTreasureBox())->readMaster()->where(['user_id' => $uid, 'help_user_id' => $self])->whereTime('create_time','d')->find();
-                if ($is_help) Common::res(['code' => 1, 'msg' => '已经帮助过该好友了']);
+                if ($is_help) Common::res(['code' => 1, 'msg' => '今日已经帮助过该好友了']);
 
                 $is_help_count = (new UserTreasureBox())->readMaster()->where(['help_user_id' => $self])->whereTime('create_time','d')->count();
                 if ($is_help_count>=100) Common::res(['code' => 1, 'msg' => '每日最多帮开100次宝箱']);
 
-                $treasure_box_times = (new UserExt)->readMaster()->where('user_id', $self)->value('treasure_box_times');
-                if ($treasure_box_times>0) {
-                    UserExt::where('user_id', $self)->update(['treasure_box_times'=>Db::raw('treasure_box_times-1'),]);
-                }else{
+                //帮助开箱次数加一
+                UserExt::where('user_id', $self)->update(['help_open_times' => Db::raw('help_open_times+1'),]);
+
+                //是否剩余开箱次数，无则使用灵丹开启
+                $treasure_box_times =  UserExt::where('user_id', $self)->where('treasure_box_times','>',0)->update(['treasure_box_times'=>Db::raw('treasure_box_times-1'),]);
+                if (!$treasure_box_times) {
                     (new User())->change($self, ['stone' => -20], ['type' => 46, 'content' => '使用灵丹帮助好友开启宝箱']);
                 }
 
+                //帮助开箱获得奖励
                 if ($data['type'] != 0) {
                     (new User())->change($uid, $currency, ['type' => 44, 'content' => '开启宝箱']);
                     (new User())->change($self, $currency, ['type' => 45, 'content' => '帮助好友开启宝箱获得']);
@@ -103,6 +106,7 @@ class UserTreasureBox extends Base
                     UserProp::addProp($self, $data['prop_id'], 1);
                 }
 
+                //增加亲密度
                 $res = UserRelation::whereOr(['rer_user_id' => $self, 'ral_user_id' => $uid])->update([
                     'intimacy' => Db::raw('intimacy+1'),
                 ]);
@@ -112,6 +116,7 @@ class UserTreasureBox extends Base
                     ]);
                 }
             }else{
+                //开箱获得奖励
                 if ($data['type'] != 0) {
                     (new User())->change($uid, $currency, ['type' => 44, 'content' => '开启宝箱']);
                 } else {
