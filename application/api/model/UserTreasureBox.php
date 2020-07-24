@@ -5,6 +5,7 @@ namespace app\api\model;
 use app\api\service\User;
 use app\base\model\Base;
 use app\base\service\Common;
+use app\api\model\User as UserModel;
 use think\Db;
 use think\Model;
 
@@ -12,11 +13,16 @@ class UserTreasureBox extends Base
 {
     public static function getList($uid, $page, $size)
     {
-        $logList = self::where(['user_id' => $uid])->order('id desc')->page($page, $size)->select();
+        $logList = self::where('user_id',$uid)->whereOr('help_user_id',$uid)->order('id desc')->page($page, $size)->select();
         $logList = json_decode(json_encode($logList, JSON_UNESCAPED_UNICODE), true);
 
         foreach ($logList as &$value) {
             $value['treasure_box'] = CfgTreasureBox::where('id',$value['treasure_box_id'])->field('id,prizeName,imgsrc')->find();
+            if($value['help_user_id'] && $value['help_user_id'] != $uid){
+                $value['help_user_info'] = UserModel::where('id',$value['help_user_id'])->field('id,nickname,avatarurl')->find();
+            }elseif ($value['help_user_id'] && $value['help_user_id'] == $uid){
+                $value['helped_user_info'] = UserModel::where('id',$value['user_id'])->field('id,nickname,avatarurl')->find();
+            }
         }
         return $logList;
     }
