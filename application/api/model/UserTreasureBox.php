@@ -99,6 +99,13 @@ class UserTreasureBox extends Base
         } elseif ($data['type'] == 2) {
             $data['num'] = mt_rand(1, 3);
             $currency = ['stone' => $data['num']];
+
+            $treasure_box14 =(new UserTreasureBox())->readMaster()->where(['user_id' => $uid, 'treasure_box_id' => 14])->whereTime('create_time','d')->count();
+            if($treasure_box14>=3){
+                $data = CfgTreasureBox::where('type',1)->find();
+                $data['num'] = mt_rand(100, 1000);
+                $currency = ['coin' => $data['num']];
+            }
         }
 
         Db::startTrans();
