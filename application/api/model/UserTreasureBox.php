@@ -68,6 +68,25 @@ class UserTreasureBox extends Base
 
         if ($data['type'] == 0) {
             $data['num'] = 1;
+
+            $reelect =false;//是否重选
+            if($data['id']==18){//福袋只能一天获取一次
+                $treasure_box18 =(new UserTreasureBox())->readMaster()->where(['user_id' => $uid, 'treasure_box_id' => 18])->whereTime('create_time','d')->find();
+                if($treasure_box18){
+                    $reelect = true;
+                }
+            }else{//其他道具只能一天获取三次
+                $treasure_box_get_count =(new UserTreasureBox())->readMaster()->where(['user_id' => $uid, 'treasure_box_id' => $data['id']])->whereTime('create_time','d')->count();
+                if($treasure_box_get_count>=3){
+                    $reelect = true;
+                }
+            }
+            if($reelect){
+                $data = CfgTreasureBox::where('type',1)->find();
+                $data['num'] = mt_rand(100, 1000);
+                $currency = ['coin' => $data['num']];
+            }
+
         } elseif ($data['type'] == 1) {
             $data['num'] = mt_rand(100, 1000);
             $currency = ['coin' => $data['num']];

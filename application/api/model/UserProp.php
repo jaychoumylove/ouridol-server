@@ -50,7 +50,7 @@ class UserProp extends Base
 
     public static function getList($uid, $page, $size)
     {
-        $list = self::with('Prop')->where('user_id', $uid)->order('id desc')->page ($page, $size)->select();
+        $list = self::with('Prop')->where('user_id', $uid)->order('id desc')->whereTime('create_time', '>', '-3 days')->page ($page, $size)->select();
 
         // 检查是否已过期
         foreach ($list as &$value) {
