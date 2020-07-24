@@ -89,12 +89,12 @@ class UserTreasureBox extends Base
             }
             if($reelect){
                 $data = CfgTreasureBox::where('type',1)->find();
-                $data['num'] = mt_rand(100, 1000);
+                $data['num'] = mt_rand(100, 500);
                 $currency = ['coin' => $data['num']];
             }
 
         } elseif ($data['type'] == 1) {
-            $data['num'] = mt_rand(100, 1000);
+            $data['num'] = mt_rand(100, 500);
             $currency = ['coin' => $data['num']];
         } elseif ($data['type'] == 2) {
             $data['num'] = mt_rand(1, 3);
@@ -103,7 +103,7 @@ class UserTreasureBox extends Base
             $treasure_box14 =(new UserTreasureBox())->readMaster()->where(['user_id' => $uid, 'treasure_box_id' => 14])->whereTime('create_time','d')->count();
             if($treasure_box14>=3){
                 $data = CfgTreasureBox::where('type',1)->find();
-                $data['num'] = mt_rand(100, 1000);
+                $data['num'] = mt_rand(100, 500);
                 $currency = ['coin' => $data['num']];
             }
         }
