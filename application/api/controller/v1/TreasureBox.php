@@ -99,7 +99,7 @@ class TreasureBox extends Base
     {
         $this->getUser();
         $page = input('page', 1);
-        $size = input('size', 10);
+        $size = input('size', 15);
         $logList = UserTreasureBox::getList($this->uid, $page, $size);
 
         Common::res(['data' => $logList]);
