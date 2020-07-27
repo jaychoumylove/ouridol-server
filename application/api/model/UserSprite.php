@@ -106,6 +106,7 @@ class UserSprite extends Base
 
                 if ($uid != $self) {
                     // 他人帮收
+                    Common::res(['code' => 1, 'msg' => '不能帮别人收取能量了']);
                     $update_time = UserStar::where(['user_id' => $uid])->value('update_time');
                     if (time() - strtotime($update_time) > Cfg::getCfg('Inactive_days') * 3600 * 24) {
                         Common::res(['code' => 1, 'msg' => '好友已经很久没有打榜了，提醒TA一起为偶像打榜']);
