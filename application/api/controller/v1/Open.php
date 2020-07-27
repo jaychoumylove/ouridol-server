@@ -66,7 +66,7 @@ class Open extends Base
             // 助力开屏
             $res['img'] = $topInfo['open_img'];
             $res['starname'] = $topInfo['starname'];
-            $res['user'] = $topInfo['user_rank'][0];
+            $res['user'] = $topInfo['user_rank']?$topInfo['user_rank'][0]:[];
         } else {
             $res['img'] = Cfg::getCfg('open_img');
         }
