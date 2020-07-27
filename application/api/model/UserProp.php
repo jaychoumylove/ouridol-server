@@ -101,6 +101,7 @@ class UserProp extends Base
                         'coin' => $awards[$rd]
                     ], ['type' => 26]);
                     $res['awards'] = $awards[$rd];
+                    break;
                 case self::DOUBLE_STEAL_CARD_ID:
                     $expireTime = self::useMultipleStealCard($prop['user_id'], self::DOUBLE_STEAL_CARD_ID);
                     $res['expire_time'] = date('Y-m-d H:i:s', $expireTime);
@@ -108,6 +109,9 @@ class UserProp extends Base
                 case self::TRIPLE_STEAL_CARD_ID:
                     $expireTime = self::useMultipleStealCard($prop['user_id'], self::TRIPLE_STEAL_CARD_ID);
                     $res['expire_time'] = date('Y-m-d H:i:s', $expireTime);
+                    break;
+                case 7:
+                    // 领能量双倍卡
                     break;
                 default:
                     # code...

@@ -60,6 +60,14 @@ class UserSprite extends Base
             $prop_id = 2;
             $item['isUseCard'] = UserProp::where(['user_id' => $uid, 'status' => 1, 'prop_id' => $prop_id])
                     ->where('use_time', '>=', time() - 2 * 3600)->value('id') == true;
+
+            //是否存在领能量双倍卡,先判断是否使用了一个了
+            $isUseCard7 = UserProp::where(['user_id' => $uid, 'status' => 1, 'prop_id' => 7])->where('use_time', '<>', 0)->value('id');
+            if($isUseCard7){
+                $item['isExistCard7'] = -1;
+            }else{
+                $item['isExistCard7'] = UserProp::where(['user_id' => $uid, 'status' => 0, 'prop_id' => 7])->value('id');
+            }
         }
 
         // if($uid == 1){
@@ -78,6 +86,19 @@ class UserSprite extends Base
         if ($userSprite['earn'] > 0) {
             Db::startTrans();
             try {
+
+                // 使用道具卡
+                $prop_id = 7;
+                $isDone = UserProp::where([
+                    'user_id' => $uid,
+                    'prop_id' => $prop_id,
+                ])->where('status',1)->where('use_time', '<>', 0)->limit(1)->update(['use_time' => 0]);
+
+                if ($isDone) {
+                    // 双倍领取当次收益
+                    $userSprite['earn'] = $userSprite['earn'] * 2;
+                }
+
                 self::where(['user_id' => $uid])->update([
                     'settle_time' => time() - 5,
                     'total_coin' => Db::raw('total_coin+' . $userSprite['earn'])
