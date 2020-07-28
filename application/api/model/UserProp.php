@@ -54,7 +54,7 @@ class UserProp extends Base
 
         // 检查是否已过期
         foreach ($list as &$value) {
-            if ($value['status'] == 0 && date('Ymd', strtotime($value['create_time'])) != date('Ymd')) {
+            if (($value['status'] == 0 || $value['prop_id'] == 7) && date('Ymd', strtotime($value['create_time'])) != date('Ymd')) {
                 // 购买的道具仅限当天使用
                 $value['status'] = 2;
                 self::where('id', $value['id'])->update(['status' => 2]);
