@@ -51,10 +51,11 @@ class AutoRun extends Base
             Prop::where('1=1')->update([
                 'remain' => 100
             ]);
-            // 每日参与群集结次数重置,剩余开启宝箱次数刷新
+            // 每日参与群集结次数重置,剩余开启宝箱次数刷新,帮助开启宝箱次数
             UserExt::where('1=1')->update([
                 'group_mass_times' => 0,
-                'treasure_box_times' => 5
+                'treasure_box_times' => 5,
+                'help_open_times' => 0,
             ]);
             // 群贡献
             Wxgroup::dayInit();
@@ -122,11 +123,6 @@ class AutoRun extends Base
 
             // 后援会贡献重置
             Fanclub::where('1=1')->update(['week_count' => 0]);
-
-            // 周清帮助开启宝箱次数
-            UserExt::where('1=1')->update([
-                'help_open_times' => 0,
-            ]);
 
             Db::commit();
         } catch (\Exception $e) {
