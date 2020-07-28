@@ -123,6 +123,11 @@ class AutoRun extends Base
             // 后援会贡献重置
             Fanclub::where('1=1')->update(['week_count' => 0]);
 
+            // 周清帮助开启宝箱次数
+            UserExt::where('1=1')->update([
+                'help_open_times' => 0,
+            ]);
+
             Db::commit();
         } catch (\Exception $e) {
             Db::rollBack();

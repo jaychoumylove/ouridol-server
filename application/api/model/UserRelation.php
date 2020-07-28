@@ -129,13 +129,14 @@ class UserRelation extends Base
 
                     $checkTimeInfo = UserTreasureBox::checkTime();
                     $res[$k]['treasure_box_count'] = 5-(UserTreasureBox::where('user_id', $val['user']['id'])->where('index','<>',0)->where('create_date_hour',$checkTimeInfo['date'])->count());
-                    $res[$k]['treasure_box_times'] = UserExt::where('user_id', $uid)->value('treasure_box_times');
+
 
                     // 排序
                     $sort[$k] = $val['intimacy'];
                 }
                 array_multisort($sort, SORT_DESC, $res);
                 $data['total_count'] = count($res);
+                $data['treasure_box_times'] = UserExt::where('user_id', $uid)->value('treasure_box_times');
                 $data['list'] = array_slice($res, ($page - 1) * $size, $size);
                 $res = $data;
             } else {
