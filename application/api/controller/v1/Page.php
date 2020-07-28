@@ -190,7 +190,7 @@ class Page extends Base
 
     public function prop()
     {
-        Common::res(['data' => Prop::all(['status' => Prop::ON])]);
+        Common::res(['data' => Prop::where(['status' => Prop::ON])->order('sort','asc')->select()]);
     }
 
     public function myprop()
