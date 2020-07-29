@@ -72,7 +72,7 @@ class User
                     // 货币不足
                     switch ($key) {
                         case 'coin':
-                            Common::res(['msg' => '能量不足', 'data' => ['nomore' => true]]);
+                            Common::res(['code' => 1, 'msg' => '能量不足', 'data' => ['nomore' => true]]);
                             break;
                         case 'stone':
                             Common::res(['code' => 1, 'msg' => '灵丹不足']);
