@@ -4,6 +4,7 @@ namespace app\api\service;
 
 use app\api\model\RecTask;
 use app\api\model\Task as TaskModel;
+use app\api\model\UserTreasureBox;
 use think\Db;
 use app\api\model\UserStar;
 use app\base\service\Common;
@@ -238,6 +239,32 @@ class Task
 
                         if ($task['doneTimes'] > $task['times']) {
                             $task['status'] = 2;
+                        }
+                    }
+                    break;
+                case 18:
+                    // 偷能量数量
+                    $task['doneTimes'] = 0;
+                    $steal = UserExt::where(['user_id' => $uid])->field('steal_count,steal_time')->find();
+
+                    if (date('Ymd', $steal['steal_time']) == date('Ymd', time())) {
+                        $task['doneTimes'] = $steal['steal_count'];
+                        if ($task['doneTimes'] >= $task['times']) {
+                            $task['status'] = 1;
+                        }
+                    }
+                    if (in_array($task['id'], $recTask)) {
+                        $task['status'] = 2;
+                    }
+                    break;
+                case 19:
+                    // 被开宝箱次数
+                    $task['doneTimes'] = UserTreasureBox::where('user_id', $uid)->where('index','>',0)->whereTime('create_time', 'd')->count();
+                    if (in_array($task['id'], $recTask)) {
+                        $task['status'] = 2;
+                    } else {
+                        if ($task['doneTimes'] >= $task['times']) {
+                            $task['status'] = 1;
                         }
                     }
                     break;
