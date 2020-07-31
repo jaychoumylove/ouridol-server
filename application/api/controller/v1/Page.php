@@ -93,10 +93,13 @@ class Page extends Base
 
         // 顺便获取分享信息
         $res['config'] = Cfg::getList();
-        if ($res['userStar'] && $res['userStar']['birthday'] == (int) date('md') && $res['userStar']['head_img_s']) {
-            // 生日弹框条件
-            $res['config']['index_banner']['img_url'] = $res['userStar']['head_img_s'];
-            $res['config']['isBirthday']=1;
+        if ($userStar) {
+            if($userStar['star']['birthday'] && $userStar['star']['birthday'] == (int) date('md') && $userStar['star']['head_img_s']){
+                // 生日弹框条件
+                $res['config']['index_banner']['img_url'] = $userStar['star']['head_img_s'];
+                $res['config']['isBirthday']=1;
+            }
+
         }
         $res['config']['share_text'] = CfgShare::getOne();
         $res['spriteInfo'] = UserSprite::getInfo($this->uid, $this->uid);
