@@ -45,6 +45,12 @@ class Rec extends Base
                     $value['type']['content'] = str_replace('$' . $i, $list[$i],  $value['type']['content']);
                 }
             }
+            if($value['type']['id']==47 && $value['target_user']['nickname']){
+                $value['type']['content'] = '膜拜大神['.$value['target_user']['nickname'].']';
+
+            }elseif ($value['type']['id']==48 && $value['target_user']['nickname']){
+                $value['type']['content'] = '被['.$value['target_user']['nickname'].']膜拜';
+            }
         }
         return $logList;
     }

@@ -18,7 +18,7 @@ class HongbaoUser extends Base
     /**打开宝箱 */
     public static function openBox($uid, $box_id)
     {
-        $isExist = self::where('box_id', $box_id)->where('user_id', $uid)->value('id');
+        $isExist = (new HongbaoUser)->readMaster()->where('box_id', $box_id)->where('user_id', $uid)->value('id');
         if ($isExist) return;
         
         //不在一个圈子
@@ -87,7 +87,7 @@ class HongbaoUser extends Base
 
     public static function getDouble($uid)
     {
-        $hongbaoUser = self::where('user_id', $uid)->order('id desc')->find();
+        $hongbaoUser = (new HongbaoUser)->readMaster()->where('user_id', $uid)->order('id desc')->find();
 
         if ($hongbaoUser['double'] == 0) {
             Db::startTrans();

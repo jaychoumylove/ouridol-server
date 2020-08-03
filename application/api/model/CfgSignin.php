@@ -19,7 +19,7 @@ class CfgSignin extends Base
                 // ------ 管理员发奖励
                 // 每个人只能领一次管理员发的红包
                 // 领了管理员红包表示已加群
-                $isJoin = UserExt::where('user_id', $uid)->value('is_join_wxgroup');
+                $isJoin = (new UserExt)->readMaster()->where('user_id', $uid)->value('is_join_wxgroup');
                 if ($isJoin == 1) {
                     Common::res(['data' => [
                         'error' => 1,
@@ -53,7 +53,6 @@ class CfgSignin extends Base
                 break;
             case 2:
                 // ------ 团长发红包
-                $isJoin = UserExt::where('user_id', $uid)->value('is_join_wxgroup');
 
                 $award = [
                     'coin' => 1000,

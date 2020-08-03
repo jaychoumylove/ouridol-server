@@ -126,6 +126,8 @@ Route::rule('api/:version/sprite/settle', 'api/v1.UserSprite/settle');// 精灵�
 Route::rule('api/:version/sprite/upgrade', 'api/v1.UserSprite/upgrade');// 精灵升级
 Route::rule('api/:version/sprite/skill', 'api/v1.UserSprite/skill');// 精灵技能
 Route::rule('api/:version/sprite/shortEarn', 'api/v1.UserSprite/shortEarn');// 使用精灵加速卡
+Route::rule('api/:version/sprite/rank', 'api/v1.UserSprite/rankList');// 精灵产量排行
+Route::rule('api/:version/sprite/zanGod', 'api/v1.UserSprite/zanGod');//膜拜大神
 
 // Pay
 Route::rule('api/:version/pay/order', 'api/v1.Payment/order');// 支付下单

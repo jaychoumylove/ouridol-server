@@ -10,20 +10,16 @@ use think\Db;
 use app\api\model\StarRankHistory;
 use app\api\model\UserStar;
 use app\api\model\UserCurrency;
-use app\api\model\OtherLock;
-use think\Cache;
+use app\api\model\UserSprite;
 use app\api\model\Fanclub;
 use app\api\model\Star;
 use app\base\service\WxAPI;
-use think\Log;
 use app\api\model\Lock;
 use app\api\model\Open;
 use app\api\model\Prop;
 use app\api\model\Rec;
-use app\api\model\RecCardHistory;
 use app\api\model\RecTask;
 use app\api\model\UserExt;
-use app\api\model\UserWxgroup;
 use app\api\model\Wxgroup;
 
 class AutoRun extends Base
@@ -56,6 +52,13 @@ class AutoRun extends Base
                 'group_mass_times' => 0,
                 'treasure_box_times' => 5,
                 'help_open_times' => 0,
+            ]);
+            // 用户每日产量排行清空,膜拜和被膜拜次数重置
+            UserSprite::where('1=1')->update([
+                'lastday_coin' => Db::raw('thisday_coin'),
+                'thisday_coin' => 0,
+                'god_count' => 3,
+                'cover_god_count' => 0,
             ]);
             // 群贡献
             Wxgroup::dayInit();

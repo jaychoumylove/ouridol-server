@@ -18,7 +18,7 @@ class ActiveFudaiUser extends Base
     /**打开宝箱 */
     public static function openBox($uid, $box_id)
     {
-        $isExist = self::where('box_id', $box_id)->where('user_id', $uid)->value('id');
+        $isExist = (new ActiveFudaiUser)->readMaster()->where('box_id', $box_id)->where('user_id', $uid)->value('id');
         if ($isExist) return;
         
         //不在一个圈子
@@ -94,7 +94,7 @@ class ActiveFudaiUser extends Base
 
     public static function getDouble($uid)
     {
-        $fudaiUser = self::where('user_id', $uid)->order('id desc')->find();
+        $fudaiUser = (new ActiveFudaiUser)->readMaster()->where('user_id', $uid)->order('id desc')->find();
 
         if ($fudaiUser['double'] == 0) {
             Db::startTrans();

@@ -32,13 +32,13 @@ class UserSprite extends Base
         // 能量收益
         $duratime = time() - $item['settle_time'];
         //能量蛋等级存储时间及能量蛋图片
-        $item['egg_info'] = CfgEgg::where('level',$item['egg_level'])->find();
-        $item['next_egg_info'] = CfgEgg::where('level',$item['egg_level']+1)->find();
-        $storage_time = CfgEgg::where('level',$item['egg_level'])->value('storage_time');
-        if($storage_time){
-            $spriteLimitTime =  $storage_time * 3600;
-        }else{
-            $spriteLimitTime =  Cfg::getCfg('spriteLimitTime');
+        $item['egg_info'] = CfgEgg::where('level', $item['egg_level'])->find();
+        $item['next_egg_info'] = CfgEgg::where('level', $item['egg_level'] + 1)->find();
+        $storage_time = CfgEgg::where('level', $item['egg_level'])->value('storage_time');
+        if ($storage_time) {
+            $spriteLimitTime = $storage_time * 3600;
+        } else {
+            $spriteLimitTime = Cfg::getCfg('spriteLimitTime');
         }
 
         if ($duratime >= $spriteLimitTime) {
@@ -63,9 +63,9 @@ class UserSprite extends Base
 
             //是否存在领能量双倍卡,先判断是否使用了一个了
             $isUseCard7 = UserProp::where(['user_id' => $uid, 'status' => 1, 'prop_id' => 7])->where('use_time', '<>', 0)->value('id');
-            if($isUseCard7){
+            if ($isUseCard7) {
                 $item['isExistCard7'] = -1;
-            }else{
+            } else {
                 $item['isExistCard7'] = UserProp::where(['user_id' => $uid, 'status' => 0, 'prop_id' => 7])->value('id');
             }
         }
@@ -92,7 +92,7 @@ class UserSprite extends Base
                 $isDone = UserProp::where([
                     'user_id' => $uid,
                     'prop_id' => $prop_id,
-                ])->where('status',1)->where('use_time', '<>', 0)->limit(1)->update(['use_time' => 0]);
+                ])->where('status', 1)->where('use_time', '<>', 0)->limit(1)->update(['use_time' => 0]);
 
                 if ($isDone) {
                     // 双倍领取当次收益
@@ -124,6 +124,10 @@ class UserSprite extends Base
                 (new User())->change($uid, [
                     'coin' => $userSprite['earn'],
                 ], $log);
+
+                UserSprite::where('user_id', $uid)->update([
+                    'thisday_coin' => Db::raw('thisday_coin+' . $userSprite['earn']),
+                ]);
                 Db::commit();
             } catch (\Exception $e) {
                 Db::rollBack();
@@ -149,7 +153,7 @@ class UserSprite extends Base
             case 1:
                 // 技能一升级
                 $nextSkill = CfgSpriteSkillone::get(['level' => $userSprite['skillone_level'] + 1]);
-                if (!$nextSkill)  Common::res(['code' => 1, 'msg' => '已经是顶级了！']);
+                if (!$nextSkill) Common::res(['code' => 1, 'msg' => '已经是顶级了！']);
                 $field = 'skillone_level';
                 $need_stone = $nextSkill['need_stone'];
                 $type = 11;
@@ -157,7 +161,7 @@ class UserSprite extends Base
             case 2:
                 // 能量蛋升级
                 $nextEgg = CfgEgg::get(['level' => $userSprite['egg_level'] + 1]);
-                if (!$nextEgg)  Common::res(['code' => 1, 'msg' => '已经是顶级了！']);
+                if (!$nextEgg) Common::res(['code' => 1, 'msg' => '已经是顶级了！']);
                 $field = 'egg_level';
                 $need_stone = $nextEgg['need_stone'];
                 $type = 43;
@@ -193,7 +197,7 @@ class UserSprite extends Base
         // $myEarn = CfgSpriteSkillone::where(['times' => ['elt', $userSprite['skillone_times']]])->order('times desc')->value('earn');
 
         // 按被收人的50%
-        $myEarn =  floor($earn * Cfg::getCfg('sprite_percent'));
+        $myEarn = floor($earn * Cfg::getCfg('sprite_percent'));
 
         (new User)->change($uid, [
             'coin' => $myEarn,
@@ -217,5 +221,54 @@ class UserSprite extends Base
                 # code...
                 break;
         }
+    }
+
+    //每日产量排行榜
+    public static function getRankList($uid, $page, $size)
+    {
+
+        $list = self::with('User')->where('thisday_coin', '>', 0)->field('id,user_id,thisday_coin,lastday_coin')->order('thisday_coin desc,lastday_coin desc')
+            ->page($page, $size)->select();
+        foreach ($list as &$value) {
+            $star_id = UserStar::where('user_id', $value['user_id'])->value('star_id');
+            if($star_id){
+                $value['starname'] = Star::where('id', $star_id)->value('name');
+            }
+        }
+        $myInfo['thisday_coin'] = self::where('user_id',$uid)->value('thisday_coin');
+        $myInfo['rank'] = (self::where('thisday_coin','>',$myInfo['thisday_coin'])->order('thisday_coin desc,lastday_coin desc')->count())+1;
+
+        return ['list'=>$list,'myInfo'=>$myInfo];
+    }
+
+    /** 膜拜大神*/
+    public static function zanGod($uid, $user_id, $earn_coin = 1000, $god_earn_coin = 10)
+    {
+        $myStar = UserStar::where('user_id', $uid)->value('star_id');
+        $godStar = UserStar::where('user_id', $user_id)->value('star_id');
+        if ($myStar != $godStar) Common::res(['code' => 1, 'msg' => '只能膜拜同一圈子的大神！']);
+        Db::startTrans();
+        try {
+            $isDone = self::where('user_id', $uid)->where('god_count', '>', 0)->update([
+                'god_count' => Db::raw('god_count-1'),
+                'god_count_time' => time(),
+            ]);
+            if (!$isDone) Common::res(['code' => 1, 'msg' => '已经没有膜拜次数了，每天只能膜拜三次！']);
+            self::where('user_id', $user_id)->update([
+                'cover_god_count' => Db::raw('cover_god_count+1'),
+            ]);
+
+            (new User())->change($uid, [
+                'coin' => $earn_coin,
+            ], ['type' => 47, 'target_user_id' => $user_id]);
+            (new User())->change($user_id, [
+                'coin' => $god_earn_coin,
+            ], ['type' => 48, 'target_user_id' => $uid]);
+            Db::commit();
+        } catch (\Exception $e) {
+            Db::rollBack();
+            Common::res(['code' => 400, 'data' => $e->getMessage()]);
+        }
+        return $cover_count = self::where('user_id', $user_id)->value('cover_god_count');
     }
 }

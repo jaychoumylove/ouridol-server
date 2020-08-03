@@ -38,7 +38,7 @@ class UserExt extends Base
     {
         self::addCount($uid);
 
-        $ext = self::where('user_id', $uid)->field('lottery_count,lottery_time')->find();
+        $ext = (new ActiveFudaiUser)->readMaster()->where('user_id', $uid)->field('lottery_count,lottery_time')->find();
         if ($ext['lottery_count'] < Cfg::getCfg('lottery')['max']) {
             $ext['remain_time'] = Cfg::getCfg('lottery')['per'] - (time() - $ext['lottery_time']);
         }

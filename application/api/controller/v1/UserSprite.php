@@ -61,6 +61,29 @@ class UserSprite extends Base
         ]);
     }
 
+    public function rankList()
+    {
+        $this->getUser();
+        $page = input('page', 1);
+        $size = input('size', 15);
+
+        $res = UserSpriteModel::getRankList($this->uid, $page, $size);
+
+        Common::res(['data' => $res]);
+    }
+
+    public function zanGod()
+    {
+        $this->getUser();
+        $user_id = input('user_id');
+        if ($this->uid == $user_id) Common::res(['code' => 1, 'msg' => '您有点自恋，不能膜拜自己！']);
+        $data['earn_coin'] = 1000;
+        $data['god_earn_coin'] = 10;
+        $data['cover_count'] = UserSpriteModel::zanGod($this->uid, $user_id, $data['earn_coin'], $data['god_earn_coin']);
+
+        Common::res(['data' => $data]);
+    }
+
     public function upgrade()
     {
         $this->getUser();
