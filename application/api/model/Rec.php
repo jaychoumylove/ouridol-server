@@ -51,6 +51,10 @@ class Rec extends Base
             }elseif ($value['type']['id']==48 && $value['target_user']['nickname']){
                 $value['type']['content'] = '被['.$value['target_user']['nickname'].']膜拜';
             }
+
+            if($value['type']['id']==5 && $value['target_user']['nickname']){
+                $value['type']['content'] = '领取徒弟['.$value['target_user']['nickname'].']的收益';
+            }
         }
         return $logList;
     }
