@@ -227,14 +227,19 @@ class UserSprite extends Base
     public static function getRankList($uid, $page, $size)
     {
 
-        $list = self::with('User')->where('thisday_coin', '>', 0)->field('id,user_id,thisday_coin,lastday_coin')->order('thisday_coin desc,lastday_coin desc')
-            ->page($page, $size)->select();
-        foreach ($list as &$value) {
-            $star_id = UserStar::where('user_id', $value['user_id'])->value('star_id');
-            if($star_id){
-                $value['starname'] = Star::where('id', $star_id)->value('name');
+        if($page<=10){
+            $list = self::with('User')->where('thisday_coin', '>', 0)->field('id,user_id,thisday_coin,lastday_coin')->order('thisday_coin desc,lastday_coin desc')
+                ->page($page, $size)->select();
+            foreach ($list as &$value) {
+                $star_id = UserStar::where('user_id', $value['user_id'])->value('star_id');
+                if($star_id){
+                    $value['starname'] = Star::where('id', $star_id)->value('name');
+                }
             }
+        }else{
+            $list = [];
         }
+
         $myInfo['thisday_coin'] = self::where('user_id',$uid)->value('thisday_coin');
         $myInfo['rank'] = (self::where('thisday_coin','>',$myInfo['thisday_coin'])->order('thisday_coin desc,lastday_coin desc')->count())+1;
 

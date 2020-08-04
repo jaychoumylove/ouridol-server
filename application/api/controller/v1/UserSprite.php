@@ -65,7 +65,7 @@ class UserSprite extends Base
     {
         $this->getUser();
         $page = input('page', 1);
-        $size = input('size', 15);
+        $size = input('size', 10);
 
         $res = UserSpriteModel::getRankList($this->uid, $page, $size);
 
