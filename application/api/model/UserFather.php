@@ -72,7 +72,7 @@ class UserFather extends Base
 
     public static function sonEarn($father, $son)
     {
-        $cur_contribute = self::where(['father' => $father, 'son' => $son])->value('cur_contribute');
+        $cur_contribute = (new UserFather())->readMaster()->where(['father' => $father, 'son' => $son])->value('cur_contribute');
         $earn = floor($cur_contribute * Cfg::getCfg('father_earn_per'));
         if ($earn) {
             // 收益
