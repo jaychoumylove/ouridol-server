@@ -2,6 +2,7 @@
 
 namespace app\api\service;
 
+use app\api\model\CfgAds;
 use app\api\model\RecTask;
 use app\api\model\Task as TaskModel;
 use app\api\model\UserTreasureBox;
@@ -552,7 +553,10 @@ class Task
                 } else {
                     $task['doneTimes'] = (new RecTask)->readMaster()->where('user_id', $uid)->where('task_id', $task['id'])->whereTime('create_time', 'd')->count('id');
 
-                    if ($task['doneTimes'] > $task['times']) {
+                    $task['times'] = CfgAds::where('platform','MP-WEIXIN')->order('sort asc')->count();
+                    if ($task['doneTimes'] <= $task['times']) {
+                        $task['status'] = 1;
+                    }else{
                         $task['status'] = 2;
                     }
                 }
