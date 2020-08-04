@@ -3,6 +3,7 @@
 namespace app\api\controller\v1;
 
 use app\api\model\CfgActive;
+use app\api\model\UserFather;
 use app\api\model\UserRelation;
 use app\base\controller\Base;
 use app\api\model\StarRank;
@@ -62,6 +63,11 @@ class AutoRun extends Base
             ]);
             // 群贡献
             Wxgroup::dayInit();
+
+            UserFather::where('1=1')->update([
+                'cur_contribute' => 0,
+                'has_earn_count' => 0
+            ]);
 
             // 开屏结算
             Open::settle();
