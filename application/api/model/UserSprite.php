@@ -243,7 +243,9 @@ class UserSprite extends Base
         $myInfo['thisday_coin'] = self::where('user_id',$uid)->value('thisday_coin');
         $myInfo['rank'] = (self::where('thisday_coin','>',$myInfo['thisday_coin'])->order('thisday_coin desc,lastday_coin desc')->count())+1;
 
-        return ['list'=>$list,'myInfo'=>$myInfo];
+        $banner = 'https://mmbiz.qpic.cn/mmbiz_png/w5pLFvdua9HUKRibxkbQUYy5TEicA6o19g9jcQNVibn3ZOQ3kXeCSEfsp1rWCyAW4nwTNbxZfKQqJvv3QucCVUCpQ/0';
+
+        return ['list'=>$list,'myInfo'=>$myInfo,'banner'=>$banner];
     }
 
     /** 膜拜大神*/
