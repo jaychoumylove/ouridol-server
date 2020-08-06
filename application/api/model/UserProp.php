@@ -70,6 +70,10 @@ class UserProp extends Base
         $prop = self::get($id);
         if (!$prop || $prop['status'] != 0) Common::res(['code' => 3, 'msg' => '道具无法使用']);
 
+        $propInfo = Prop::get($prop['prop_id']);
+        if (empty($propInfo)) Common::res(['code' => 1, 'msg' => "未知道具"]);
+        if ($propInfo['status'] == Prop::OFF) Common::res(['code' => 1, 'msg' => '道具已下架']);
+
         $res = [];
         Db::startTrans();
         try {

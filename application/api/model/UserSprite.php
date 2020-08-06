@@ -49,7 +49,7 @@ class UserSprite extends Base
         // 每100秒收益
         $item['earnPer'] = $earnPer;
         if ($duratime) {
-            $item['earn'] = floor($duratime / 100) * $earnPer;
+            $item['earn'] = floor($duratime / 10) * $earnPer;
         } else {
             $item['earn'] = 0;
         }
