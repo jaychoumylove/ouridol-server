@@ -2,6 +2,7 @@
 
 namespace app\api\controller\v1;
 
+use app\api\model\CfgUserLevel;
 use app\api\service\Sms;
 use app\base\controller\Base;
 use app\api\model\User;
@@ -137,11 +138,8 @@ class Page extends Base
 
         $res['mass'] = ShareMass::getMass($this->uid);
 
-        // $res['invitList'] = [
-        //     'list' => UserRelation::fixByType(1, $this->uid, 1, 10),
-        //     'award' => Cfg::getCfg('invitAward'),
-        //     'hasInvitcount' => UserRelation::with('User')->where(['rer_user_id' => $this->uid, 'status' => ['in', [1, 2]]])->count()
-        // ];
+        $count = UserStar::where('user_id', $this->uid)->order('id desc')->value('total_count');
+        $res['my_level'] = CfgUserLevel::where('total', '<=', $count)->max('level');
 
         $res['article'] = Article::where('1=1')->order('create_time desc,id desc')->find();
 
