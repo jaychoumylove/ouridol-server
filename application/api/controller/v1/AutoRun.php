@@ -121,7 +121,7 @@ class AutoRun extends Base
             ]);
 
             // 前三
-            $topThreeAward = [290000, 190000, 90000];
+            $topThreeAward = [49990000, 19990000, 90000];
             $topThreeIds = array_slice(array_column($rankList, 'star_id'), 0, 3);
             foreach ($topThreeAward as $key => $value) {
                 StarRank::where(['star_id' => $topThreeIds[$key]])->update([
