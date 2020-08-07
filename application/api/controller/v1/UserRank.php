@@ -11,9 +11,7 @@ class UserRank extends Base
     public function getRank()
     {
         $starid = input('starid', 0);
-        $type = input('type', 0);
         $field = $this->req('field', 'require', 'thisweek_count');
-        if ($type==0) $field = 'thisweek_count'; 
         $open_id = $this->req('open_id', 'integer', 0); // 开屏图id
 
         $page = input('page', 1);

@@ -40,7 +40,7 @@ class UserStar extends Base
             }
         }
 
-        return self::with('User')->where($w)->where([$field => ['neq', 0]])->order($field . ' desc')->page($page, $size)->select();
+        return self::with('User')->where($w)->where([$field => ['neq', 0]])->field("*,{$field} as hot")->order($field . ' desc')->page($page, $size)->select();
     }
 
     /**贡献度改变 */
