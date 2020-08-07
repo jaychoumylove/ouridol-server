@@ -75,6 +75,7 @@ class UserSprite extends Base
         //     $item['earn'] = 100;
         // }
         $item['sprite_img'] = CfgSprite::where(['level' => $item['sprite_level']])->value('image');
+        $item['next_sprite_level'] = CfgSprite::where(['level' => $item['sprite_level']+1])->value('level');
 
         return $item;
     }
