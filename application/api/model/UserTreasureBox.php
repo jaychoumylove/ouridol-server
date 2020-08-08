@@ -68,7 +68,7 @@ class UserTreasureBox extends Base
         $checkTimeInfo = self::checkTime();
 
         //抽取一个奖品
-        $treasureBoxList = CfgTreasureBox::all();
+        $treasureBoxList = CfgTreasureBox::where('chance','>',0)->select();
         $treasureBoxList = json_decode(json_encode($treasureBoxList, JSON_UNESCAPED_UNICODE), true);
         $data = Common::lottery($treasureBoxList);
 
