@@ -149,7 +149,8 @@ class User extends Base
             $res['forbidden_time'] = $forbiddenTime == UserModel::FOREVER_FORBIDDEN ? UserModel::FOREVER_FORBIDDEN: date('Y-m-d H:i:s', $forbiddenTime);
         }
         $res['userStar'] = UserStar::where('user_id', $uid)->field('total_count,thismonth_count,thisweek_count')->find();
-        $res['level'] = UserSprite::where('user_id', $uid)->value('sprite_level');
+        $res['sprite_level'] = UserSprite::where('user_id', $uid)->value('sprite_level');
+        $res['level'] = CfgUserLevel::where('total', '<=', $res['userStar']['total_count'])->max('level');
         Common::res(['data' => $res]);
     }
 
