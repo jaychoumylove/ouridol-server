@@ -19,7 +19,11 @@ class UserExt extends Base
         $item = self::get(['user_id' => $uid]);
 
         $leftTime = json_decode($item['left_time'], true);
-        $leftTime[$index] = time();
+        if($index>=0){
+            $leftTime[$index] = time();
+        }else{
+            $leftTime = [time(),time(),time(),time(),time()];
+        }
         $leftTime = json_encode($leftTime);
 
         self::where(['user_id' => $uid])->update([

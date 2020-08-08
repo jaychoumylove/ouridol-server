@@ -58,6 +58,7 @@ Route::rule('api/:version/star/sendmsg', 'api/v1.Star/sendMsg');// 在圈子中�
 Route::rule('api/:version/star/sendhot', 'api/v1.Star/sendHot');// 给明星贡献人气
 Route::rule('api/:version/star/follow', 'api/v1.Star/follow');// 加入明星圈子
 Route::rule('api/:version/star/steal', 'api/v1.Star/steal');// 偷花
+Route::rule('api/:version/star/automaticSteal', 'api/v1.Star/automaticSteal');// 开启自动偷花
 Route::rule('api/:version/star/dynamic', 'api/v1.Star/dynamic');// 动态
 
 // StarRank

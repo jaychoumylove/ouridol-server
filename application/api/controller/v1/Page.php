@@ -141,6 +141,12 @@ class Page extends Base
         $count = UserStar::where('user_id', $this->uid)->order('id desc')->value('total_count');
         $res['my_level'] = CfgUserLevel::where('total', '<=', $count)->max('level');
 
+        //是否自动偷能量
+        $userExtInfo = UserExt::where('user_id', $this->uid)->field('is_automatic_steal,left_time')->find();
+        $res['is_automatic_steal'] = $userExtInfo['is_automatic_steal'];
+        $left_time = json_decode($userExtInfo['left_time'], true);
+        $res['stealTime'] = max($left_time);
+
         $res['article'] = Article::where('1=1')->order('create_time desc,id desc')->find();
 
         // 师傅收益

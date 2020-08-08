@@ -24,7 +24,7 @@ use app\api\model\Fanclub;
 use app\api\model\Lock;
 use app\api\model\Open;
 use app\api\model\UserProp;
-use app\api\model\Star as  StarModel;
+use app\api\model\Star as StarModel;
 use app\api\model\Wxgroup;
 
 class Star
@@ -37,9 +37,9 @@ class Star
 
     /**
      * 打榜
-     * @param integer $starid 
-     * @param integer $hot 人气 
-     * @param integer $uid 
+     * @param integer $starid
+     * @param integer $hot 人气
+     * @param integer $uid
      * @param integer $type 打榜类型：0送能量 1送礼物
      * @param integer $openId 开屏图ID
      */
@@ -108,9 +108,9 @@ class Star
 
                 $fudai = ActiveFudai::sendbox($uid, bcmul($hot, ActiveFudai::FUDAI_ACTIVE), ActiveFudai::MAX_PEOPLE);
 
-                $res['fudai'] = ($fudai == ActiveFudai::FUDAI_OFF) ? false: [
-                    'id'     => $fudai['id'],
-                    'coin'   => $fudai['coin'],
+                $res['fudai'] = ($fudai == ActiveFudai::FUDAI_OFF) ? false : [
+                    'id' => $fudai['id'],
+                    'coin' => $fudai['coin'],
                     'people' => $fudai['people']
                 ];
 
@@ -174,18 +174,18 @@ class Star
         // 加上可偷能量增加卡的上限
         $prop_id = 1;
         $count = 1 + UserProp::where([
-            'user_id' => $uid,
-            'prop_id' => $prop_id,
-            'use_time' => ['>=', strtotime(date("Y-m-d"), time())] // 今日使用的
-        ])->count('id');
+                'user_id' => $uid,
+                'prop_id' => $prop_id,
+                'use_time' => ['>=', strtotime(date("Y-m-d"), time())] // 今日使用的
+            ])->count('id');
         return $cfg * $count;
     }
 
     /**偷能量 */
-    public function steal($starid, $uid, $hot)
+    public function steal($starid, $uid, $hot, $index)
     {
         UserExt::checkSteal($uid);
-        $userExt = UserExt::where(['user_id' => $uid])->field('steal_times,steal_count')->find();
+        $userExt = (new UserExt)->readMaster()->where(['user_id' => $uid])->field('steal_times,steal_count')->find();
         if ($userExt['steal_times'] >= Cfg::getCfg('steal_limit')) {
             Common::res(['code' => 1, 'msg' => '今日偷取次数已达上限']);
         }
@@ -210,6 +210,50 @@ class Star
                 'steal_count' => Db::raw('steal_count+' . $hot),
                 'steal_time' => time(),
             ]);
+
+            UserExt::setTime($uid, $index);
+
+
+            Db::commit();
+        } catch (\Exception $e) {
+            Db::rollBack();
+            Common::res(['code' => 400, 'data' => $e->getMessage()]);
+        }
+    }
+
+    public function stealAll($staridList, $uid, $hot)
+    {
+        UserExt::checkSteal($uid);
+        $userExt = (new UserExt)->readMaster()->where(['user_id' => $uid])->field('steal_times,steal_count')->find();
+        if ($userExt['steal_times'] >= Cfg::getCfg('steal_limit')) {
+            Common::res(['code' => 1, 'msg' => '今日偷取次数已达上限']);
+        }
+
+        if ($userExt['steal_count'] >= self::stealCountLimit($uid)) {
+            Common::res(['code' => 1, 'msg' => '今日偷取数额已达上限']);
+        }
+
+        Db::startTrans();
+        try {
+
+            foreach ($staridList as $starid) {
+
+                StarRankModel::where(['star_id' => $starid])->update([
+                    'week_hot' => Db::raw('week_hot-' . $hot),
+                    'month_hot' => Db::raw('month_hot-' . $hot),
+                ]);
+
+                (new UserService())->change($uid, [
+                    'coin' => $hot,
+                ],['type' => 1, 'target_star_id' => $starid]);
+
+                UserExt::where(['user_id' => $uid])->update([
+                    'steal_times' => Db::raw('steal_times+1'),
+                    'steal_count' => Db::raw('steal_count+' . $hot),
+                    'steal_time' => time(),
+                ]);
+            }
+            UserExt::setTime($uid, -1);
 
             Db::commit();
         } catch (\Exception $e) {

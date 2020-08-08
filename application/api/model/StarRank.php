@@ -21,6 +21,8 @@ class StarRank extends Base
 
         $list = self::with('star')->where($w)->order($rankField . ' desc,id asc')
             ->page($page, $size)->select();
+        $list = json_decode(json_encode($list, JSON_UNESCAPED_UNICODE), true);
+
         return $list;
     }
 }
