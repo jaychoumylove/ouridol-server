@@ -156,6 +156,11 @@ class UserTreasureBox extends Base
                 }
             }
 
+            $is_get =(new UserTreasureBox())->readMaster()->where(['user_id' => $uid, 'index' => $index, 'create_date_hour' => $checkTimeInfo['date']])->count();
+            if($is_get){
+                Common::res(['code' => 1, 'msg' => '该宝箱已开启']);
+            }
+
             //添加记录
             self::create([
                 'user_id' => $uid,
