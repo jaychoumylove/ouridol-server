@@ -26,14 +26,18 @@ use app\api\model\Wxgroup;
 class AutoRun extends Base
 {
     public function index()
-    { }
+    {
+        echo $this->monthHandle() . '</br>';
+        echo $this->weekHandle() . '</br>';
+        echo $this->dayHandle() . '</br>';
+    }
 
     /**每日执行 */
     public function dayHandle()
     {
         $lock = Lock::getVal('day_end');
         if (date('md', time()) == date('md', strtotime($lock['time']))) {
-            die('本日已执行过');
+            return '本日已执行过';
         }
         // lock
         Lock::setVal('day_end', 1);
@@ -82,7 +86,7 @@ class AutoRun extends Base
         // lock
         Lock::setVal('day_end', 0);
 
-        die('done');
+        return '本日执行完毕';
     }
 
     /**每周执行 */
@@ -91,7 +95,7 @@ class AutoRun extends Base
         $lock = Lock::getVal('week_end');
 
         if (date('oW', time()) == date('oW', strtotime($lock['time']))) {
-            die('本周已执行过');
+            return '本周已执行过';
         }
 
         // lock
@@ -142,7 +146,8 @@ class AutoRun extends Base
         }
         // 解锁
         Lock::setVal('week_end', 0);
-        die('done');
+
+        return '本周执行完毕';
     }
 
     /**每月执行 */
@@ -150,7 +155,7 @@ class AutoRun extends Base
     {
         $lock = Lock::getVal('month_end');
         if (date('Ym', time()) == date('Ym', strtotime($lock['time']))) {
-            die('本月已执行过');
+            return '本月已执行过';
         }
 
         Lock::setVal('month_end', 1);
@@ -204,7 +209,7 @@ class AutoRun extends Base
 
         Lock::setVal('month_end', 0);
 
-        die('done');
+        return '本月执行完毕';
     }
 
     /**每分钟执行 */
@@ -233,7 +238,7 @@ class AutoRun extends Base
 
         Lock::setVal('month_end', 0);
 
-        die('done');
+        return '本分钟执行完毕';
     }
 
     /**解锁消息推送 */

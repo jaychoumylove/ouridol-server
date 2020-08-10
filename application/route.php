@@ -13,10 +13,11 @@ Route::rule('h5/star', 'api/v1.H5/star');
 Route::rule('api/:version/clean', 'api/v1.Cleaner/index');
 Route::rule('api/:version/createMenu', 'api/v1.Notify/createMenu');
 
-// AutoRun 
-Route::rule('api/:version/auto/d', 'api/v1.AutoRun/dayHandle');// 每日定期执行
-Route::rule('api/:version/auto/w', 'api/v1.AutoRun/weekHandle');// 每周定期执行
-Route::rule('api/:version/auto/m', 'api/v1.AutoRun/monthHandle');// 每月定期执行
+// AutoRun
+Route::rule('api/:version/auto', 'api/v1.AutoRun/index');// 定时任务
+//Route::rule('api/:version/auto/d', 'api/v1.AutoRun/dayHandle');// 每日定期执行
+//Route::rule('api/:version/auto/w', 'api/v1.AutoRun/weekHandle');// 每周定期执行
+//Route::rule('api/:version/auto/m', 'api/v1.AutoRun/monthHandle');// 每月定期执行
 Route::rule('api/:version/auto/i', 'api/v1.AutoRun/minuteHandle');// 每分钟定期执行
 
 Route::rule('api/:version/auto/clear', 'api/v1.AutoRun/clearDb');// 清除数据表
