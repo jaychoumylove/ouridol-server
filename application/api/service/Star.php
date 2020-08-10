@@ -226,16 +226,10 @@ class Star
         UserExt::checkSteal($uid);
         $userExt = (new UserExt)->readMaster()->where(['user_id' => $uid])->field('steal_times,steal_count')->find();
         if ($userExt['steal_times'] >= Cfg::getCfg('steal_limit')) {
-            UserExt::where(['user_id' => $uid,'is_automatic_steal' => 1])->update([
-                'is_automatic_steal'=>0
-            ]);
             Common::res(['code' => 1, 'msg' => '今日偷取次数已达上限']);
         }
 
         if ($userExt['steal_count'] >= self::stealCountLimit($uid)) {
-            UserExt::where(['user_id' => $uid,'is_automatic_steal' => 1])->update([
-                'is_automatic_steal'=>0
-            ]);
             Common::res(['code' => 1, 'msg' => '今日偷取数额已达上限']);
         }
 

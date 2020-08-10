@@ -145,13 +145,19 @@ class Page extends Base
         $useCard = UserProp::getMultipleStealCardVar($this->uid);
         $res['stealLimitTime'] = $useCard ? $useCard['cooling_time'] : Cfg::getCfg('stealLimitTime');
         //是否自动偷能量
-        $userExtInfo = UserExt::where('user_id', $this->uid)->field('is_automatic_steal,left_time')->find();
+        $userExtInfo = UserExt::where('user_id', $this->uid)->field('steal_times,steal_count,is_automatic_steal,left_time')->find();
         $res['is_automatic_steal'] = $userExtInfo['is_automatic_steal'];
+        if ($userExtInfo['steal_times'] >= Cfg::getCfg('steal_limit') || $userExtInfo['steal_count'] >= Star::stealCountLimit($this->uid)) {
+            UserExt::where(['user_id' => $this->uid,'is_automatic_steal' => 1])->update([
+                'is_automatic_steal'=>0
+            ]);
+            $res['is_automatic_steal'] = 0;
+        }
         $left_time = json_decode($userExtInfo['left_time'], true);
         $stealTime = max($left_time);
         $res['stealCountdown'] = 0;
         if($stealTime>0){
-            $res['stealCountdown'] = time()-$stealTime<60?60-(time()-$stealTime):0;
+            $res['stealCountdown'] = time()-$stealTime<$res['stealLimitTime']?$res['stealLimitTime']-(time()-$stealTime):0;
         }
 
         $res['article'] = Article::where('1=1')->order('create_time desc,id desc')->find();
