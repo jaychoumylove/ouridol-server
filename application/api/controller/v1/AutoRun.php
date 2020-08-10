@@ -80,7 +80,7 @@ class AutoRun extends Base
             Db::commit();
         } catch (\Exception $e) {
             Db::rollBack();
-            die('rollBack:' . $e->getMessage());
+            return 'rollBack:' . $e->getMessage();
         }
 
         // lock
@@ -142,7 +142,7 @@ class AutoRun extends Base
         } catch (\Exception $e) {
             Db::rollBack();
 
-            die('rollBack:' . $e->getMessage());
+            return 'rollBack:' . $e->getMessage();
         }
         // 解锁
         Lock::setVal('week_end', 0);
@@ -204,7 +204,7 @@ class AutoRun extends Base
         } catch (\Exception $e) {
             Db::rollBack();
 
-            die('rollBack:' . $e->getMessage());
+            return 'rollBack:' . $e->getMessage();
         }
 
         Lock::setVal('month_end', 0);
@@ -233,7 +233,7 @@ class AutoRun extends Base
         } catch (\Exception $e) {
             Db::rollBack();
 
-            die('rollBack:' . $e->getMessage());
+            return 'rollBack:' . $e->getMessage();
         }
 
         Lock::setVal('month_end', 0);
