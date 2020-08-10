@@ -53,7 +53,8 @@ class StarRank extends Base
                 'steal_times' => $res['steal_times'],
                 'steal_times_max' => Cfg::getCfg('steal_limit'),
                 'steal_num' => $res['steal_count'],
-                'steal_num_max' => Star::stealCountLimit($this->uid)
+                'steal_num_max' => Star::stealCountLimit($this->uid),
+                'is_automatic_steal' => UserExt::where('user_id', $this->uid)->value('is_automatic_steal'),
             ]]);
         } else {
             Common::res(['data' => $list]);

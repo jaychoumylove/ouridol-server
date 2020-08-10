@@ -208,7 +208,7 @@ class Star
             UserExt::where(['user_id' => $uid])->update([
                 'steal_times' => Db::raw('steal_times+1'),
                 'steal_count' => Db::raw('steal_count+' . $hot),
-                'steal_time' => time(),
+                'steal_time' => time()+5,
             ]);
 
             UserExt::setTime($uid, $index);
@@ -250,7 +250,7 @@ class Star
                 UserExt::where(['user_id' => $uid])->update([
                     'steal_times' => Db::raw('steal_times+1'),
                     'steal_count' => Db::raw('steal_count+' . $hot),
-                    'steal_time' => time(),
+                    'steal_time' => time()+5,
                 ]);
             }
             UserExt::setTime($uid, -1);

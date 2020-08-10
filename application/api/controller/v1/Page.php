@@ -145,7 +145,11 @@ class Page extends Base
         $userExtInfo = UserExt::where('user_id', $this->uid)->field('is_automatic_steal,left_time')->find();
         $res['is_automatic_steal'] = $userExtInfo['is_automatic_steal'];
         $left_time = json_decode($userExtInfo['left_time'], true);
-        $res['stealTime'] = max($left_time);
+        $stealTime = max($left_time);
+        $res['stealCountdown'] = 0;
+        if($stealTime>0){
+            $res['stealCountdown'] = time()-$stealTime<60?60-(time()-$stealTime):0;
+        }
 
         $res['article'] = Article::where('1=1')->order('create_time desc,id desc')->find();
 

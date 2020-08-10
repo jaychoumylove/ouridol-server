@@ -137,14 +137,15 @@ class Star extends Base
     public function automaticSteal()
     {
         $this->getUser();
-
+        $type = $this->req('type', 'integer');
+        if ($type < 0 || $type > 1) Common::res(['code' => 100]);
         $spriteLevel = UserSprite::where(['user_id' => $this->uid])->value('sprite_level');
-        if($spriteLevel<10)Common::res(['code' => 1, 'msg' => '精灵lv.10解锁自动偷取']);
+        if ($spriteLevel < 10) Common::res(['code' => 1, 'msg' => '精灵lv.10解锁自动偷取']);
 
         Db::startTrans();
         try {
 
-            UserExt::where(['user_id' => $this->uid])->update(['is_automatic_steal'=>1]);
+            UserExt::where(['user_id' => $this->uid])->update(['is_automatic_steal' => $type]);
 
             Db::commit();
         } catch (\Exception $e) {
@@ -160,9 +161,9 @@ class Star extends Base
      */
     public function steal()
     {
-        $starid = input('starid','');
+        $starid = input('starid', '');
         $index = input('index');
-        if ($starid && !is_numeric($starid))Common::res(['code' => 100]);
+        if ($starid && !is_numeric($starid)) Common::res(['code' => 100]);
         $this->getUser();
 
         $staridList = $this->staridList();
@@ -178,12 +179,12 @@ class Star extends Base
         $stealCount = $stealMultiple * $spriteLevel;
 
         if ($starid) {
-            $this->checkTime($stealLimitTime,$index);
+            $this->checkTime($stealLimitTime, $index);
             if (!in_array($starid, $staridList)) Common::res(['code' => 1, 'msg' => '不能偷取该爱豆']);
             (new StarService())->steal($starid, $this->uid, $stealCount, $index);
         } else {
-            if($spriteLevel<5) Common::res(['code' => 1, 'msg' => '精灵达到5级解锁一键偷取']);
-            $this->checkTime($stealLimitTime,$index);
+            if ($spriteLevel < 5) Common::res(['code' => 1, 'msg' => '精灵达到5级解锁一键偷取']);
+            $this->checkTime($stealLimitTime, $index);
             (new StarService())->stealAll($staridList, $this->uid, $stealCount);
             $stealCount = $stealCount * 5;
         }
@@ -193,12 +194,12 @@ class Star extends Base
             'data' => [
                 'count' => $stealCount,
                 'steal' => $stealLimitTime,
-                'stealTime' => time()
             ]
         ]);
     }
 
-    public function staridList(){
+    public function staridList()
+    {
 
         $my_star_id = UserStar::where('user_id', $this->uid)->value('star_id');
         $list = StarRankModel::getRankList(1, 6, 'week_hot', '', 0);
@@ -220,15 +221,16 @@ class Star extends Base
         return $staridList;
     }
 
-    public function checkTime($stealLimitTime,$index){
+    public function checkTime($stealLimitTime, $index)
+    {
 
         $left_time = UserExt::where(['user_id' => $this->uid])->value('left_time');
         $leftTime = json_decode($left_time, true);
-        if($index>=0){
-           if(time()-$leftTime[$index]<=$stealLimitTime)Common::res(['code' => 1, 'msg' => '冷却中，请稍等']);
-        }else{
-            foreach ($leftTime as $value){
-                if(time()-$value<=$stealLimitTime)Common::res(['code' => 1, 'msg' => '冷却中，请稍等']);
+        if ($index >= 0) {
+            if (time() - $leftTime[$index] < $stealLimitTime) Common::res(['code' => 1, 'msg' => '冷却中，请稍等']);
+        } else {
+            foreach ($leftTime as $value) {
+                if (time() - $value < $stealLimitTime) Common::res(['code' => 1, 'msg' => '冷却中，请稍等']);
             }
         }
     }
