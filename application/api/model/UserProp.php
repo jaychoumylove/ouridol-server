@@ -42,6 +42,7 @@ class UserProp extends Base
             $insert[] = [
                 'user_id' => $user_id,
                 'prop_id' => $prop_id,
+                'end_time' => time()+24*3600,
             ];
         }
 
@@ -54,10 +55,21 @@ class UserProp extends Base
 
         // 检查是否已过期
         foreach ($list as &$value) {
-            if (($value['status'] == 0 || $value['prop_id'] == 7) && date('Ymd', strtotime($value['create_time'])) != date('Ymd')) {
+            $end_time = strtotime($value['create_time'])+24*3600;
+            if($value['end_time']==0){
+                $value['end_time']= $end_time;
+                self::where('id', $value['id'])->update(['end_time' => $end_time]);
+                $value['end_time_text'] = date('Y-m-d H:i:s',$end_time);
+            }else{
+                $value['end_time_text'] = date('Y-m-d H:i:s',$value['end_time']);
+            }
+            if (($value['status'] == 0 || $value['prop_id'] == 7)) {
                 // 购买的道具仅限当天使用
-                $value['status'] = 2;
-                self::where('id', $value['id'])->update(['status' => 2]);
+                if(time()>$value['end_time']){
+                    $value['status'] = 2;
+                    self::where('id', $value['id'])->update(['status' => 2]);
+                }
+
             }
         }
 
