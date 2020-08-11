@@ -245,7 +245,7 @@ class Star
 
                 (new UserService())->change($uid, [
                     'coin' => $hot,
-                ],['type' => 1, 'target_star_id' => $starid]);
+                ]);
 
                 UserExt::where(['user_id' => $uid])->update([
                     'steal_times' => Db::raw('steal_times+1'),
