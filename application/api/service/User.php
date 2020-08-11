@@ -2,6 +2,7 @@
 
 namespace app\api\service;
 
+use app\api\model\Lock;
 use app\base\service\WxAPI;
 use app\base\service\Common;
 use app\api\model\User as UserModel;
@@ -59,6 +60,14 @@ class User
      */
     public function change($uid, $currency, $rec = null)
     {
+        //结榜时停止操作
+        $lock1 = Lock::getVal('day_end');
+        $lock2 = Lock::getVal('week_end');
+        $lock3 = Lock::getVal('month_end');
+        if($lock1['value'] == 1 || $lock2['value'] == 1 || $lock3['value'] == 1){
+            Common::res(['code' => 2, 'msg' => '结榜中，请稍后']);
+        }
+
         $userCurrency = UserCurrency::get(['uid' => $uid]);
 
         $update = [];
