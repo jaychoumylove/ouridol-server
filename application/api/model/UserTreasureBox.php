@@ -59,6 +59,15 @@ class UserTreasureBox extends Base
             $uid_star_id = (new UserStar())->where(['user_id' => $uid])->value('star_id');
             $self_star_id = (new UserStar())->where(['user_id' => $self])->value('star_id');
             if (!$self_star_id || ($uid_star_id!=$self_star_id)) Common::res(['code' => 1, 'msg' => '你们不在同一个圈子']);
+            $uid_platform = (new UserModel())->where(['id' => $uid])->value('platform');
+            $self_platform = (new UserModel())->where(['id' => $self])->value('platform');
+            if($uid_platform != $self_platform){
+                if($uid_platform == 'MP-WEIXIN' && $self_platform == 'MP-QQ'){
+                    Common::res(['code' => 1, 'msg' => '不能给微信用户开宝箱了']);
+                }else if($self_platform == 'MP-WEIXIN' && $uid_platform == 'MP-QQ'){
+                    Common::res(['code' => 1, 'msg' => '不能给QQ用户开宝箱了']);
+                }
+            }
 
         } else {
             if ($index != 0 || $index > 5) Common::res(['code' => 1, 'msg' => '该宝箱不能开启']);
