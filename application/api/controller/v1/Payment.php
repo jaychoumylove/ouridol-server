@@ -9,15 +9,9 @@ use app\api\model\RecPayOrder;
 use app\base\service\WxAPI;
 use app\api\model\User;
 use app\base\service\WxPay as WxPayService;
-use app\api\service\User as UserService;
 use think\Db;
-use app\api\model\UserItem;
-use app\api\model\CfgItem;
-use app\api\model\Rec;
-use app\api\model\Prop;
 use app\api\model\UserStar;
 use app\api\model\Star;
-use app\api\model\Cfg;
 
 class Payment extends Base
 {
@@ -47,6 +41,18 @@ class Payment extends Base
         $type = input('type', 0); // 购买类型
         if ($user_id == $this->uid) $user_id = 0;
         if (!$goodsId) Common::res(['code' => 100]);
+        if($user_id!=0){
+            $uid_platform = User::where(['id' => $user_id])->value('platform');
+            $self_platform = User::where(['id' => $this->uid])->value('platform');
+            if($uid_platform != $self_platform){
+                if($uid_platform == 'MP-WEIXIN' && $self_platform == 'MP-QQ'){
+                    Common::res(['code' => 1, 'msg' => '不能给微信用户充值']);
+                }else if($self_platform == 'MP-WEIXIN' && $uid_platform == 'MP-QQ'){
+                    Common::res(['code' => 1, 'msg' => '不能给QQ用户充值']);
+                }
+            }
+        }
+
 
         // 商品
         $goods = PayGoods::getInfo($this->uid, $goodsId, $goodsNum, $type);
