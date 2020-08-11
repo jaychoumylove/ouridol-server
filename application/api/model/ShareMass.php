@@ -81,12 +81,21 @@ class ShareMass extends Base
             $todayTimes = RecMass::where(['be_mass_uid' => $uid])->whereTime('create_time', 'd')->count();
             $leastTime = RecMass::where(['be_mass_uid' => $uid])->whereTime('create_time', 'd')->order('create_time desc')->value('create_time');
             if ($todayTimes < $dayLimitTimes && time() - strtotime($leastTime) > 3600) {
-                RecMass::create(['be_mass_uid' => $uid, 'mass_uid' => $rer]);
+                Db::startTrans();
+                try {
 
-                // 望帮别人集结成功也有100能量奖励
-                (new UserService())->change($uid, [
-                    'coin' => Cfg::getCfg('share_mass')['earn']
-                ], ['type' => 14]);
+                    RecMass::create(['be_mass_uid' => $uid, 'mass_uid' => $rer]);
+
+                    // 望帮别人集结成功也有100能量奖励
+                    (new UserService())->change($uid, [
+                        'coin' => Cfg::getCfg('share_mass')['earn']
+                    ], ['type' => 14]);
+
+                    Db::commit();
+                } catch (\Exception $e) {
+                    Db::rollback();
+                    Common::res(['code' => 400, 'data' => $e->getMessage()]);
+                }
 
                 return User::where(['id' => $rer])->value('nickname');
             }

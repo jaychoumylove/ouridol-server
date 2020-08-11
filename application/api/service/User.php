@@ -155,16 +155,25 @@ class User
         // 奖励数额
         $coin = CfgSignin::where('days', '<=', $ext['signin_day'])->order('days desc')->value('coin');
 
-        UserExt::where(['user_id' => $uid])->update([
-            'signin_day' => $ext['signin_day'],
-            'signin_time' => time(),
-        ]);
+        Db::startTrans();
+        try {
 
-        (new User())->change($uid, [
-            'coin' => $coin,
-        ], [
-            'type' => 10
-        ]);
+            UserExt::where(['user_id' => $uid])->update([
+                'signin_day' => $ext['signin_day'],
+                'signin_time' => time(),
+            ]);
+
+            (new User())->change($uid, [
+                'coin' => $coin,
+            ], [
+                'type' => 10
+            ]);
+
+            Db::commit();
+        } catch (\Exception $e) {
+            Db::rollback();
+            Common::res(['code' => 400, 'data' => $e->getMessage()]);
+        }
 
         return [
             'coin' => $coin,

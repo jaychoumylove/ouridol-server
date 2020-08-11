@@ -170,13 +170,23 @@ class UserProp extends Base
         $tokenStone = bcmul($prop['stone'], $num);
         if ($tokenStone > $userCurrency['stone']) Common::res(['code' => 1, 'msg' => '灵丹不足']);
 
-        self::addProp($uid, $propId, $num);
+        Db::startTrans();
+        try {
 
-        Prop::where(['id' => $propId])->update(['remain' => bcsub($prop['remain'], $num)]);
+            self::addProp($uid, $propId, $num);
 
-        $recordContent = sprintf('["%s", "%s"]', $num, $prop['name']);
+            Prop::where(['id' => $propId])->update(['remain' => bcsub($prop['remain'], $num)]);
 
-        (new User())->change($uid, ['stone' => -$tokenStone], ['type' => 39, 'content' => $recordContent]);// 扣除灵丹并记录
+            $recordContent = sprintf('["%s", "%s"]', $num, $prop['name']);
+
+            (new User())->change($uid, ['stone' => -$tokenStone], ['type' => 39, 'content' => $recordContent]);// 扣除灵丹并记录
+
+            Db::commit();
+        } catch (\Exception $e) {
+            Db::rollback();
+            Common::res(['code' => 400, 'data' => $e->getMessage()]);
+        }
+
     }
 
     /**
