@@ -118,7 +118,7 @@ class UserExt extends Base
     public static function checkSteal($uid)
     {
         $stealTime = self::where(['user_id' => $uid])->value('steal_time');
-        if (date('Ymd', $stealTime) != date('Ymd', time())) {
+        if (date('Ymd', $stealTime-5) != date('Ymd', time())) {
             // 偷取次数清零
             self::where(['user_id' => $uid])->update([
                 'steal_times' => 0,
