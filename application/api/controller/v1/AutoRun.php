@@ -52,12 +52,14 @@ class AutoRun extends Base
             Prop::where('1=1')->update([
                 'remain' => 100
             ]);
-            // 每日参与群集结次数重置,剩余开启宝箱次数刷新,帮助开启宝箱次数,自动偷心关闭
+            // 1每日参与群集结次数重置,2剩余开启宝箱次数刷新,3帮助开启宝箱次数,4自动偷心关闭,5
             UserExt::where('1=1')->update([
                 'group_mass_times' => 0,
                 'treasure_box_times' => 5,
                 'help_open_times' => 0,
-                'is_automatic_steal' => 0,
+                'get_new_invite_energy' => 0,
+                'get_old_invite_energy' => 0,
+                'invite_energy' => 0,
             ]);
             // 用户每日产量排行清空,膜拜和被膜拜次数重置
             UserSprite::where('1=1')->update([

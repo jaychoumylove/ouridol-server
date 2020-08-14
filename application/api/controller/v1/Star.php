@@ -95,6 +95,7 @@ class Star extends Base
      */
     public function sendHot()
     {
+        $rer_user_id = input('referrer', 0);
         $starid = $this->req('starid', 'integer');
         $openId = $this->req('open_id', 'number', 0); // 开屏图id
         $hot = input('hot'); // type=1 为礼物id
@@ -105,7 +106,7 @@ class Star extends Base
             ]);
         $this->getUser();
 
-        $res = (new StarService())->sendHot($starid, $hot, $this->uid, $type, $openId);
+        $res = (new StarService())->sendHot($starid, $hot, $this->uid, $type, $openId ,$rer_user_id);
         // 我的总贡献
         $res['totalCount'] = UserStar::where('user_id', $this->uid)->value('total_count');
         // 距离上一名

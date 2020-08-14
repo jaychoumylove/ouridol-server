@@ -220,5 +220,8 @@ Route::rule('api/:version/treasureBox/log', 'api/v1.TreasureBox/log'); // 宝箱
 Route::rule('api/:version/treasureBox/getOpenBoxRank', 'api/v1.TreasureBox/getOpenBoxRank'); // 全服开箱排行榜
 
 Route::rule('api/:version/active/invite_new_info', 'api/v1.ActiveInvite/invite_new_info');// 用户拉新活动信息
-Route::rule('api/:version/active/invite_steps_reward', 'api/v1.ActiveInvite/invite_steps_reward');// 点击领取拉新额外奖励
+Route::rule('api/:version/active/invite_steps_reward', 'api/v1.ActiveInvite/invite_steps_reward');// 点击领取拉新奖励
+Route::rule('api/:version/active/get_invit_energy', 'api/v1.ActiveInvite/get_invit_energy');// 点击领取拉新电量
 Route::rule('api/:version/active/invite_group_invite_rank', 'api/v1.ActiveInvite/groupInviteRank');// 圈子拉新排名
+Route::rule('api/:version/active/invite_reward_log', 'api/v1.ActiveInvite/invite_reward_log');// 领取拉新奖励记录
+Route::rule('api/:version/active/invite_user_log', 'api/v1.ActiveInvite/invite_user_log');// 拉新人员记录

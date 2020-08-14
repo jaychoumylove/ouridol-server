@@ -43,7 +43,7 @@ class Star
      * @param integer $type 打榜类型：0送能量 1送礼物
      * @param integer $openId 开屏图ID
      */
-    public function sendHot($starid, $hot, $uid, $type, $openId = null)
+    public function sendHot($starid, $hot, $uid, $type, $openId = null, $rer_user_id = '')
     {
         if (Lock::getVal('week_end')['value'] == 1) {
             Common::res(['code' => 1, 'msg' => '榜单结算中，请稍后再试！']);
@@ -156,6 +156,11 @@ class Star
             ]);
             // 微信群贡献度增加
             Wxgroup::userSendHot($uid, $hot);
+
+            //增加旧用户电量
+            if ($rer_user_id) {
+                UserRelation::inviteOld($uid, $rer_user_id);
+            }
 
             Db::commit();
         } catch (\Exception $e) {
