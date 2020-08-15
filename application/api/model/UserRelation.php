@@ -40,7 +40,7 @@ class UserRelation extends Base
     public static function inviteOld($ral_user_id, $rer_user_id)
     {
         if ($ral_user_id == $rer_user_id) return;
-        $create_time = Rec::where('type',2)->order('create_time desc')->value('create_time');
+        $create_time = Rec::where('type',2)->where('user_id',$ral_user_id)->order('create_time desc')->value('create_time');
         Db::startTrans();
         try {
             if (time()-strtotime($create_time)>16*24*3600) {

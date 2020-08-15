@@ -52,6 +52,11 @@ class Star
         $res = [];
         Db::startTrans();
         try {
+            //增加旧用户电量
+            if ($rer_user_id) {
+                UserRelation::inviteOld($uid, $rer_user_id);
+            }
+
             $moreInfo = ''; // 日志记录的更多信息
             if ($type == 1) {
                 // 送礼物
@@ -156,11 +161,6 @@ class Star
             ]);
             // 微信群贡献度增加
             Wxgroup::userSendHot($uid, $hot);
-
-            //增加旧用户电量
-            if ($rer_user_id) {
-                UserRelation::inviteOld($uid, $rer_user_id);
-            }
 
             Db::commit();
         } catch (\Exception $e) {
