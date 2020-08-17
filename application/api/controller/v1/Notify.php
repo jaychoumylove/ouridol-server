@@ -209,6 +209,11 @@ class Notify extends Base
                     "type": "view",
                     "name": "购买礼物",
                     "url": "https://ouridol.anaculture.com/#/pages/recharge/recharge"
+                },
+                {
+                    "type": "view",
+                    "name": "购买道具",
+                    "url": "https://ouridol.anaculture.com/#/pages/prop/buy/buy"
                 }
             ]
         }';
