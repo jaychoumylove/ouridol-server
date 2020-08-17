@@ -72,10 +72,13 @@ class UserRelation extends Base
     /**新用户加入圈子后 修改关系状态 */
     public static function join($starid, $uid)
     {
-        $relation = self::where(['ral_user_id' => $uid, 'status' => ['in',  [0, 1, 2]]])->find();
+        $relation = self::where(['ral_user_id' => $uid, 'status' => 0])->find();
 
         if ($relation) {
-            if ($relation['status'] == 0) {
+            // 更新状态为1，上级可以领取奖励
+            $isDone = self::where(['ral_user_id' => $uid])->update(['status' => 1]);
+
+            if ($isDone) {
                 //拉新用户加电量
                 $isDone = UserExt::where('user_id', $relation['rer_user_id'])->update([
                     'get_new_invite_energy' => Db::raw('get_new_invite_energy+3'),
@@ -92,9 +95,6 @@ class UserRelation extends Base
                 }
 
             }
-
-            // 更新状态为1，上级可以领取奖励
-            self::where(['ral_user_id' => $uid])->update(['status' => 1]);
 
             $rerType = User::where('id', $relation['rer_user_id'])->value('type');
             // 上级需为普通用户0 
