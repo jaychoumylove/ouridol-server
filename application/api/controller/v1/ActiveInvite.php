@@ -69,6 +69,8 @@ class ActiveInvite extends Base
     public function invite_steps_reward(){
 
         $this->getUser();
+        self::isStart();
+
         $index = $this->req('index', 'integer');
 
         $invite_steps=Cfg::getCfg('invite_steps');
@@ -129,6 +131,8 @@ class ActiveInvite extends Base
     public function get_invit_energy()
     {
         $this->getUser();
+        self::isStart();
+
         $type = input('type', 1);
         if($type==1){
             $is_exist_energy = (new UserExt)->readMaster()->where(['user_id'=>$this->uid])->value('get_new_invite_energy');
@@ -174,6 +178,19 @@ class ActiveInvite extends Base
         }
 
         Common::res(['data' => ['energy'=>$is_exist_energy]]);
+    }
+
+    public static function isStart(){
+        //是否活动时间内
+        $is_invite_active=Cfg::getCfg('is_invite_active');
+        $isOpen = 0 ;
+        if($is_invite_active['start_time']<=date('Y-m-d') && $is_invite_active['end_time']>=date('Y-m-d')){
+            $isOpen = 1 ;
+        }
+
+        if(!$isOpen){
+            Common::res(['code' => 1, 'msg' => '活动已截止']);
+        }
     }
 
     /**
