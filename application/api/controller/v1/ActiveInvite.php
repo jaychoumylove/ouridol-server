@@ -26,7 +26,7 @@ class ActiveInvite extends Base
     {
         $this->getUser();
 
-        $res['notice']=41;//奖励说明
+        $res['notice']=42;//奖励说明
         $res['title_img']='https://mmbiz.qpic.cn/mmbiz_png/w5pLFvdua9EOWV82IkeqFRibMgcWRnrqII5hZrPLCRJyTlzU7BQTKtG8ibTDMK7PlkbHB7LrncYuuMVKmzEaglxQ/0';//主题图片
         $res['my_remaining_time']=strtotime('tomorrow')-time();
         $res['total_coin']=StarRank::where('total_invite_energy','>','0')->sum('total_invite_energy');
