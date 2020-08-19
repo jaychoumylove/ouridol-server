@@ -399,6 +399,8 @@ class User extends Base
         
         $nextCount = CfgUserLevel::where('total', '>', $count)->order('level asc')->value('total');
         $res['gap'] = $nextCount - $count;
+        $res['count'] = $count;
+        $res['next_count'] = $nextCount;
         if ($res['gap'] < 0) $res['gap'] = 0;
         Common::res(['data' => $res]);
     }
