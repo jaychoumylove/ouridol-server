@@ -98,6 +98,7 @@ Route::rule('api/:version/user/bind', 'api/v1.User/bindClientId');// 绑定clien
 Route::rule('api/:version/user/saveformid', 'api/v1.Ext/saveFormId');// 保存formId
 
 Route::rule('api/:version/user/exit', 'api/v1.User/exit');// 退出偶像圈
+Route::rule('api/:version/user/exitInfo', 'api/v1.User/exitInfo');// 退团信息
 Route::rule('api/:version/user/signin', 'api/v1.User/signin');// 连续签到
 
 Route::rule('api/:version/user/recharge', 'api/v1.User/recharge');// 礼物兑换能量
@@ -130,6 +131,15 @@ Route::rule('api/:version/sprite/skill', 'api/v1.UserSprite/skill');// 精灵技
 Route::rule('api/:version/sprite/shortEarn', 'api/v1.UserSprite/shortEarn');// 使用精灵加速卡
 Route::rule('api/:version/sprite/rank', 'api/v1.UserSprite/rankList');// 精灵产量排行
 Route::rule('api/:version/sprite/zanGod', 'api/v1.UserSprite/zanGod');//膜拜大神
+Route::rule('api/:version/sprite/getHandBook', 'api/v1.UserSprite/getHandBook');// 精灵图鉴
+Route::rule('api/:version/sprite/switchImage', 'api/v1.UserSprite/switchImage');// 精灵换肤
+
+//精灵背景
+Route::rule('api/:version/sprite/sprite_bg_list', 'api/v1.UserSprite/sprite_bg_list');//精灵背景列表
+Route::rule('api/:version/sprite/sprite_bg_use', 'api/v1.UserSprite/sprite_bg_use');// 精灵背景使用
+Route::rule('api/:version/sprite/sprite_bg_buy', 'api/v1.UserSprite/sprite_bg_buy');// 精灵背景购买
+Route::rule('api/:version/sprite/sprite_bg_unlock', 'api/v1.UserSprite/sprite_bg_unlock');// 精灵背景解锁
+Route::rule('api/:version/sprite/sprite_bg_upload_img', 'api/v1.UserSprite/sprite_bg_upload_img');// 精灵背景上传头像
 
 // Pay
 Route::rule('api/:version/pay/order', 'api/v1.Payment/order');// 支付下单

@@ -74,7 +74,19 @@ class UserSprite extends Base
         //     // GM 收益始终显示为100
         //     $item['earn'] = 100;
         // }
-        $item['sprite_img'] = CfgSprite::where(['level' => $item['sprite_level']])->value('image');
+
+        //使用中的精灵
+        if(!$item['sprite_img']){
+            $item['sprite_img'] = CfgSprite::where(['level' => $item['sprite_level']])->value('image');
+        }
+        //使用中的精灵背景
+        if(!$item['sprite_bg_id']){
+            $item['sprite_bg_img'] = CfgSpriteBg::where(['type' => 0])->order('id asc')->value('img');
+        }else{
+            $item['sprite_bg_img'] = CfgSpriteBg::where(['id' => $item['sprite_bg_id']])->value('img');
+            $item['sprite_bg_upload_img'] = UserSpriteBg::where(['user_id' => $uid,'sprite_bg_id' => $item['sprite_bg_id']])->value('sprite_bg_upload_img');
+        }
+        //前十级等级提示
         $item['next_sprite_level'] = CfgSprite::where(['level' => $item['sprite_level']+1])->value('level');
         if($item['sprite_level']<5){
             $total_need_stone = CfgSprite::where('level','<',5)->where('level','>=',$item['sprite_level'])->sum('need_stone');
@@ -233,11 +245,11 @@ class UserSprite extends Base
     }
 
     //每日产量排行榜
-    public static function getRankList($uid, $page, $size)
+    public static function getRankList($uid, $page, $size, $rankField)
     {
 
         if($page<=10){
-            $list = self::with('User')->where('thisday_coin', '>', 0)->field('id,user_id,thisday_coin,lastday_coin')->order('thisday_coin desc,lastday_coin desc')
+            $list = self::with('User')->where($rankField, '>', 0)->field('id,user_id,thisday_coin,lastday_coin')->order($rankField . ' desc,sprite_level desc')
                 ->page($page, $size)->select();
             foreach ($list as &$value) {
                 $star_id = UserStar::where('user_id', $value['user_id'])->value('star_id');
@@ -249,10 +261,10 @@ class UserSprite extends Base
             $list = [];
         }
 
-        $myInfo['thisday_coin'] = self::where('user_id',$uid)->value('thisday_coin');
-        $myInfo['rank'] = (self::where('thisday_coin','>',$myInfo['thisday_coin'])->order('thisday_coin desc,lastday_coin desc')->count())+1;
+        $myInfo['daycoin'] = self::where('user_id',$uid)->value($rankField);
+        $myInfo['rank'] = (self::where($rankField,'>',$myInfo['daycoin'])->order($rankField . ' desc,sprite_level desc')->count())+1;
 
-        $banner = 'https://mmbiz.qpic.cn/mmbiz_png/w5pLFvdua9HUKRibxkbQUYy5TEicA6o19g9jcQNVibn3ZOQ3kXeCSEfsp1rWCyAW4nwTNbxZfKQqJvv3QucCVUCpQ/0';
+        $banner = 'https://mmbiz.qpic.cn/mmbiz_png/w5pLFvdua9E69pHJIdb31PXQySxuBibtqxrQmowuh5Wju6v13rPOF1ttZJ2PvXdokxFicqrWvuRibXnaUKDtXMDicQ/0';
 
         return ['list'=>$list,'myInfo'=>$myInfo,'banner'=>$banner];
     }
@@ -286,5 +298,14 @@ class UserSprite extends Base
             Common::res(['code' => 400, 'data' => $e->getMessage()]);
         }
         return $cover_count = self::where('user_id', $user_id)->value('cover_god_count');
+    }
+
+    public static function switchImage($uid, $level)
+    {
+        $mylevel = self::where('user_id',$uid)->value('sprite_level');
+        if ($mylevel<$level) Common::res(['code' => 1,'msg' => '请提示精灵等级']);
+        $sprite_img = CfgSprite::where('level',$level)->value('image');
+        $isDone = self::where('user_id', $uid)->update(['sprite_img' => $sprite_img]);
+        if (!$isDone) Common::res(['msg' => '操作失败，请稍后再试']);
     }
 }

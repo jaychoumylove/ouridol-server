@@ -2,6 +2,8 @@
 
 namespace app\api\controller\v1;
 
+use app\api\model\CfgSprite;
+use app\api\model\UserSpriteBg;
 use app\base\controller\Base;
 use app\api\model\UserSprite as UserSpriteModel;
 use app\base\service\Common;
@@ -66,8 +68,9 @@ class UserSprite extends Base
         $this->getUser();
         $page = input('page', 1);
         $size = input('size', 10);
+        $rankField = input('rankField', 'thisday_coin');
 
-        $res = UserSpriteModel::getRankList($this->uid, $page, $size);
+        $res = UserSpriteModel::getRankList($this->uid, $page, $size ,$rankField);
 
         Common::res(['data' => $res]);
     }
@@ -99,4 +102,75 @@ class UserSprite extends Base
         $skillList = UserSpriteModel::getSkill($type);
         Common::res(['data' => $skillList]);
     }
+
+    //图鉴
+    public function getHandBook()
+    {
+        $this->getUser();
+        $res = CfgSprite::group('image')->order('id asc')->select();
+        Common::res(['data' => $res]);
+    }
+
+    //换肤
+    public function switchImage()
+    {
+        $this->getUser();
+        $level = input('level');
+        if ($level<=0) Common::res(['code' => 100]);
+        UserSpriteModel::switchImage($this->uid, $level);
+        Common::res();
+    }
+
+    //背景列表
+    public function sprite_bg_list()
+    {
+        $this->getUser();
+
+        $res = UserSpriteBg::getAll($this->uid);
+
+        Common::res(['data' => $res]);
+    }
+
+    //使用背景
+    public function sprite_bg_use()
+    {
+        $this->getUser();
+        $id = $this->req('id', 'integer','0');
+
+        UserSpriteBg::useIt($this->uid,$id);
+        Common::res([]);
+    }
+
+    //背景购买
+    public function sprite_bg_buy()
+    {
+        $this->getUser();
+        $id = $this->req('id', 'integer','0');
+
+        UserSpriteBg::buyIt($this->uid,$id);
+        Common::res([]);
+    }
+
+    //背景解锁
+    public function sprite_bg_unlock()
+    {
+        $this->getUser();
+        $id = $this->req('id', 'integer','0');
+
+        UserSpriteBg::unlockIt($this->uid,$id);
+        Common::res([]);
+    }
+
+    //精灵背景上传头像
+    public function sprite_bg_upload_img()
+    {
+        $this->getUser();
+        $id = $this->req('upload_id', 'integer','0');
+        $avatar = $this->req('avatar', 'require');
+
+        UserSpriteBg::uploadImg($this->uid,$id,$avatar);
+        Common::res([]);
+    }
+
+
 }

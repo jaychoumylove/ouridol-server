@@ -294,6 +294,14 @@ class User extends Base
         Common::res([]);
     }
 
+    /**退出偶像圈信息 */
+    public function exitInfo()
+    {
+        $this->getUser();
+        $res=UserStar::exitInfo($this->uid);
+        Common::res(['data'=>$res]);
+    }
+
     public function signin()
     {
         $this->getUser();

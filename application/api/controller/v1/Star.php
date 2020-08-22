@@ -141,7 +141,7 @@ class Star extends Base
         $type = $this->req('type', 'integer');
         if ($type < 0 || $type > 1) Common::res(['code' => 100]);
         $spriteLevel = UserSprite::where(['user_id' => $this->uid])->value('sprite_level');
-        if ($spriteLevel < 10) Common::res(['code' => 1, 'msg' => '精灵lv.10解锁自动偷取']);
+        if ($type!=0 && $spriteLevel < 10) Common::res(['code' => 1, 'msg' => '精灵lv.10解锁自动偷取']);
 
         Db::startTrans();
         try {

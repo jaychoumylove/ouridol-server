@@ -158,6 +158,18 @@ class UserStar extends Base
         return $res;
     }
 
+    /** 退出圈子信息*/
+    public static function exitInfo($uid){
+        $ext = UserExt::get(['user_id' => $uid]);
+        $res['exit_group_time']=date( 'Y-m-d',($ext['exit_group_time'] + 3600 * 24 * 180));
+        if (time()>=strtotime($res['exit_group_time'])){
+            $res['status']=1;
+        }else{
+            $res['status']=0;
+        }
+        return $res;
+    }
+
     /**
      * 活动信息
      * @param int $type 0：阶段解锁 1：7日解锁

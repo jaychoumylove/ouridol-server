@@ -20,6 +20,7 @@ class UserCurrency extends Base
                 'trumpet' => 0,
             ]);
         }
+        $item['item_count'] = UserItem::where(['uid' => $uid])->sum('count');
         unset($item['id']);
         unset($item['create_time']);
         unset($item['uid']);
