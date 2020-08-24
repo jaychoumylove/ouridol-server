@@ -47,6 +47,7 @@ class AutoRun extends Base
             // 用户日贡献清零
             UserStar::where('1=1')->update([
                 'thisday_count' => 0,
+                'update_time' => Db::raw('update_time'),
             ]);
             // 道具重置100库存
             Prop::where('1=1')->update([
@@ -106,12 +107,16 @@ class AutoRun extends Base
         Db::startTrans();
         try {
             // 用户能量每周清零
-            UserCurrency::where('1=1')->update(['coin' => 0]);
+            UserCurrency::where('1=1')->update([
+                'coin' => 0,
+                'update_time' => Db::raw('update_time'),
+            ]);
 
             // 用户周贡献清零
             UserStar::where('1=1')->update([
                 'lastweek_count' => Db::raw('thisweek_count'),
                 'thisweek_count' => 0,
+                'update_time' => Db::raw('update_time'),
             ]);
 
             // 转存历史排名
@@ -179,6 +184,7 @@ class AutoRun extends Base
             UserStar::where('1=1')->update([
                 'lastmonth_count' => Db::raw('thismonth_count'),
                 'thismonth_count' => 0,
+                'update_time' => Db::raw('update_time'),
             ]);
 
             // 转存历史排名
