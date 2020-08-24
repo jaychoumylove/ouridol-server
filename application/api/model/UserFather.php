@@ -28,6 +28,8 @@ class UserFather extends Base
         if ($res) {
             foreach ($res as &$value) {
                 $value['user_earn'] = floor($value['cur_contribute'] * Cfg::getCfg('father_earn_per'));
+                $total_count = UserStar::where('user_id', $value['son'])->value('total_count');
+                $value['level'] = CfgUserLevel::where('total', '<=', $total_count)->max('level');
             }
         }
         $data['list'] = $res;
@@ -38,36 +40,41 @@ class UserFather extends Base
     }
 
     /**结成师徒关系 */
-    public static function join($father, $son)
+    public static function joinIt($father, $son)
     {
-        if ($father == $son) return;
+        if ($father == $son) return '您太自恋了，不能拜自己为师，也不能收自己为徒';
         // 师傅必须已加入圈子
         $userStar = UserStar::where(['user_id' => $father])->value('star_id');
-        if (!$userStar) return;
+        if (!$userStar) return '师傅必须已加入圈子';
 
         // 师傅与徒弟需在同一个圈子
         if (UserStar::where(['user_id' => $father])->value('star_id') != UserStar::where(['user_id' => $son])->value('star_id')) {
             // Common::res(['msg' => '不是同一圈子']);
-            return;
+            return '师傅与徒弟需在同一个圈子';
         }
         // 不能是别人徒弟
         if (self::get(['son' => $son])) {
             // Common::res(['msg' => '已经是别人的徒弟了']);
-            return;
+            return '他已经拜师了';
         }
         // 师徒关系不能逆转
         if (self::get(['father' => $son, 'son' => $father])) {
             // Common::res(['msg' => '你是邀请人的师傅，不能成为他的徒弟']);
-            return;
+            return '你们已经是师徒关系';
         }
         // 徒弟必须是师傅拉进来的
         // if (!UserRelation::get(['rer_user_id' => $father, 'ral_user_id' => $son])) {
         //     return;
         // }
-        self::create([
-            'father' => $father,
-            'son' => $son,
+        $isDone = UserStar::where('user_id',$son)->update([
+            'is_son'=>1
         ]);
+        if($isDone){
+            self::create([
+                'father' => $father,
+                'son' => $son,
+            ]);
+        }
     }
 
     public static function sonEarn($father, $son)
@@ -85,6 +92,11 @@ class UserFather extends Base
                 if (!$isDone) Common::res(['code' => 1, 'msg' => '请稍后再试']);
                 self::where(['father' => $father, 'son' => $son])->update([
                     'has_earn_count' => Db::raw('has_earn_count+' . $earn),
+                ]);
+
+                UserExt::where(['user_id' => $father])->update([
+                    'father_get_count' => Db::raw('father_get_count+' . $earn),
+                    'father_get_time' => time(),
                 ]);
 
                 (new UserService())->change($father, [
@@ -125,7 +137,14 @@ class UserFather extends Base
         $isDone = self::destroy([
             'son' => $uid,
         ], true);
-        if (!$isDone) Common::res(['code' => 1]);
+
+        if($isDone){
+            UserStar::where('user_id',$uid)->update([
+                'is_son'=>0
+            ]);
+        }else{
+            Common::res(['code' => 1]);
+        }
     }
 
     /**增加徒弟贡献 */

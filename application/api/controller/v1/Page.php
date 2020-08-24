@@ -52,7 +52,7 @@ class Page extends Base
             // 加入集结
             $res['massUser'] = ShareMass::join($rer_user_id, $this->uid);
             // 师徒关系
-            UserFather::join($rer_user_id, $this->uid);
+            UserFather::joinIt($rer_user_id, $this->uid);
         }
 
         $res['userInfo'] = User::where(['id' => $this->uid])->field('id,nickname,avatarurl,type,phoneNumber')->find();

@@ -46,7 +46,7 @@ class Share extends Base
         // 加入集结
         $massRerUser = ShareMass::join($rer_user_id, $this->uid);
         // 师徒关系
-        UserFather::join($rer_user_id, $this->uid);
+        UserFather::joinIt($rer_user_id, $this->uid);
 
         Common::res(['data' => [
             'massRerUser' => $massRerUser

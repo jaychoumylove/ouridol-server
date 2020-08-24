@@ -113,7 +113,7 @@ class UserRelation extends Base
                 }
 
                 // 判断是否结成师徒关系
-                UserFather::join($relation['rer_user_id'], $uid);
+                UserFather::joinIt($relation['rer_user_id'], $uid);
             }
         }
         // 分配好友

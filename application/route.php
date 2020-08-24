@@ -90,6 +90,11 @@ Route::rule('api/:version/user/checkearn', 'api/v1.Share/checkEarn');// 检查�
 Route::rule('api/:version/user/breakFather', 'api/v1.Share/breakFather');// 脱离师傅
 Route::rule('api/:version/user/reset/father', 'api/v1.UserFather/resetFather');// 反出师门
 Route::rule('api/:version/user/reset/son', 'api/v1.UserFather/resetSon');// 逐出师门
+Route::rule('api/:version/user/fromFather', 'api/v1.UserFather/fromFather');// 拜师
+Route::rule('api/:version/user/acceptSon', 'api/v1.UserFather/acceptSon');// 收徒
+Route::rule('api/:version/user/fatherRank', 'api/v1.UserFather/fatherRank');// 师傅排行及未拜师用户排行
+Route::rule('api/:version/user/applyList', 'api/v1.UserFather/applyList');// 师徒申请列表
+Route::rule('api/:version/user/applyDeal', 'api/v1.UserFather/applyDeal');// 师徒申请处理
 
 Route::rule('api/:version/user/sayworld', 'api/v1.User/sayworld');// 世界喊话
 Route::rule('api/:version/user/report', 'api/v1.User/report');// 举报世界喊话
