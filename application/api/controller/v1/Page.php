@@ -55,6 +55,14 @@ class Page extends Base
             UserFather::joinIt($rer_user_id, $this->uid);
         }
 
+        $is_son_info = UserFather::where(['son'=>$this->uid])->count();
+        $is_son = UserStar::where('user_id',$this->uid)->value('is_son');
+        if($is_son_info>0 && $is_son==0){
+            UserStar::where('user_id',$this->uid)->update([
+                'is_son'=>1
+            ]);
+        }
+
         $res['userInfo'] = User::where(['id' => $this->uid])->field('id,nickname,avatarurl,type,phoneNumber')->find();
         $res['userCurrency'] = UserCurrency::getCurrency($this->uid);
         $res['userExt'] = UserExt::where('user_id', $this->uid)->field('is_join_wxgroup')->find();
