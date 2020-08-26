@@ -134,7 +134,7 @@ class UserFather extends Base
                 $userStar = UserStar::where('user_id', $value['user_id'])->field('star_id,total_count')->find();
                 $value['starname'] = Star::where('id', '=', $userStar['star_id'])->value('name');
                 $value['level'] = CfgUserLevel::where('total', '<=', $userStar['total_count'])->max('level');
-                $value['is_apply'] = UserFatherApply::where(['father' => $value['user_id'], 'son' => $this->uid])->find();
+                $value['is_apply'] = UserFatherApply::where(['father' => $value['user_id'], 'son' => $this->uid, 'apply_user' => $this->uid])->find();
             }
         } else {
             $star_id = UserStar::where('user_id', $this->uid)->value('star_id');
@@ -144,7 +144,7 @@ class UserFather extends Base
             foreach ($list as &$value) {
                 $total_count = UserStar::where('user_id', $value['user_id'])->value('total_count');
                 $value['level'] = CfgUserLevel::where('total', '<=', $total_count)->max('level');
-                $value['is_apply'] = UserFatherApply::where(['father' => $this->uid, 'son' => $value['user_id']])->find();
+                $value['is_apply'] = UserFatherApply::where(['father' => $this->uid, 'son' => $value['user_id'], 'apply_user' => $this->uid])->find();
             }
         }
 

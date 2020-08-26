@@ -12,13 +12,13 @@ class UserFatherApply extends Base
     public static function getList($uid, $type, $page, $size)
     {
         if($type==1){
-            $list = self::where('father',$uid)->where('apply_user','<>',$uid)->where('status',0)->page($page, $size)->select();
+            $list = self::where('father',$uid)->where('apply_user','<>',$uid)->where('status',0)->order('create_time asc')->page($page, $size)->select();
             foreach ($list as &$value) {
                 $value['user'] = User::where('id',  $value['son'])->field('id,nickname,avatarurl')->find();
                 $value['count'] = UserStar::where('user_id',  $value['son'])->value('thisday_count');
             }
         }else{
-            $list = self::where('son',$uid)->where('apply_user','<>',$uid)->where('status',0)->page($page, $size)->select();
+            $list = self::where('son',$uid)->where('apply_user','<>',$uid)->where('status',0)->order('create_time asc')->page($page, $size)->select();
             foreach ($list as &$value) {
                 $value['user'] = User::where('id',  $value['father'])->field('id,nickname,avatarurl')->find();
                 $value['count'] = UserExt::where('user_id',  $value['father'])->value('father_get_count');
