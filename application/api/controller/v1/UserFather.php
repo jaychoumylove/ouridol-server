@@ -139,7 +139,7 @@ class UserFather extends Base
         } else {
             $star_id = UserStar::where('user_id', $this->uid)->value('star_id');
             $list = UserStar::with('User')->where('star_id', $star_id)->field('id,user_id,star_id,is_son,thisday_count')
-                ->where('is_son', 0)->order('thisday_count desc,total_count desc')
+                ->where('is_son', 0)->where('thisday_count','>', 0)->order('thisday_count desc,total_count desc')
                 ->page($page, $size)->select();
             foreach ($list as &$value) {
                 $total_count = UserStar::where('user_id', $value['user_id'])->value('total_count');
