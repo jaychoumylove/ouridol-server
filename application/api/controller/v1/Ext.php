@@ -290,4 +290,24 @@ class Ext extends Base
 
         Common::res ();
     }
+
+    /**
+     * 是否开启活动
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function is_start($key)
+    {
+        $status = false;
+        $value = Cfg::getCfg($key);
+        if ($value['start_time'] <= date('Y-m-d') && $value['end_time'] >= date('Y-m-d')) {
+            $status = true;
+        }
+        if($value['status'] && $value['status']==0){
+            $status = false;
+        }
+
+        return $status;
+    }
 }

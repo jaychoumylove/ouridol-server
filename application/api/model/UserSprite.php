@@ -22,7 +22,7 @@ class UserSprite extends Base
     /**获取该用户宠物信息 */
     public static function getInfo($uid, $self)
     {
-        $item = self::get(['user_id' => $uid]);
+        $item = (new UserSprite)->readMaster()->where(['user_id' => $uid])->find();
 
         if (!$item) {
             self::create(['user_id' => $uid, 'settle_time' => time()]);
@@ -94,6 +94,9 @@ class UserSprite extends Base
         }elseif ($item['sprite_level']<10){
             $total_need_stone = CfgSprite::where('level','<',10)->where('level','>=',$item['sprite_level'])->sum('need_stone');
             $item['tips_text'] = '到Lv.10还需'.$total_need_stone.'灵丹';
+        }elseif ($item['sprite_level']<30){
+            $total_need_stone = CfgSprite::where('level','<',30)->where('level','>=',$item['sprite_level'])->sum('need_stone');
+            $item['tips_text'] = '到Lv.30还需'.$total_need_stone.'灵丹，可守护爱豆';
         }
 
 

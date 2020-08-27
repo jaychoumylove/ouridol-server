@@ -240,3 +240,8 @@ Route::rule('api/:version/active/get_invit_energy', 'api/v1.ActiveInvite/get_inv
 Route::rule('api/:version/active/invite_group_invite_rank', 'api/v1.ActiveInvite/groupInviteRank');// 圈子拉新排名
 Route::rule('api/:version/active/invite_reward_log', 'api/v1.ActiveInvite/invite_reward_log');// 领取拉新奖励记录
 Route::rule('api/:version/active/invite_user_log', 'api/v1.ActiveInvite/invite_user_log');// 拉新人员记录
+
+//守护
+Route::rule('api/:version/active/guardian_info', 'api/v1.ActivityGuardian/getList');// 守护列表信息
+Route::rule('api/:version/active/guardian_star', 'api/v1.ActivityGuardian/guardian');// 开始守护
+Route::rule('api/:version/active/guardian_rank', 'api/v1.ActivityGuardian/rankList');// 守护排行

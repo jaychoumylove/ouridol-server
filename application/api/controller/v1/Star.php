@@ -187,7 +187,17 @@ class Star extends Base
             if ($spriteLevel < 5) Common::res(['code' => 1, 'msg' => '精灵达到5级解锁一键偷取']);
             $this->checkTime($stealLimitTime, $index);
             (new StarService())->stealAll($staridList, $this->uid, $stealCount);
-            $stealCount = $stealCount * 5;
+            //守护爱豆不能偷
+            if(Ext::is_start('is_guardian_active')){
+                foreach ($staridList as $starid){
+                    $guardian_active_info = ActivityGuardian::is_guardian($starid);
+                    if($guardian_active_info) {
+                        $key = array_search($starid, $staridList);
+                        array_splice($staridList, $key, 1);
+                    }
+                }
+            }
+            $stealCount = $stealCount * count($staridList);
         }
 
 

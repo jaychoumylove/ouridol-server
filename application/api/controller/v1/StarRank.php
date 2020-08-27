@@ -45,6 +45,13 @@ class StarRank extends Base
 
             $stealMultiple = $useCard ? $useCard['multiple'] : Cfg::getCfg('stealCount');
 
+            if(Ext::is_start('is_guardian_active')){
+                foreach ($list as &$value){
+                    $value['guardian_active_info'] = ActivityGuardian::is_guardian($value['star_id']);
+                }
+            }
+
+
             Common::res(['data' => [
                 'list' => $list,
                 'steal' => $leftTime,

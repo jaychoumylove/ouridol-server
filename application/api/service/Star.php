@@ -2,6 +2,8 @@
 
 namespace app\api\service;
 
+use app\api\controller\v1\ActivityGuardian;
+use app\api\controller\v1\Ext;
 use app\api\model\ActiveFudai;
 use app\api\model\StarRank as StarRankModel;
 use think\Db;
@@ -199,6 +201,12 @@ class Star
             Common::res(['code' => 1, 'msg' => '今日偷取数额已达上限']);
         }
 
+        //守护爱豆不能偷
+        if(Ext::is_start('is_guardian_active')){
+            $guardian_active_info = ActivityGuardian::is_guardian($starid);
+            if($guardian_active_info) Common::res(['code' => 1, 'msg' => '爱豆被守护中，不可偷']);
+        }
+
         Db::startTrans();
         try {
             StarRankModel::where(['star_id' => $starid])->update([
@@ -241,7 +249,14 @@ class Star
         Db::startTrans();
         try {
 
-            foreach ($staridList as $starid) {
+            foreach ($staridList as $key=>$starid) {
+
+                //守护爱豆不能偷
+                if(Ext::is_start('is_guardian_active')){
+                    $guardian_active_info = ActivityGuardian::is_guardian($starid);
+                    if($guardian_active_info) continue;
+                }
+
 
                 StarRankModel::where(['star_id' => $starid])->update([
                     'week_hot' => Db::raw('week_hot-' . $hot),
@@ -257,8 +272,10 @@ class Star
                     'steal_count' => Db::raw('steal_count+' . $hot),
                     'steal_time' => time()+5,
                 ]);
+
+                UserExt::setTime($uid, $key);
+
             }
-            UserExt::setTime($uid, -1);
 
             Db::commit();
         } catch (\Exception $e) {
