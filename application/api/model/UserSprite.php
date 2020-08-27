@@ -123,7 +123,7 @@ class UserSprite extends Base
                     $userSprite['earn'] = $userSprite['earn'] * 2;
                 }
 
-                self::where(['user_id' => $uid])->update([
+                $isDoneUpdate = self::where(['user_id' => $uid])->where('settle_time','<=',(time()-15))->update([
                     'settle_time' => time() - 5,
                     'total_coin' => Db::raw('total_coin+' . $userSprite['earn'])
                 ]);
@@ -145,13 +145,16 @@ class UserSprite extends Base
                     ];
                 }
 
-                (new User())->change($uid, [
-                    'coin' => $userSprite['earn'],
-                ], $log);
+                if ($isDoneUpdate) {
+                    (new User())->change($uid, [
+                        'coin' => $userSprite['earn'],
+                    ], $log);
 
-                UserSprite::where('user_id', $uid)->update([
-                    'thisday_coin' => Db::raw('thisday_coin+' . $userSprite['earn']),
-                ]);
+                    UserSprite::where('user_id', $uid)->update([
+                        'thisday_coin' => Db::raw('thisday_coin+' . $userSprite['earn']),
+                    ]);
+                }
+
                 Db::commit();
             } catch (\Exception $e) {
                 Db::rollBack();
