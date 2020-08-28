@@ -182,22 +182,14 @@ class Star extends Base
         if ($starid) {
             $this->checkTime($stealLimitTime, $index);
             if (!in_array($starid, $staridList)) Common::res(['code' => 1, 'msg' => '不能偷取该爱豆']);
+            $index = array_search($starid, $staridList);
             (new StarService())->steal($starid, $this->uid, $stealCount, $index);
         } else {
             if ($spriteLevel < 5) Common::res(['code' => 1, 'msg' => '精灵达到5级解锁一键偷取']);
             $this->checkTime($stealLimitTime, $index);
             (new StarService())->stealAll($staridList, $this->uid, $stealCount);
-            //守护爱豆不能偷
-            if(Ext::is_start('is_guardian_active')){
-                foreach ($staridList as $starid){
-                    $guardian_active_info = ActivityGuardian::is_guardian($starid);
-                    if($guardian_active_info) {
-                        $key = array_search($starid, $staridList);
-                        array_splice($staridList, $key, 1);
-                    }
-                }
-            }
-            $stealCount = $stealCount * count($staridList);
+
+            $stealCount = $stealCount * 5;
         }
 
 
@@ -205,6 +197,7 @@ class Star extends Base
             'data' => [
                 'count' => $stealCount,
                 'steal' => $stealLimitTime,
+                'staridStealList' => $staridList,
             ]
         ]);
     }
@@ -213,7 +206,7 @@ class Star extends Base
     {
 
         $my_star_id = UserStar::where('user_id', $this->uid)->value('star_id');
-        $list = StarRankModel::getRankList(1, 6, 'week_hot', '', 0);
+        $list = StarRankModel::getRankList(1, 11, 'week_hot', '', 0);
         $staridList = array_map(function ($element) {
             $newarray = [];
             if (array_key_exists('star_id', $element)) {
@@ -222,12 +215,23 @@ class Star extends Base
             return $newarray;
         }, $list);
 
-        if (in_array($my_star_id, $staridList)) {
-            $key = array_search($my_star_id, $staridList);
-            array_splice($staridList, $key, 1);
-        } else {
-            array_pop($staridList);
+        foreach ($staridList as $key => $starid){
+
+            if($my_star_id==$starid){
+                unset($staridList[$key]);
+                continue;
+            }
+            //守护爱豆不能偷
+            if(Ext::is_start('is_guardian_active')){
+                $guardian_active_info = ActivityGuardian::is_guardian($starid);
+                if($guardian_active_info) {
+                    unset($staridList[$key]);
+                    continue;
+                }
+            }
         }
+
+        $staridList = array_slice($staridList,0,5);
 
         return $staridList;
     }

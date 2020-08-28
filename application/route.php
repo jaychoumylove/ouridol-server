@@ -64,6 +64,7 @@ Route::rule('api/:version/star/dynamic', 'api/v1.Star/dynamic');// 动态
 
 // StarRank
 Route::rule('api/:version/star/rank', 'api/v1.StarRank/getRankList');// 明星排名
+Route::rule('api/:version/star/stealRank', 'api/v1.StarRank/getStealRankList');// 偷能量爱豆列表
 Route::rule('api/:version/star/rank/history', 'api/v1.StarRank/getRankHistory');// 明星排名历史
 
 // Banner

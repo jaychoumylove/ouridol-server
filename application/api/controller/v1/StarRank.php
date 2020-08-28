@@ -3,6 +3,7 @@
 namespace app\api\controller\v1;
 
 use app\api\model\UserProp;
+use app\api\model\UserStar;
 use app\base\controller\Base;
 use app\api\model\StarRank as StarRankModel;
 use app\base\service\Common;
@@ -22,50 +23,70 @@ class StarRank extends Base
         $keywords = input('keywords', '');
         $sign = input('sign', 0); // 韩星榜
         $rankField = input('rankField', 'week_hot');
-        $type = input('type', 0);
 
         $list = StarRankModel::getRankList($page, $size, $rankField, $keywords, $sign);
-        if ($type == 1) {
-            // 偷花倒计时
-            $this->getUser();
-            $res = UserExt::get(['user_id' => $this->uid]);
-            // 获取使用偷取多倍卡信息
-            $useCard = UserProp::getMultipleStealCardVar($this->uid);
+        Common::res(['data' => $list]);
+    }
 
-            $stealLimitTime = $useCard ? $useCard['cooling_time'] : Cfg::getCfg('stealLimitTime');
-            $leftTime = json_decode($res['left_time']);
-            foreach ($leftTime as &$value) {
-                $time =  $stealLimitTime - (time() - $value);
-                if ($time < 0) {
-                    $time = 0;
-                }
-                $value = $time;
+    /**明星人气榜单 */
+    public function getStealRankList()
+    {
+        $this->getUser();
+
+        $list = StarRankModel::getRankList(1, 11, 'week_hot', '', 0);
+        // 偷花倒计时
+        $res = UserExt::get(['user_id' => $this->uid]);
+        // 获取使用偷取多倍卡信息
+        $useCard = UserProp::getMultipleStealCardVar($this->uid);
+
+        $stealLimitTime = $useCard ? $useCard['cooling_time'] : Cfg::getCfg('stealLimitTime');
+        $leftTime = json_decode($res['left_time']);
+        foreach ($leftTime as &$t) {
+            $time =  $stealLimitTime - (time() - $t);
+            if ($time < 0) {
+                $time = 0;
             }
-            $spriteLevel = UserSprite::where(['user_id' => $this->uid])->value('sprite_level');
-
-            $stealMultiple = $useCard ? $useCard['multiple'] : Cfg::getCfg('stealCount');
-
-            if(Ext::is_start('is_guardian_active')){
-                foreach ($list as &$value){
-                    $value['guardian_active_info'] = ActivityGuardian::is_guardian($value['star_id']);
-                }
-            }
-
-
-            Common::res(['data' => [
-                'list' => $list,
-                'steal' => $leftTime,
-                'steal_count' => bcmul($stealMultiple, $spriteLevel),
-                'sprite_level' => $spriteLevel,
-                'steal_times' => $res['steal_times'],
-                'steal_times_max' => Cfg::getCfg('steal_limit'),
-                'steal_num' => $res['steal_count'],
-                'steal_num_max' => Star::stealCountLimit($this->uid),
-                'is_automatic_steal' => UserExt::where('user_id', $this->uid)->value('is_automatic_steal'),
-            ]]);
-        } else {
-            Common::res(['data' => $list]);
+            $t = $time;
         }
+        $spriteLevel = UserSprite::where(['user_id' => $this->uid])->value('sprite_level');
+        $star_id = UserStar::where(['user_id' => $this->uid])->value('star_id');
+        $stealMultiple = $useCard ? $useCard['multiple'] : Cfg::getCfg('stealCount');
+        $num = 0;//用作截取数组
+        $index = 0;//判断什么时候截取数组
+        foreach ($list as $key=>$value){
+            if($star_id==$value['star_id']){
+                unset($list[$key]);
+                continue;
+            }
+            //是否开启守护
+            $list[$key]['guardian_active_info'] = '';
+            if(Ext::is_start('is_guardian_active')){
+                $list[$key]['guardian_active_info'] = ActivityGuardian::is_guardian($value['star_id']);
+            }
+            if($index<5){
+                if(!$list[$key]['guardian_active_info']){
+                    $index++;
+                }
+            }else{
+                $num =$key-1;
+                break;
+            }
+        }
+
+        $list = array_slice($list,0,$num);
+
+
+        Common::res(['data' => [
+            'list' => $list,
+            'steal' => $leftTime,
+            'steal_count' => bcmul($stealMultiple, $spriteLevel),
+            'sprite_level' => $spriteLevel,
+            'steal_times' => $res['steal_times'],
+            'steal_times_max' => Cfg::getCfg('steal_limit'),
+            'steal_num' => $res['steal_count'],
+            'steal_num_max' => Star::stealCountLimit($this->uid),
+            'is_automatic_steal' => UserExt::where('user_id', $this->uid)->value('is_automatic_steal')
+        ]]);
     }
 
     public function search()
