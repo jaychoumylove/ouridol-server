@@ -51,13 +51,18 @@ class StarRank extends Base
         $spriteLevel = UserSprite::where(['user_id' => $this->uid])->value('sprite_level');
         $star_id = UserStar::where(['user_id' => $this->uid])->value('star_id');
         $stealMultiple = $useCard ? $useCard['multiple'] : Cfg::getCfg('stealCount');
-        $num = 0;//用作截取数组
-        $index = 0;//判断什么时候截取数组
+
         foreach ($list as $key=>$value){
             if($star_id==$value['star_id']){
                 unset($list[$key]);
                 continue;
             }
+        }
+        $list =array_values($list);
+        $num = 0;//用作截取数组
+        $index = 1;//判断什么时候截取数组
+        foreach ($list as $key=>$value){
+
             //是否开启守护
             $list[$key]['guardian_active_info'] = '';
             if(Ext::is_start('is_guardian_active')){
@@ -68,11 +73,10 @@ class StarRank extends Base
                     $index++;
                 }
             }else{
-                $num =$key-1;
+                $num =$key+1;
                 break;
             }
         }
-
         $list = array_slice($list,0,$num);
 
 
