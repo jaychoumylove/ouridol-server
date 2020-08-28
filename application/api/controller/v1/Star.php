@@ -180,9 +180,9 @@ class Star extends Base
         $stealCount = $stealMultiple * $spriteLevel;
 
         if ($starid) {
+            $index = array_search($starid, $staridList);
             $this->checkTime($stealLimitTime, $index);
             if (!in_array($starid, $staridList)) Common::res(['code' => 1, 'msg' => '不能偷取该爱豆']);
-            $index = array_search($starid, $staridList);
             (new StarService())->steal($starid, $this->uid, $stealCount, $index);
         } else {
             if ($spriteLevel < 5) Common::res(['code' => 1, 'msg' => '精灵达到5级解锁一键偷取']);
