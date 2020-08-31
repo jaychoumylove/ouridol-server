@@ -109,10 +109,10 @@ class UserSprite extends Base
     {
         $this->getUser();
         $res = CfgSprite::group('image')->order('id asc')->select();
-        $star_id = UserStar::where('user_id',$this->uid)->value('star_id');
-        if($star_id!=42){
-            unset($res[1]);
-        }
+//        $star_id = UserStar::where('user_id',$this->uid)->value('star_id');
+//        if($star_id!=42){
+//            unset($res[1]);
+//        }
         Common::res(['data' => $res]);
     }
 
