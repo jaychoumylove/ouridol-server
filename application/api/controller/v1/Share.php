@@ -2,6 +2,7 @@
 
 namespace app\api\controller\v1;
 
+use app\api\model\UserFatherApply;
 use app\base\controller\Base;
 use app\api\model\ShareMass;
 use app\base\service\Common;
@@ -46,7 +47,7 @@ class Share extends Base
         // 加入集结
         $massRerUser = ShareMass::join($rer_user_id, $this->uid);
         // 师徒关系
-        UserFather::joinIt($rer_user_id, $this->uid);
+        UserFatherApply::apply($rer_user_id, $this->uid, $rer_user_id);
 
         Common::res(['data' => [
             'massRerUser' => $massRerUser

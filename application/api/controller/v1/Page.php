@@ -3,6 +3,7 @@
 namespace app\api\controller\v1;
 
 use app\api\model\CfgUserLevel;
+use app\api\model\UserFatherApply;
 use app\api\service\Sms;
 use app\base\controller\Base;
 use app\api\model\User;
@@ -52,7 +53,7 @@ class Page extends Base
             // 加入集结
             $res['massUser'] = ShareMass::join($rer_user_id, $this->uid);
             // 师徒关系
-            UserFather::joinIt($rer_user_id, $this->uid);
+            UserFatherApply::apply($rer_user_id, $this->uid, $rer_user_id);
         }
 
         $res['userInfo'] = User::where(['id' => $this->uid])->field('id,nickname,avatarurl,type,phoneNumber')->find();
