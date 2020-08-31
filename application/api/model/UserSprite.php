@@ -123,7 +123,7 @@ class UserSprite extends Base
                     $userSprite['earn'] = $userSprite['earn'] * 2;
                 }
 
-                $isDoneUpdate = self::where(['user_id' => $uid])->where('settle_time','<=',(time()-15))->update([
+                $isDoneUpdate = self::where(['user_id' => $uid])->where('settle_time','>=',(time()-15))->update([
                     'settle_time' => time() - 5,
                     'total_coin' => Db::raw('total_coin+' . $userSprite['earn'])
                 ]);
