@@ -4,6 +4,7 @@ namespace app\api\controller\v1;
 
 use app\api\model\CfgSprite;
 use app\api\model\UserSpriteBg;
+use app\api\model\UserStar;
 use app\base\controller\Base;
 use app\api\model\UserSprite as UserSpriteModel;
 use app\base\service\Common;
@@ -108,6 +109,10 @@ class UserSprite extends Base
     {
         $this->getUser();
         $res = CfgSprite::group('image')->order('id asc')->select();
+        $star_id = UserStar::where('user_id',$this->uid)->value('star_id');
+        if($star_id!=42){
+            unset($res[1]);
+        }
         Common::res(['data' => $res]);
     }
 
