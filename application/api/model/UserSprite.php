@@ -272,7 +272,7 @@ class UserSprite extends Base
         $myInfo['daycoin'] = self::where('user_id',$uid)->value($rankField);
         $myInfo['rank'] = (self::where($rankField,'>',$myInfo['daycoin'])->order($rankField . ' desc,sprite_level desc')->count())+1;
 
-        $banner = 'https://mmbiz.qpic.cn/mmbiz_png/w5pLFvdua9E69pHJIdb31PXQySxuBibtqxrQmowuh5Wju6v13rPOF1ttZJ2PvXdokxFicqrWvuRibXnaUKDtXMDicQ/0';
+        $banner = 'https://mmbiz.qpic.cn/mmbiz_png/w5pLFvdua9Fic6VmPQYib2ktqATmSxJmUtTRHayiaO4WCy862Re6icogxOIELW9bFtWZIFRC7dpvw0KZbHDNOGxw9A/0';
 
         return ['list'=>$list,'myInfo'=>$myInfo,'banner'=>$banner];
     }
