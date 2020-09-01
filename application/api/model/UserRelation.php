@@ -2,6 +2,7 @@
 
 namespace app\api\model;
 
+use app\api\controller\v1\Ext;
 use app\base\model\Base;
 use app\base\service\Common;
 use think\Db;
@@ -40,6 +41,7 @@ class UserRelation extends Base
     public static function inviteOld($ral_user_id, $rer_user_id)
     {
         if ($ral_user_id == $rer_user_id) return;
+        if(!Ext::is_start('is_invite_active')) return;
         $create_time = Rec::where('type',2)->where('user_id',$ral_user_id)->order('create_time desc')->value('create_time');
         Db::startTrans();
         try {
@@ -79,21 +81,22 @@ class UserRelation extends Base
             $isDone = self::where(['ral_user_id' => $uid])->update(['status' => 1]);
 
             if ($isDone) {
-                //拉新用户加电量
-                $isDone = UserExt::where('user_id', $relation['rer_user_id'])->update([
-                    'get_new_invite_energy' => Db::raw('get_new_invite_energy+3'),
-                    'last_invite_add_time' => time(),
-                ]);
-                if($isDone){
-                    UserInviteActive::create([
-                        'user_id' => $relation['rer_user_id'],
-                        'usered_id' => $uid,
-                        'type' => 1,
-                        'num' => 3,
-                        'create_date' => date('Y-m-d'),
+                if(Ext::is_start('is_invite_active')){
+                    //拉新用户加电量
+                    $isDone = UserExt::where('user_id', $relation['rer_user_id'])->update([
+                        'get_new_invite_energy' => Db::raw('get_new_invite_energy+3'),
+                        'last_invite_add_time' => time(),
                     ]);
+                    if($isDone){
+                        UserInviteActive::create([
+                            'user_id' => $relation['rer_user_id'],
+                            'usered_id' => $uid,
+                            'type' => 1,
+                            'num' => 3,
+                            'create_date' => date('Y-m-d'),
+                        ]);
+                    }
                 }
-
             }
 
             $rerType = User::where('id', $relation['rer_user_id'])->value('type');
