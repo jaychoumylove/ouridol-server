@@ -81,7 +81,7 @@ class UserFatherApply extends Base
                 ]);
             } elseif ($status == 1) { // 允许
                 if ($info['father'] == $uid) {
-                    self::where('father', $uid)->delete();
+                    self::where('id', $id)->delete();
                     $res = UserFather::joinIt($uid, $info['son']);
                 }elseif ($info['son'] == $uid) {
                     self::where('son', $uid)->delete();
