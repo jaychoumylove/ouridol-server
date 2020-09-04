@@ -89,13 +89,13 @@ class UserSprite extends Base
         //前十级等级提示
         $item['next_sprite_level'] = CfgSprite::where(['level' => $item['sprite_level']+1])->value('level');
         if($item['sprite_level']<5){
-            $total_need_stone = CfgSprite::where('level','<',5)->where('level','>=',$item['sprite_level'])->sum('need_stone');
+            $total_need_stone = CfgSprite::where('level','<=',5)->where('level','>=',$item['sprite_level'])->sum('need_stone');
             $item['tips_text'] = '到Lv.5还需'.$total_need_stone.'灵丹';
         }elseif ($item['sprite_level']<10){
-            $total_need_stone = CfgSprite::where('level','<',10)->where('level','>=',$item['sprite_level'])->sum('need_stone');
+            $total_need_stone = CfgSprite::where('level','<=',10)->where('level','>=',$item['sprite_level'])->sum('need_stone');
             $item['tips_text'] = '到Lv.10还需'.$total_need_stone.'灵丹';
         }elseif ($item['sprite_level']<30){
-            $total_need_stone = CfgSprite::where('level','<',30)->where('level','>=',$item['sprite_level'])->sum('need_stone');
+            $total_need_stone = CfgSprite::where('level','<=',30)->where('level','>=',$item['sprite_level'])->sum('need_stone');
             $item['tips_text'] = '到Lv.30还需'.$total_need_stone.'灵丹，可守护爱豆';
         }
 
