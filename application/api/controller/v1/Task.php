@@ -100,12 +100,5 @@ class Task extends Base
         ]]);
     }
 
-    public function badgeUse()
-    {
-        $badgeId = $this->req('badge_id', 'integer');
 
-        $this->getUser();
-        CfgBadge::badgeUse($badgeId, $this->uid);
-        Common::res();
-    }
 }

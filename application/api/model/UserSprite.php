@@ -260,6 +260,7 @@ class UserSprite extends Base
             $list = self::with('User')->where($rankField, '>', 0)->field('id,user_id,thisday_coin,lastday_coin')->order($rankField . ' desc,sprite_level desc')
                 ->page($page, $size)->select();
             foreach ($list as &$value) {
+                $value['headwear'] = UserHeadwear::getUse($value['user_id']);
                 $star_id = UserStar::where('user_id', $value['user_id'])->value('star_id');
                 if($star_id){
                     $value['starname'] = Star::where('id', $star_id)->value('name');

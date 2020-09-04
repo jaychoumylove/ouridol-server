@@ -61,6 +61,7 @@ class AutoRun extends Base
                 'get_new_invite_energy' => 0,
                 'get_old_invite_energy' => 0,
                 'invite_energy' => 0,
+                'lastday_father_get_count' => Db::raw('father_get_count'),
                 'father_get_count' => 0,
             ]);
             // 用户每日产量排行清空,膜拜和被膜拜次数重置

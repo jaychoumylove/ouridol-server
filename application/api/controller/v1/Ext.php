@@ -3,6 +3,7 @@
 namespace app\api\controller\v1;
 
 use app\api\model\ActiveYingyuan;
+use app\api\model\UserHeadwear;
 use app\base\controller\Base;
 use app\api\model\RecUserFormid;
 use app\base\service\Common;
@@ -268,6 +269,9 @@ class Ext extends Base
             ->order (['sup_num'=>'desc','create_time'=>'desc'])
             ->page ($page, $size)
             ->select ();
+        foreach ($list as &$value){
+            $value['user']['headwear'] = UserHeadwear::getUse($value['user_id']);
+        }
 
         Common::res (['data' => $list]);
     }

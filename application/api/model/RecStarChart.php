@@ -49,6 +49,7 @@ class RecStarChart extends Base
         foreach ($list as &$value) {
             $totalCount = $value['user']['user_star']['total_count'];
             $value['user']['level'] = CfgUserLevel::where('total', '<=', $totalCount)->max('level');
+            $value['user']['headwear'] = UserHeadwear::getUse($value['user_id']);
         }
 
         return array_reverse($list);
@@ -112,6 +113,7 @@ class RecStarChart extends Base
 
             $totalCount = $res['user']['user_star']['total_count'];
             $res['user']['level'] = CfgUserLevel::where('total', '<=', $totalCount)->max('level');
+            $res['user']['headwear'] = UserHeadwear::getUse($uid);
 
             // 如果是新用户,群主默认回复一段话
             //if ($client_id) self::GrouperSayHello($starid, $uid);

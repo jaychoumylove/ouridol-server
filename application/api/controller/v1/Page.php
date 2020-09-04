@@ -4,6 +4,7 @@ namespace app\api\controller\v1;
 
 use app\api\model\CfgUserLevel;
 use app\api\model\UserFatherApply;
+use app\api\model\UserHeadwear;
 use app\api\service\Sms;
 use app\base\controller\Base;
 use app\api\model\User;
@@ -57,6 +58,7 @@ class Page extends Base
         }
 
         $res['userInfo'] = User::where(['id' => $this->uid])->field('id,nickname,avatarurl,type,phoneNumber')->find();
+        $res['userInfo']['curHeadwear'] = UserHeadwear::getUse($this->uid);
         $res['userCurrency'] = UserCurrency::getCurrency($this->uid);
         $res['userExt'] = UserExt::where('user_id', $this->uid)->field('is_join_wxgroup')->find();
 

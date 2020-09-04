@@ -183,9 +183,9 @@ class UserRelation extends Base
 
                     $checkTimeInfo = UserTreasureBox::checkTime();
                     $res[$k]['treasure_box_count'] = 5-(UserTreasureBox::where('user_id', $val['user']['id'])->where('index','<>',0)->where('create_date_hour',$checkTimeInfo['date'])->count());
+                    $res[$k]['headwear'] = UserHeadwear::getUse($val['user']['id']);
 
-
-                    // 排序
+                        // 排序
                     $sort[$k] = $val['intimacy'];
                 }
                 array_multisort($sort, SORT_DESC, $res);
@@ -204,6 +204,8 @@ class UserRelation extends Base
                 foreach ($res as $key => &$value) {
                     $value['user_star'] = $value['user']['user_star'];
                     $value['user_earn'] = ceil(Cfg::getCfg('father_earn_per') * $value['user_star']['thisday_count']);
+
+                    $value['headwear'] = UserHeadwear::getUse($value['user']['id']);
                     // 排序
                     $sort[$key] = $value['user_star']['thisday_count'];
                 }

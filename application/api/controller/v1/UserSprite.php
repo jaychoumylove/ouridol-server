@@ -126,46 +126,6 @@ class UserSprite extends Base
         Common::res();
     }
 
-    //背景列表
-    public function sprite_bg_list()
-    {
-        $this->getUser();
-
-        $res = UserSpriteBg::getAll($this->uid);
-
-        Common::res(['data' => $res]);
-    }
-
-    //使用背景
-    public function sprite_bg_use()
-    {
-        $this->getUser();
-        $id = $this->req('id', 'integer','0');
-
-        UserSpriteBg::useIt($this->uid,$id);
-        Common::res([]);
-    }
-
-    //背景购买
-    public function sprite_bg_buy()
-    {
-        $this->getUser();
-        $id = $this->req('id', 'integer','0');
-
-        UserSpriteBg::buyIt($this->uid,$id);
-        Common::res([]);
-    }
-
-    //背景解锁
-    public function sprite_bg_unlock()
-    {
-        $this->getUser();
-        $id = $this->req('id', 'integer','0');
-
-        UserSpriteBg::unlockIt($this->uid,$id);
-        Common::res([]);
-    }
-
     //精灵背景上传头像
     public function sprite_bg_upload_img()
     {

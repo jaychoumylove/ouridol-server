@@ -141,11 +141,14 @@ Route::rule('api/:version/sprite/getHandBook', 'api/v1.UserSprite/getHandBook');
 Route::rule('api/:version/sprite/switchImage', 'api/v1.UserSprite/switchImage');// 精灵换肤
 
 //精灵背景
-Route::rule('api/:version/sprite/sprite_bg_list', 'api/v1.UserSprite/sprite_bg_list');//精灵背景列表
-Route::rule('api/:version/sprite/sprite_bg_use', 'api/v1.UserSprite/sprite_bg_use');// 精灵背景使用
-Route::rule('api/:version/sprite/sprite_bg_buy', 'api/v1.UserSprite/sprite_bg_buy');// 精灵背景购买
-Route::rule('api/:version/sprite/sprite_bg_unlock', 'api/v1.UserSprite/sprite_bg_unlock');// 精灵背景解锁
 Route::rule('api/:version/sprite/sprite_bg_upload_img', 'api/v1.UserSprite/sprite_bg_upload_img');// 精灵背景上传头像
+
+// DressUp
+Route::rule('api/:version/dressUp/select', 'api/v1.DressUp/select'); // 装扮列表
+Route::rule('api/:version/dressUp/buy', 'api/v1.DressUp/buy'); // 装扮购买
+Route::rule('api/:version/dressUp/use', 'api/v1.DressUp/useIt'); // 装扮使用
+Route::rule('api/:version/dressUp/cancel', 'api/v1.DressUp/cancel'); // 装扮取消使用
+Route::rule('api/:version/dressUp/unlock', 'api/v1.DressUp/unlock');// 解锁
 
 // Pay
 Route::rule('api/:version/pay/order', 'api/v1.Payment/order');// 支付下单
@@ -159,8 +162,7 @@ Route::rule('api/:version/prop/exchange', 'api/v1.Prop/exchange');// 灵丹兑�
 Route::rule('api/:version/task', 'api/v1.Task/index');// 任务
 Route::rule('api/:version/task/settle', 'api/v1.Task/settle');// 任务领取
 Route::rule('api/:version/task/weibo', 'api/v1.Task/weibo');// 提交微博链接
-Route::rule('api/:version/sharetext', 'api/v1.Task/sharetext');// 分享文字 
-Route::rule('api/:version/badge/use', 'api/v1.Task/badgeUse');// 徽章使用
+Route::rule('api/:version/sharetext', 'api/v1.Task/sharetext');// 分享文字
 
 // Ext
 Route::rule('api/:version/config', 'api/v1.Ext/config');// 配置信息
@@ -246,3 +248,8 @@ Route::rule('api/:version/active/invite_user_log', 'api/v1.ActiveInvite/invite_u
 Route::rule('api/:version/active/guardian_info', 'api/v1.ActivityGuardian/getList');// 守护列表信息
 Route::rule('api/:version/active/guardian_star', 'api/v1.ActivityGuardian/guardian');// 开始守护
 Route::rule('api/:version/active/guardian_rank', 'api/v1.ActivityGuardian/rankList');// 守护排行
+
+//Route::rule('api/:version/active/get_marry_list', 'api/v1.ActivityMarry/getList');// 结婚历程列表
+//Route::rule('api/:version/active/get_marry_reward', 'api/v1.ActivityMarry/getReward');// 获取结婚历程等级奖励
+//Route::rule('api/:version/active/agree_marry', 'api/v1.ActivityMarry/agreeMarry');// 同意求婚
+//Route::rule('api/:version/active/divorce', 'api/v1.ActivityMarry/divorce');// 离婚

@@ -2,6 +2,7 @@
 
 namespace app\api\model;
 
+use app\api\controller\v1\Ext;
 use think\Model;
 use app\base\model\Base;
 use app\base\service\Common;
@@ -82,6 +83,12 @@ class UserFather extends Base
         $cur_contribute = (new UserFather())->readMaster()->where(['father' => $father, 'son' => $son])->value('cur_contribute');
         $earn = floor($cur_contribute * Cfg::getCfg('father_earn_per'));
         if ($earn) {
+
+            //教师节活动，双倍领取徒弟收益
+            if(Ext::is_start('is_teacher_active')){
+                $earn = $earn * 2 ;
+            }
+
             // 收益
             Db::startTrans();
             try {

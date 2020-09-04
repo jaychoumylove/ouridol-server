@@ -3,6 +3,7 @@
 namespace app\api\controller\v1;
 
 use app\api\model\RecReport;
+use app\api\model\UserHeadwear;
 use app\base\controller\Base;
 use app\api\model\User as UserModel;
 use app\base\service\Common;
@@ -151,6 +152,8 @@ class User extends Base
         $res['userStar'] = UserStar::where('user_id', $uid)->field('total_count,thismonth_count,thisweek_count')->find();
         $res['sprite_level'] = UserSprite::where('user_id', $uid)->value('sprite_level');
         $res['level'] = CfgUserLevel::where('total', '<=', $res['userStar']['total_count'])->max('level');
+        $res['curHeadwear'] = UserHeadwear::getUse($uid);
+
         Common::res(['data' => $res]);
     }
 
