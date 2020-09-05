@@ -37,6 +37,11 @@ class UserFather extends Base
         $data['earn'] = Rec::where(['type' => 5, 'user_id' => $uid])->whereTime('create_time', 'd')->sum('coin');
         $father_uid = self::where('son', $uid)->value('father');
         $data['father'] = User::where('id', $father_uid)->value('nickname');
+        //教师节活动，双倍领取徒弟收益
+        $data['is_teacher_active'] = false ;
+        if(Ext::is_start('is_teacher_active')){
+            $data['is_teacher_active'] = true ;
+        }
         return $data;
     }
 
