@@ -112,20 +112,9 @@ class UserHeadwear extends Base
             case 'unlock'://解锁
                 if ($check['type'] != 2) Common::res(['code' => 1, 'msg' => '不能解锁该头饰']);
 
-                if ($id == 1) {
-                    if(!Ext::is_start('is_teacher_active')) Common::res(['code' => 1, 'msg' => '活动已结束']);
 
-                    //1、师傅每日收益排行前三的用户获得【最美师父】绝版头饰
-                    $lastday_father_get_count = UserExt::where(['user_id' => $uid])->value('lastday_father_get_count');
-                    $lastday_rank = (UserExt::where('lastday_father_get_count', '>', $lastday_father_get_count)->order('lastday_father_get_count desc,father_get_time desc')->count()) + 1;
-                    if ($lastday_father_get_count==0 || $lastday_rank > 3) Common::res(['code' => 1, 'msg' => '未满足解锁条件']);
-                } else if ($id == 2) {
-                    if(!Ext::is_start('is_teacher_active')) Common::res(['code' => 1, 'msg' => '活动已结束']);
-
-                    //2、精灵产量收益排行榜前十的用户获得【大神】绝版头饰
-                    $lastday_coin = UserSprite::where(['user_id' => $uid])->value('lastday_coin');
-                    $lastday_rank = (UserSprite::where('lastday_coin', '>', $lastday_coin)->order('lastday_coin desc,sprite_level desc')->count()) + 1;
-                    if ($lastday_coin==0 || $lastday_rank > 10) Common::res(['code' => 1, 'msg' => '未满足解锁条件']);
+                if($id<=21){
+                    self::teacherActive($id,$uid);
                 } else {
                     Common::res(['code' => 1, 'msg' => '不能解锁该头饰']);
                 }
@@ -137,5 +126,26 @@ class UserHeadwear extends Base
         }
     }
 
+    public static function teacherActive($id,$uid)
+    {
+
+        if(!Ext::is_start('is_teacher_active')) Common::res(['code' => 1, 'msg' => '活动已结束']);
+
+        if ($id == 1) {
+            //1、师傅每日收益排行前三的用户获得【最美师父】绝版头饰
+            $lastday_father_get_count = UserExt::where(['user_id' => $uid])->value('lastday_father_get_count');
+            $lastday_rank = (UserExt::where('lastday_father_get_count', '>', $lastday_father_get_count)->order('lastday_father_get_count desc,father_get_time desc')->count()) + 1;
+            if ($lastday_father_get_count==0 || $lastday_rank > 3) Common::res(['code' => 1, 'msg' => '未满足解锁条件']);
+        } else if ($id == 2) {
+            //2、精灵产量收益排行榜前十的用户获得【大神】绝版头饰
+            $lastday_coin = UserSprite::where(['user_id' => $uid])->value('lastday_coin');
+            $lastday_rank = (UserSprite::where('lastday_coin', '>', $lastday_coin)->order('lastday_coin desc,sprite_level desc')->count()) + 1;
+            if ($lastday_coin==0 || $lastday_rank > 10) Common::res(['code' => 1, 'msg' => '未满足解锁条件']);
+        } else {
+            $need_count = CfgHeadwear::where(['id' => $id])->value('need_stone');//在活动里该字段可任意代表其他数量
+            $thisweek_count = UserStar::where(['user_id' => $uid])->value('thisweek_count');
+            if ($need_count > $thisweek_count) Common::res(['code' => 1, 'msg' => '未满足解锁条件，周贡献需达到'.$need_count]);
+        }
+    }
 
 }
