@@ -2,6 +2,8 @@
 
 namespace app\api\controller\v1;
 
+use app\api\model\UserCurrency;
+use app\api\model\UserItem;
 use app\base\controller\Base;
 use app\base\service\alipay\request\AlipayTradeWapPayRequest;
 use app\base\service\AliPayApi;
@@ -35,6 +37,8 @@ class Payment extends Base
                 $star_id = UserStar::getStarId($user_id);
                 $birthday = Star::where('id', $star_id)->value('birthday');
                 $res['item_double'] = $birthday == date('md');
+                $res['currency'] = UserCurrency::getCurrency($user_id);
+                $res['gift_num'] = UserItem::where(['uid' => $user_id])->sum('count');
             }
         }
 
