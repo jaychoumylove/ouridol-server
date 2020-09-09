@@ -137,9 +137,9 @@ class User extends Base
 
     public function getInfo()
     {
-        $this->getUser();
         $uid = input('user_id', null);
         if (!$uid) {
+            $this->getUser();
             $uid = $this->uid;
         }
 
