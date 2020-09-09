@@ -52,7 +52,7 @@ class Payment extends Base
         $goodsNum = input('goods_num', 1); // 商品数量
         $user_id = input('user_id', 0); // 代充值uid
         $type = input('type', 0); // 购买类型
-        $pay_type = input('pay_type', 'WECHAT_PAY'); // 购买类型
+        $pay_type = input('pay_type', 'wechat_pay'); // 购买类型
         if ($user_id == $this->uid) $user_id = 0;
         if (!$goodsId) Common::res(['code' => 100]);
         if($user_id!=0){
@@ -72,7 +72,7 @@ class Payment extends Base
         $goods = PayGoods::getInfo($this->uid, $goodsId, $goodsNum, $type);
         // 总价
         $totalFee = $goods['fee'] * $goodsNum;
-        if ($pay_type == 'WECHAT_PAY') {
+        if ($pay_type == 'wechat_pay') {
             // 下单
             $order = RecPayOrder::create([
                 'id' => date('YmdHis') . mt_rand(1000, 9999),
@@ -97,7 +97,7 @@ class Payment extends Base
             (new WxPayService())->returnFront($res);
         }
 
-        if ($pay_type == 'ALI_PAI') {
+        if ($pay_type == 'ali_pay') {
             $totalFee = number_format($totalFee, 2);
 
             $aop = AliPayApi::getInstance();
