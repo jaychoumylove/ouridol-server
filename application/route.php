@@ -153,6 +153,7 @@ Route::rule('api/:version/dressUp/unlock', 'api/v1.DressUp/unlock');// 解锁
 // Pay
 Route::rule('api/:version/pay/order', 'api/v1.Payment/order');// 支付下单
 Route::rule('api/:version/pay/notify', 'api/v1.Payment/notify');// 支付通知
+Route::rule('api/:version/pay/alipaynotify', 'api/v1.Payment/alipayNotify');// 支付通知
 Route::rule('api/:version/pay/goods', 'api/v1.Payment/goods');// 商品列表
 
 // Props
