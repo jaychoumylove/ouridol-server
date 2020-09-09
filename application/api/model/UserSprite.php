@@ -77,7 +77,13 @@ class UserSprite extends Base
 
         //使用中的精灵
         if(!$item['sprite_img']){
-            $item['sprite_img'] = CfgSprite::where(['level' => $item['sprite_level']])->value('image');
+            $star_id = UserStar::where('user_id',$uid)->value('star_id');
+            if($star_id!=42 && $item['sprite_level']==2){
+                $item['sprite_img'] = CfgSprite::where(['level' => $item['sprite_level']-1])->value('image');
+            }else{
+                $item['sprite_img'] = CfgSprite::where(['level' => $item['sprite_level']])->value('image');
+
+            }
         }
         //使用中的精灵背景
         if(!$item['sprite_bg_id']){
@@ -122,6 +128,11 @@ class UserSprite extends Base
                     // 双倍领取当次收益
                     $userSprite['earn'] = $userSprite['earn'] * 2;
                 }
+
+//                // 结婚活动，蜜月期双倍领取当次收益
+//                if(UserMarry::is_honeymoon($uid)){
+//                    $userSprite['earn'] = $userSprite['earn'] * 2;
+//                }
 
                 $total_coin = $userSprite['total_coin'];
                 $isDoneUpdate = self::where(['user_id' => $uid])->where('settle_time','<=',(time()-15))
