@@ -53,6 +53,13 @@ class Payment extends Base
         $user_id = input('user_id', 0); // 代充值uid
         $type = input('type', 0); // 购买类型
         $pay_type = input('pay_type', 'wechat_pay'); // 购买类型
+        if ($pay_type == 'ali_pay') {
+            $user_id = (int)$user_id;
+            if (empty($user_id)) {
+                Common::res(['code' => 1, 'msg' => '请选择充值用户']);
+            }
+        }
+
         if ($user_id == $this->uid) $user_id = 0;
         if (!$goodsId) Common::res(['code' => 100]);
         if($user_id!=0){
