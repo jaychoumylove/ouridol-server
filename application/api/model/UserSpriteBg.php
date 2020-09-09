@@ -2,6 +2,7 @@
 
 namespace app\api\model;
 
+use app\api\controller\v1\Ext;
 use app\api\service\User;
 use app\base\model\Base;
 use app\base\service\Common;
@@ -118,6 +119,11 @@ class UserSpriteBg extends Base
                     $sprite_info= UserSprite::where(['user_id' => $uid])->field('sprite_level,lastday_coin')->find();
                     $lastday_rank = (UserSprite::where('lastday_coin','>',$sprite_info['lastday_coin'])->order('lastday_coin desc,sprite_level desc')->count())+1;
                     if($invite_energy<15 && $sprite_info['sprite_level']<15 && $lastday_rank>100)Common::res(['code' => 1, 'msg' => '未满足解锁条件']);
+                }elseif ($id==11){
+                    if(!Ext::is_start('is_teacher_active')) Common::res(['code' => 1, 'msg' => '活动已结束']);
+                    $lastday_father_get_count= UserExt::where(['user_id' => $uid])->value('lastday_father_get_count');
+                    $lastday_rank = (UserExt::where('lastday_father_get_count', '>', $lastday_father_get_count)->order('lastday_father_get_count desc,father_get_time desc')->count()) + 1;
+                    if($lastday_rank>100)Common::res(['code' => 1, 'msg' => '未满足解锁条件']);
                 }
 
                 break;
