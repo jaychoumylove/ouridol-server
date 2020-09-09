@@ -22,11 +22,21 @@ class Payment extends Base
     {
         $res['list'] = PayGoods::with('Item')->where('1=1')->select();
 
-        // 明星生日福利
-        $this->getUser();
-        $star_id = UserStar::getStarId($this->uid);
-        $birthday = Star::where('id', $star_id)->value('birthday');
-        $res['item_double'] = $birthday == date('md');
+        $platform = input('platform', 'MP-WEIXIN');
+        if ($platform != 'H5-OTHER') {
+            // 明星生日福利
+            $this->getUser();
+            $star_id = UserStar::getStarId($this->uid);
+            $birthday = Star::where('id', $star_id)->value('birthday');
+            $res['item_double'] = $birthday == date('md');
+        } else {
+            $user_id = input('user_id', false);
+            if ($user_id&&(int)$user_id) {
+                $star_id = UserStar::getStarId($user_id);
+                $birthday = Star::where('id', $star_id)->value('birthday');
+                $res['item_double'] = $birthday == date('md');
+            }
+        }
 
         Common::res(['data' => $res]);
     }
