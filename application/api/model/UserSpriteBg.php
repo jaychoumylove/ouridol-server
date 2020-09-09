@@ -123,7 +123,7 @@ class UserSpriteBg extends Base
                     if(!Ext::is_start('is_teacher_active')) Common::res(['code' => 1, 'msg' => '活动已结束']);
                     $lastday_father_get_count= UserExt::where(['user_id' => $uid])->value('lastday_father_get_count');
                     $lastday_rank = (UserExt::where('lastday_father_get_count', '>', $lastday_father_get_count)->order('lastday_father_get_count desc,father_get_time desc')->count()) + 1;
-                    if($lastday_rank>100)Common::res(['code' => 1, 'msg' => '未满足解锁条件']);
+                    if($lastday_father_get_count>0 && $lastday_rank>100)Common::res(['code' => 1, 'msg' => '未满足解锁条件']);
                 }
 
                 break;
