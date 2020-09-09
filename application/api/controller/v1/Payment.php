@@ -47,24 +47,26 @@ class Payment extends Base
      */
     public function order()
     {
-        $this->getUser();
         $goodsId = input('goods_id'); // 商品id
         $goodsNum = input('goods_num', 1); // 商品数量
-        $user_id = input('user_id', 0); // 代充值uid
+        $target_user_id = input('user_id', 0); // 代充值uid
         $type = input('type', 0); // 购买类型
         $pay_type = input('pay_type', 'wechat_pay'); // 购买类型
         if ($pay_type == 'ali_pay') {
-            $user_id = (int)$user_id;
+            $user_id = (int)$target_user_id;
             if (empty($user_id)) {
                 Common::res(['code' => 1, 'msg' => '请选择充值用户']);
             }
+        } else {
+            $this->getUser();
+            $user_id = $this->uid;
         }
 
-        if ($user_id == $this->uid) $user_id = 0;
+        if ($user_id == $target_user_id) $target_user_id = 0;
         if (!$goodsId) Common::res(['code' => 100]);
-        if($user_id!=0){
-            $uid_platform = User::where(['id' => $user_id])->value('platform');
-            $self_platform = User::where(['id' => $this->uid])->value('platform');
+        if($target_user_id!=0){
+            $uid_platform = User::where(['id' => $target_user_id])->value('platform');
+            $self_platform = User::where(['id' => $user_id])->value('platform');
             if($uid_platform != $self_platform){
                 if($uid_platform == 'MP-WEIXIN' && $self_platform == 'MP-QQ'){
                     Common::res(['code' => 1, 'msg' => '不能给微信用户充值']);
@@ -76,21 +78,21 @@ class Payment extends Base
 
 
         // 商品
-        $goods = PayGoods::getInfo($this->uid, $goodsId, $goodsNum, $type);
+        $goods = PayGoods::getInfo($user_id, $goodsId, $goodsNum, $type);
         // 总价
         $totalFee = $goods['fee'] * $goodsNum;
+        // 下单
+        $order = RecPayOrder::create([
+            'id' => date('YmdHis') . mt_rand(1000, 9999),
+            'user_id' => $user_id,
+            'total_fee' => $totalFee,
+            'coin' => isset($goods['coin']) ? $goods['coin'] : 0,
+            'stone' => isset($goods['stone']) ? $goods['stone'] : 0,
+            'item_id' => isset($goods['item_id']) ? $goods['item_id'] : 0,
+            'goods_info' => json_encode($goods, JSON_UNESCAPED_UNICODE), // 商品信息
+            'friend_uid' => $target_user_id,
+        ]);
         if ($pay_type == 'wechat_pay') {
-            // 下单
-            $order = RecPayOrder::create([
-                'id' => date('YmdHis') . mt_rand(1000, 9999),
-                'user_id' => $this->uid,
-                'total_fee' => $totalFee,
-                'coin' => isset($goods['coin']) ? $goods['coin'] : 0,
-                'stone' => isset($goods['stone']) ? $goods['stone'] : 0,
-                'item_id' => isset($goods['item_id']) ? $goods['item_id'] : 0,
-                'goods_info' => json_encode($goods, JSON_UNESCAPED_UNICODE), // 商品信息
-                'friend_uid' => $user_id,
-            ]);
             // 预支付
             $res = (new WxAPI())->unifiedorder([
                 'body' => $goods['title'], // 支付标题
@@ -98,7 +100,7 @@ class Payment extends Base
                 'totalFee' => $totalFee, // 支付金额
                 'notifyUrl' => 'https://' . $_SERVER['HTTP_HOST'] . '/api/v1/pay/notify', // 支付成功通知url
                 'tradeType' => 'JSAPI', // 支付类型
-                'openid' => User::where('id', $this->uid)->value('openid'), // 用户openid
+                'openid' => User::where('id', $user_id)->value('openid'), // 用户openid
             ]);
             // 处理预支付数据
             (new WxPayService())->returnFront($res);
