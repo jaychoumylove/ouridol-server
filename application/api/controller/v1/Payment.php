@@ -111,7 +111,7 @@ class Payment extends Base
         }
 
         if ($pay_type == 'ali_pay') {
-            $totalFee = number_format($totalFee, 2);
+            $totalFee = number_format($totalFee, 2, '.', '');
 
             $aop = AliPayApi::getInstance();
 
